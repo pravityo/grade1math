@@ -197,3 +197,19 @@ figure.ill.seq .arr,.cyc .arr{color:var(--pri);font-size:1.6rem;font-weight:800}
 .subj-progress{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin:8px 0 24px}
 .meter{height:12px;border-radius:99px;background:var(--pri2);overflow:hidden;margin:6px 0}
 .meter i{display:block;height:100%;background:var(--pri)}.meter i.eng{background:#0f9d8a}.meter i.sci{background:#e0862b}
+
+/* learn: deeper explanation */
+.deep{margin:34px 0;padding:22px 24px;border-radius:16px;background:color-mix(in srgb,var(--pri2) 45%,var(--card));border:2px solid var(--line)}
+.deep h3{margin:0 0 .6em;font-size:1.2rem}
+.deep p{margin:0 0 1em}
+.deep ol,.deep ul{margin:0;padding-left:1.3em}
+.deep li{margin:.55em 0}
+.deep.worked{background:color-mix(in srgb,var(--c) 10%,var(--card))}
+.deep.watch{background:color-mix(in srgb,var(--gold) 14%,var(--card))}
+.deep.talk{background:color-mix(in srgb,var(--b) 10%,var(--card))}
+.wordlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.word{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:10px 14px;line-height:1.4}
+.word b{display:block;color:var(--pri)}
+.word span{font-size:.95rem}
+.deep.links li a{font-weight:700;color:var(--pri)}
+@media(max-width:560px){.deep{padding:18px 16px}}

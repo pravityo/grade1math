@@ -53,3 +53,10 @@ authoring helpers in `js/data/helpers.js` (`MC`, `TP`, `LS`) and illustration to
 (`cards, seq, cycle, table, sentence, blend, states, plant, magnet, shadow, planets, moon, circuit, lever`).
 Home shows a daily plan (Maths every weekday, plus English on Mon/Wed/Fri or Science on Tue/Thu; change it in Parent corner).
 Run `node tests/data.test.js` to validate all lesson data.
+
+## Learn tab depth and outside resources
+
+Each lesson's Learn tab also shows: an "Explain it more" section, a worked example, common mistakes, talk prompts and vocabulary
+(`js/data/deep-*.js`, keyed by lesson id) and free outside resources (`js/data/links.js`, found by web search). Lesson ids are
+`0`-`39` (maths), `e0`-`e39` (English) and `s0`-`s39` (science). `node tests/data.test.js` checks every lesson has both.
+Outside links are not verified by the tests and can change, so re-check them occasionally.

@@ -240,6 +240,24 @@
     app(frag);
   }
 
+  /* Longer explanation, worked example, common mistakes, talk prompts and vocabulary (js/data/deep-*.js). */
+  function deepSections(L, body) {
+    const d = (window.DEEP || {})[L.id]; if (!d) return;
+    const sec = (cls, title, ...kids) => body.append(h('section', { class: 'deep ' + cls }, h('h3', {}, title), ...kids));
+    sec('why', '🔍 Explain it more', d.why.map(p => h('p', { html: p })));
+    sec('worked', '✍️ Try it step by step: ' + d.worked.t, h('ol', {}, d.worked.s.map(t => h('li', { html: t }))));
+    sec('watch', '⚠️ Watch out for', h('ul', {}, d.watch.map(t => h('li', { html: t }))));
+    sec('talk', '🗣️ Talk about it', h('ul', {}, d.talk.map(t => h('li', { html: t }))));
+    sec('words', '📖 Words to know', h('div', { class: 'wordlist' }, d.words.map(w => h('div', { class: 'word' }, h('b', {}, w[0]), h('span', {}, w[1])))));
+  }
+  /* Free outside resources found by web search (js/data/links.js). */
+  function linkSection(L, body) {
+    const ls = (window.LINKS || {})[L.id]; if (!ls || !ls.length) return;
+    body.append(h('section', { class: 'deep links' }, h('h3', {}, '🔗 Explore more (free websites)'),
+      h('ul', {}, ls.map(x => h('li', {}, h('a', { href: x[1], target: '_blank', rel: 'noopener noreferrer' }, x[0]), h('span', { class: 'muted' }, ' · ' + x[2])))),
+      h('p', { class: 'muted small' }, 'These are outside websites. A grown-up should open them first. Some pages have adverts, and pages can change or move.')));
+  }
+
   function viewLesson(id) {
     setNav('home');
     const L = BYID[id]; if (!L) return go('#/');
@@ -273,8 +291,10 @@
           body.append(h('div', { class: 'learn-p', html: vis(p) }));
           pics.filter(x => x[0] === i).forEach(x => body.append(h('div', { html: vis(x[1]) })));
         });
+        deepSections(L, body);
         body.append(h('div', { class: 'key' }, '🔑 Remember: ' + L.key), h('div', { class: 'callout do', html: L.do }), h('div', { class: 'callout oly', html: L.tip }),
           h('div', { class: 'callout small', html: '<b>Parent note:</b> ' + L.parent }));
+        linkSection(L, body);
       } else if (kind === 'prac' || kind === 'chal') {
         const set = Q.map((q, qi) => ({ q, qi })).filter(x => (kind === 'prac' ? 'bc' : 'so').includes(x.q.l));
         body.append(h('h2', {}, kind === 'prac' ? '✏️ Practice' : '🚀 Challenge time'),
