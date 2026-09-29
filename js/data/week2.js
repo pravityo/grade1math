@@ -2,7 +2,7 @@
 { week: 2, theme: `Numbers to 100`,
   blurb: `Tens and ones, skip counting, comparing, and the first olympiad pattern day.`,
   lessons: [
-{ t: `Tens and Ones`, sk: `Place value`,
+{ t: `Tens and Ones`, sk: `Tens and ones`,
   goal: `Read any number to 100 as tens and ones.`,
   key: `47 = 4 tens + 7 ones = 40 + 7.`,
   learn: [
@@ -12,7 +12,7 @@
     `<b>10 more</b> changes only the tens digit: 47 becomes 57. <b>10 less</b>: 37.`
   ],
   do: `<b>Hands-on:</b> Bundle 10 straws with a rubber band to make tens. Show 34 with 3 bundles and 4 singles. Show 10 more, 10 less.`,
-  tip: `<b>Olympiad tip:</b> "How many numbers have digit 5?" Check tens place and ones place separately so you never miss one.`,
+  tip: `<b>Olympiad tip:</b> When you count numbers that have the digit 5, check the tens place and the ones place separately. Then you never miss one.`,
   parent: `Use money-like language: "3 ten-dollar notes and 4 coins". Place value is the base of all column work.`,
   q: [
     { l:`b`, q:`4 tens and 7 ones make what number?`, a:`47` },
@@ -22,17 +22,17 @@
     { l:`s`, q:`3 tens and 15 ones make what number?`, a:`45`, h:`15 ones is 1 ten and 5 ones.`, s:`30 + 15 = 45.` },
     { l:`o`, q:`How many whole numbers from 1 to 50 have the digit 5 in them?`, a:`6`, h:`List: 5, 15, ... and don't forget 50.`, s:`5, 15, 25, 35, 45, 50 = 6 numbers.` }
   ]},
-{ t: `Skip Counting`, sk: `Counting in 2s, 5s, 10s`,
+{ t: `Skip Counting`, sk: `Counting in 2s, 5s and 10s`,
   goal: `Count fluently by 2, 5, 10 and start 3s. This is the road to multiplication.`,
   key: `Skip counting = repeated addition. Fingers: 5, 10, 15, 20 ...`,
   learn: [
     `<b>Count by 2:</b> 2, 4, 6, 8, 10 ... <b>by 5:</b> 5, 10, 15, 20 ... <b>by 10:</b> 10, 20, 30 ... The hundred chart below colours the numbers you land on when counting by 5, and the number line shows hops of 2.`,
     `Each count adds the same amount. 5 hands have <b>5 + 5 + 5 + 5 + 5 = 25</b> fingers.`,
     `<b>Try 3s:</b> 3, 6, 9, 12, 15. A frog that jumps 3 at a time lands only on these numbers, the coloured squares on this chart.`,
-    `Numbers you land on when counting by 2 are <b>even</b>: they end in 0, 2, 4, 6, or 8.`
+    `The numbers you land on when counting by 2 are called <b>even</b> numbers. They end in 0, 2, 4, 6 or 8.`
   ],
   do: `<b>Hands-on:</b> Walk a number line on the floor. Jump in 2s, then 5s, then 3s. Mark where you land with sticky notes.`,
-  tip: `<b>Olympiad tip:</b> Skip counting is fast counting. To count 6 groups of 5 objects you don't need to count one by one.`,
+  tip: `<b>Olympiad tip:</b> Skip counting is fast counting. To count 6 groups of 5, you do not need to count one by one.`,
   parent: `Do it on stairs or while walking: clap on every second step.`,
   q: [
     { l:`b`, q:`2, 4, 6, ?, 10. What is the missing number?`, a:`8` },
@@ -42,7 +42,7 @@
     { l:`s`, q:`A frog starts at 0 and jumps 3 steps each time. Which of these numbers will it land on?`, o:[`12`,`14`,`16`,`20`], a:`12`, s:`3, 6, 9, 12. Only 12 is on the list.` },
     { l:`o`, q:`I count 2, 4, 6, ... all the way to 20. How many numbers did I say?`, a:`10`, h:`Each number is 2 apart; think 10 twos make 20.`, s:`2 x 10 = 20 so there are 10 numbers.` }
   ]},
-{ t: `Comparing & Ordering`, sk: `Comparing numbers`,
+{ t: `Comparing & Ordering`, sk: `Which number is bigger?`,
   goal: `Compare two-digit numbers and build the largest or smallest from digit cards.`,
   key: `Compare tens first. If tens match, compare ones.`,
   learn: [
@@ -52,7 +52,7 @@
     `<b>Between:</b> the number between 46 and 48 is 47.`
   ],
   do: `<b>Hands-on:</b> Write digits 0-9 on cards. Draw 2 cards each. Make the biggest 2-digit number you can. Who wins?`,
-  tip: `<b>Olympiad tip:</b> "How many numbers between A and B" means do NOT count A or B.`,
+  tip: `<b>Olympiad tip:</b> When a puzzle asks how many numbers are between A and B, do not count A or B.`,
   parent: `Ask "how do you know?" every time. Reasoning matters more than the answer.`,
   q: [
     { l:`b`, q:`Which is bigger: 58 or 85?`, o:[`58`,`85`], a:`85` },
@@ -62,7 +62,7 @@
     { l:`s`, q:`Using two of the digits 4, 0, 8, what is the smallest 2-digit number you can make? (A number cannot start with 0.)`, a:`40`, s:`Try 04? That is just 4. So the smallest is 40.` },
     { l:`o`, q:`How many whole numbers are more than 34 and less than 41?`, a:`6`, h:`List them: 35, 36, ...`, s:`35, 36, 37, 38, 39, 40 = 6 numbers.` }
   ]},
-{ t: `Adding Tens and Ones`, sk: `Mental addition of tens`,
+{ t: `Adding Tens and Ones`, sk: `Adding tens in your head`,
   goal: `Add tens to a number without writing.`,
   key: `30 + 40 = 3 tens + 4 tens = 7 tens = 70.`,
   learn: [
@@ -73,7 +73,7 @@
     `Big jumps in tens are easy: start 7, add 10 each time: 7, 17, 27, 37. The ones digit stays 7!`
   ],
   do: `<b>Hands-on:</b> Use a hundred chart. Start on 7, jump down (+10) each time. See the ones digit stay the same.`,
-  tip: `<b>Olympiad tip:</b> Numbers reached by +10 always keep the same ones digit. Use it to spot which numbers are reachable.`,
+  tip: `<b>Olympiad tip:</b> When you keep adding 10, the ones digit never changes. Use this to spot which numbers you can reach.`,
   parent: `Use a 100-chart on the wall. Coloured pencil paths make patterns visible.`,
   q: [
     { l:`b`, q:`Work out: 30 + 40 = ?`, a:`70` },
@@ -83,17 +83,17 @@
     { l:`s`, q:`Work out: 34 + 30 + 5 = ?`, a:`69`, s:`34 + 30 = 64, plus 5 = 69.` },
     { l:`o`, q:`Start at 7 and keep adding 10 (7, 17, 27 ...). Which of these numbers will you land on?`, o:[`37`,`45`,`52`,`60`], a:`37`, s:`7, 17, 27, 37. Every number ends in 7.` }
   ]},
-{ t: `Olympiad Day: Odd, Even & Patterns`, sk: `Patterns & parity`,
-  goal: `Use odd/even rules and pattern spotting, two of the most common olympiad tools.`,
+{ t: `Olympiad Day: Odd, Even & Patterns`, sk: `Odd, even and patterns`,
+  goal: `Use odd and even rules and spot patterns. These are two clever tools for puzzles.`,
   key: `Even + even = even. Odd + odd = even. Odd + even = odd.`,
   learn: [
     `<b>Even</b> numbers can be paired up with none left over: 2, 4, 6, 8, 10. <b>Odd</b> numbers always have one left over: 1, 3, 5, 7, 9.`,
-    `<b>Parity rules:</b> even + even = even. odd + odd = even (the two leftovers pair up!). odd + even = odd. Below, 13 and 14 are paired up: 13 has one left over, 14 has none.`,
+    `Odd and even rules: even + even = even. odd + odd = even (the two leftovers pair up!). odd + even = odd. Below, 13 and 14 are paired up: 13 has one left over, 14 has none.`,
     `<b>Number patterns:</b> look at the <i>gaps</i>. 2, 4, 7, 11: gaps are 2, 3, 4, so the next gap is 5.`,
     `<b>Odd or even without adding:</b> 1 + 3 + 5 + 7 + 9 has five odd numbers. Five odds leave one odd leftover, so the total is odd.`
   ],
-  do: `<b>Hands-on:</b> Pair up 13 buttons. Is there a leftover? Now 14. Explain to a parent why odd + odd is always even.`,
-  tip: `<b>Olympiad tip:</b> When a puzzle says "can you...", try parity first. It often proves an answer is impossible in one line.`,
+  do: `<b>Hands-on:</b> Pair up 13 buttons. Is there a leftover? Now 14. Tell a grown-up why odd + odd is always even.`,
+  tip: `<b>Olympiad tip:</b> When a puzzle asks "can you...?", check odd and even first. It can quickly show that something is impossible.`,
   parent: `This is the first true "olympiad" thinking day. Praise the reasoning, even if the answer is wrong.`,
   q: [
     { l:`b`, q:`Is the number 38 odd or even?`, o:[`odd`,`even`], a:`even` },

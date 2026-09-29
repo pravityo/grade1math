@@ -2,18 +2,18 @@
 { week: 8, theme: `Olympiad Toolkit II & Mock Challenge`,
   blurb: `Age problems, working backwards, pigeonhole, combinations, and a final mixed challenge.`,
   lessons: [
-{ t: `Age & Difference Problems`, sk: `Constant difference`,
+{ t: `Age & Difference Problems`, sk: `Age puzzles`,
   goal: `Understand that the age gap between two people never changes.`,
   key: `The difference between two ages stays the same forever.`,
   learn: [
-    `<b>Amy is 6. Her brother is 3 years older.</b> He is 9. In 5 years: Amy 11, brother 14.`,
+    `Amy is 6. Her brother is 3 years older, so he is 9. In 5 years, Amy will be 11 and her brother will be 14.`,
     `[[cmp:9,6|Brother,Amy]]`,
-    `The gap is always 3. When Amy is 11 the brother is 14.`,
-    `<b>Sum and difference:</b> Ann and Mum's ages add to 40. Mum is 28 years older. 40 - 28 = 12, half is 6. Ann = 6, Mum = 34.`,
-    `<b>Looking forward and back:</b> in 3 years Ben will be 9. So now he is 6. 4 years ago he was 2.`
+    `The gap is always 3. When Amy is 11, her brother is 14.`,
+    `<b>Two clues:</b> Ann and Mum's ages add up to 40, and Mum is 28 years older. Take away the 28: 40 - 28 = 12. Half of 12 is 6. So Ann is 6 and Mum is 34.`,
+    `<b>Looking forward and back:</b> in 3 years Ben will be 9, so now he is 6. 4 years ago he was 2.`
   ],
   do: `<b>Hands-on:</b> Make a family table with ages now, in 5 years, and 10 years ago. What stays constant?`,
-  tip: `<b>Olympiad tip:</b> Age problems: find "now" first. Then move forward or backward.`,
+  tip: `<b>Olympiad tip:</b> In age puzzles, find out how old they are now first. Then go forwards or backwards.`,
   parent: `Use family members. Ask, "when I am 10, how old will Grandpa be?"`,
   q: [
     { l:`b`, q:`Amy is 6. Her brother is 3 years older. How old is he?`, a:`9` },
@@ -23,17 +23,17 @@
     { l:`s`, q:`Ann and her mum have ages that add up to 40. Mum is 28 years older than Ann. How old is Ann?`, a:`6`, s:`40 - 28 = 12; 12 / 2 = 6.` },
     { l:`o`, q:`In 3 years Ben will be 9. How old was Ben 4 years ago?`, a:`2`, h:`Find how old he is now.`, s:`Now: 9 - 3 = 6. Four years ago: 6 - 4 = 2.` }
   ]},
-{ t: `Guess, Check & Work Backwards`, sk: `Problem-solving heuristics`,
+{ t: `Guess, Check & Work Backwards`, sk: `Guess and check, or work backwards`,
   goal: `Choose between "guess and check" and "work backwards".`,
   key: `Working backwards: undo each step, starting from the end.`,
   learn: [
-    `<b>Guess and check:</b> make a smart guess, check, then adjust.`,
-    `<b>Work backwards:</b> Kim spent half of her money on a book, then $3 on a snack. She has $5 left. Undo: 5 + 3 = 8 (before snack). Undo half: 8 x 2 = 16. She started with <b>$16</b>.`,
-    `<b>Number tricks:</b> "I double a number and add 5. I get 17." Undo: 17 - 5 = 12, half of 12 = 6.`,
-    `<b>Bikes (2 wheels) and tricycles (3 wheels):</b> 5 vehicles, 13 wheels. Guess 5 bikes = 10 wheels; need 3 more, and each swap adds 1. So <b>3 tricycles</b>, 2 bikes.`
+    `<b>Guess and check:</b> make a smart guess, check it, then change it.`,
+    `<b>Work backwards:</b> Kim spent half of her money on a book, then $3 on a snack. She has $5 left. Undo the snack: 5 + 3 = 8. Undo the half: 8 x 2 = 16. She started with $16.`,
+    `<b>Number puzzle:</b> "I double a number and add 5. I get 17." Undo the steps: 17 - 5 = 12, and half of 12 is 6.`,
+    `<b>Bikes and tricycles:</b> bikes have 2 wheels and tricycles have 3. There are 5 vehicles and 13 wheels. Guess that all 5 are bikes: that is 10 wheels, and we need 3 more. Each swap from a bike to a tricycle adds 1 wheel. So there are 3 tricycles and 2 bikes.`
   ],
-  do: `<b>Hands-on:</b> Make your own "I think of a number" riddle for a parent, then solve it backwards together.`,
-  tip: `<b>Olympiad tip:</b> Steps in a story? Draw arrows forward. Undo by arrows going backwards.`,
+  do: `<b>Hands-on:</b> Make your own "I think of a number" riddle for a grown-up, then solve it backwards together.`,
+  tip: `<b>Olympiad tip:</b> If a story has steps, draw arrows going forwards. Then undo them with arrows going backwards.`,
   parent: `Ask "which strategy is best here?" to develop flexible thinking.`,
   q: [
     { l:`b`, q:`I double a number and add 5. I get 17. What is my number?`, a:`6` },
@@ -43,18 +43,18 @@
     { l:`s`, q:`There are 5 vehicles, some bikes (2 wheels) and some tricycles (3 wheels). There are 13 wheels altogether. How many tricycles are there?`, a:`3` },
     { l:`o`, q:`Kim spent half of her money on a book, then $3 on a snack. She has $5 left. How many dollars did she start with?`, a:`16`, s:`5 + 3 = 8, 8 x 2 = 16.` }
   ]},
-{ t: `Pigeonhole & Handshakes`, sk: `Worst-case thinking`,
-  goal: `Use worst-case reasoning to guarantee results.`,
+{ t: `Pigeonhole & Handshakes`, sk: `The worst-luck trick`,
+  goal: `Use the worst-luck trick to be sure of an answer.`,
   key: `To guarantee a match, plan for the worst luck, then add one.`,
   learn: [
-    `<b>Socks in the dark:</b> a drawer has red and blue socks. To <b>guarantee</b> a matching pair, take 3. (Worst case: red, blue, then any third matches one.)`,
-    `<b>Three colours:</b> take 4 to guarantee a pair (red, blue, green, then anything).`,
-    `<b>7 days of the week:</b> with 8 children, at least two share a birthday weekday.`,
-    `<b>Harder:</b> 4 red and 4 blue socks. To guarantee a <b>blue pair</b>, worst luck: 4 red first, then 2 blue. That is <b>6</b>.`,
-    `<b>Handshakes again</b> (the pairing trick from Gauss Day). For 4 friends: 3 + 2 + 1 = 6. For 6 friends: 5 + 4 + 3 + 2 + 1 = 15.`
+    `<b>Socks in the dark:</b> a drawer has red socks and blue socks. To be sure of a matching pair, take 3. In the worst case you get one red and one blue first, but the third sock must match one of them.`,
+    `<b>Three colours:</b> take 4 to be sure of a pair. In the worst case you get red, blue and green, and then any 4th sock matches.`,
+    `There are only 7 days in a week. So with 8 children, at least two of them were born on the same day of the week.`,
+    `<b>A harder one:</b> with 4 red and 4 blue socks, how many must you take to be sure of a blue pair? The worst luck is 4 red socks first, and then 2 blue socks. That is 6.`,
+    `<b>Handshakes again</b> (the adding trick from Gauss Day). For 4 friends: 3 + 2 + 1 = 6. For 6 friends: 5 + 4 + 3 + 2 + 1 = 15.`
   ],
   do: `<b>Hands-on:</b> Put 3 red and 3 blue socks in a bag. Take without looking. What's the fewest to guarantee a pair?`,
-  tip: `<b>Olympiad tip:</b> "Guarantee" means worst luck. Imagine the unluckiest possible draw, then add one.`,
+  tip: `<b>Olympiad tip:</b> To be sure, think about the worst luck. Imagine the unluckiest pick, then add one more.`,
   parent: `Ask "what's the worst that could happen?" and then plan around it.`,
   q: [
     { l:`b`, q:`A drawer has red and blue socks. What is the fewest socks you must take (without looking) to guarantee a matching pair?`, a:`3` },
@@ -64,18 +64,18 @@
     { l:`s`, q:`6 friends each shake hands once with every other friend. How many handshakes are there in total?`, a:`15`, s:`5 + 4 + 3 + 2 + 1 = 15.` },
     { l:`o`, q:`A bag has 4 red socks and 4 blue socks. What is the fewest you must take to guarantee a pair of BLUE socks?`, a:`6`, h:`Worst case: all the red ones first.`, s:`4 red first, then 2 blue = 6.` }
   ]},
-{ t: `Combinations`, sk: `Counting choices`,
+{ t: `Combinations`, sk: `Counting outfits and choices`,
   goal: `Count outfit-type combinations systematically.`,
   key: `Choices multiply: 2 shirts x 3 shorts = 6 outfits.`,
   learn: [
-    `<b>2 shirts and 3 shorts:</b> each shirt goes with 3 shorts. 3 + 3 = 6 outfits (2 x 3). The picture below lists every outfit.`,
-    `<b>Menu:</b> 2 mains and 3 drinks = 6 meals.`,
-    `<b>Arranging:</b> A and B in a line: AB, BA = 2 ways. A, B, C: ABC, ACB, BAC, BCA, CAB, CBA = 6 ways.`,
-    `<b>Digits:</b> using 1 and 2 (repeats allowed): 11, 12, 21, 22 = 4 numbers.`,
-    `<b>3 shirts, 2 shorts, 2 hats:</b> 3 x 2 x 2 = 12.`
+    `With 2 shirts and 3 pairs of shorts, each shirt goes with 3 shorts. That is 3 + 3 = 6 outfits, or 2 x 3. The picture below lists every outfit.`,
+    `<b>Menu:</b> 2 mains and 3 drinks make 6 different meals.`,
+    `<b>Standing in a line:</b> A and B can stand as AB or BA, so that is 2 ways. A, B and C can stand as ABC, ACB, BAC, BCA, CAB or CBA, so that is 6 ways.`,
+    `<b>Making numbers:</b> with the digits 1 and 2 (you can use a digit twice) you can make 11, 12, 21 and 22. That is 4 numbers.`,
+    `<b>Three choices:</b> 3 shirts, 2 shorts and 2 hats make 3 x 2 x 2 = 12 outfits.`
   ],
   do: `<b>Hands-on:</b> Cut out 2 shirts and 3 shorts from paper. Make every outfit. Count them.`,
-  tip: `<b>Olympiad tip:</b> Make a tree: first choices as branches, then second choices on each branch. Count the ends.`,
+  tip: `<b>Olympiad tip:</b> Draw a tree: the first choices are the branches, then add the second choices on each branch. Count the ends.`,
   parent: `Ask your child to dress a doll in every possible way. They will find the pattern.`,
   q: [
     { l:`b`, q:`2 shirts and 3 shorts. How many different outfits?`, a:`6` },
@@ -85,16 +85,16 @@
     { l:`s`, q:`In how many different ways can 3 children A, B and C stand in a line?`, a:`6` },
     { l:`o`, q:`You have 3 shirts, 2 shorts and 2 hats. How many different outfits (one of each)?`, a:`12`, s:`3 x 2 x 2 = 12.` }
   ]},
-{ t: `Grand Challenge Day`, sk: `Mixed olympiad`,
-  goal: `A full mixed review, olympiad style. Take your time and draw pictures.`,
+{ t: `Grand Challenge Day`, sk: `Grand challenge`,
+  goal: `A big mixed review of puzzles. Take your time and draw pictures.`,
   key: `Draw. Look for patterns. Check. You are ready for more.`,
   learn: [
-    `<b>Your toolkit:</b> bar models, make-ten, odd/even, pairing, gaps and posts, working backwards, worst-case, and listing systematically.`,
+    `<b>Your toolkit:</b> bar models, making ten, odd and even, pairing, gaps and posts, working backwards, the worst-luck trick, and listing everything in order.`,
     `Before each question, ask: <b>Can I draw it? Is there a pattern? Can I work backwards?</b>`,
     `Take a breath, be proud of how far you have come, and enjoy the puzzles!`
   ],
   do: `<b>Hands-on:</b> Choose your favourite puzzle from the last 8 weeks and teach it to someone.`,
-  tip: `<b>Olympiad tip:</b> In competitions, skip a hard one, finish the others, and come back. Never freeze.`,
+  tip: `<b>Olympiad tip:</b> If a puzzle is too hard, skip it, finish the others, and come back later.`,
   parent: `After this, keep going with the review page and mixed practice. Consistency wins.`,
   q: [
     { l:`b`, q:`Work out: 47 + 26 = ?`, a:`73` },
