@@ -319,5 +319,99 @@ button.kn-wrap{background:none;border:0;padding:0;cursor:pointer;-webkit-tap-hig
 .sect{position:relative;padding-left:1.4em}
 .sect::before{content:"⚔️";position:absolute;left:0;top:0;font-size:.9em}
 .quick{background:linear-gradient(135deg,#ffd84d,#ffb84d)}
-.tile.done::after{content:"👾";position:absolute;right:8px;bottom:4px;font-size:1.1rem}
 @media(max-width:420px){.top nav{gap:2px}.top nav a{padding:6px 9px;font-size:.93rem}}
+
+/* skyline scenery at the bottom of every page (changes with the realm) */
+:root{--scene-home:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='80' viewBox='0 0 480 80'%3E%3Cg fill='%233b2a7a'%3E%3Crect x='0' y='40' width='44' height='40'/%3E%3Crect x='0.0' y='34' width='11.0' height='6'/%3E%3Crect x='22.0' y='34' width='11.0' height='6'/%3E%3Crect x='60' y='28' width='30' height='52'/%3E%3Crect x='60.0' y='22' width='10.0' height='6'/%3E%3Crect x='80.0' y='22' width='10.0' height='6'/%3E%3Crect x='100' y='50' width='40' height='30'/%3E%3Crect x='100.0' y='44' width='10.0' height='6'/%3E%3Crect x='120.0' y='44' width='10.0' height='6'/%3E%3Crect x='150' y='34' width='34' height='46'/%3E%3Crect x='150.0' y='28' width='11.3' height='6'/%3E%3Crect x='172.7' y='28' width='11.3' height='6'/%3E%3Crect x='196' y='56' width='36' height='24'/%3E%3Crect x='196.0' y='50' width='12.0' height='6'/%3E%3Crect x='220.0' y='50' width='12.0' height='6'/%3E%3Crect x='240' y='36' width='30' height='44'/%3E%3Crect x='240.0' y='30' width='10.0' height='6'/%3E%3Crect x='260.0' y='30' width='10.0' height='6'/%3E%3Crect x='280' y='46' width='46' height='34'/%3E%3Crect x='280.0' y='40' width='11.5' height='6'/%3E%3Crect x='303.0' y='40' width='11.5' height='6'/%3E%3Crect x='336' y='30' width='30' height='50'/%3E%3Crect x='336.0' y='24' width='10.0' height='6'/%3E%3Crect x='356.0' y='24' width='10.0' height='6'/%3E%3Crect x='376' y='52' width='40' height='28'/%3E%3Crect x='376.0' y='46' width='10.0' height='6'/%3E%3Crect x='396.0' y='46' width='10.0' height='6'/%3E%3Crect x='424' y='36' width='34' height='44'/%3E%3Crect x='424.0' y='30' width='11.3' height='6'/%3E%3Crect x='446.7' y='30' width='11.3' height='6'/%3E%3Crect x='200' y='6' width='2' height='20'/%3E%3Cpath d='M202 6 l14 5 -14 5z'/%3E%3C/g%3E%3C/svg%3E");--scene-math:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='80' viewBox='0 0 480 80'%3E%3Cg fill='%235b3cc4'%3E%3Crect x='0' y='40' width='44' height='40'/%3E%3Crect x='0.0' y='34' width='11.0' height='6'/%3E%3Crect x='22.0' y='34' width='11.0' height='6'/%3E%3Crect x='60' y='28' width='30' height='52'/%3E%3Crect x='60.0' y='22' width='10.0' height='6'/%3E%3Crect x='80.0' y='22' width='10.0' height='6'/%3E%3Crect x='100' y='50' width='40' height='30'/%3E%3Crect x='100.0' y='44' width='10.0' height='6'/%3E%3Crect x='120.0' y='44' width='10.0' height='6'/%3E%3Crect x='150' y='34' width='34' height='46'/%3E%3Crect x='150.0' y='28' width='11.3' height='6'/%3E%3Crect x='172.7' y='28' width='11.3' height='6'/%3E%3Crect x='196' y='56' width='36' height='24'/%3E%3Crect x='196.0' y='50' width='12.0' height='6'/%3E%3Crect x='220.0' y='50' width='12.0' height='6'/%3E%3Crect x='240' y='36' width='30' height='44'/%3E%3Crect x='240.0' y='30' width='10.0' height='6'/%3E%3Crect x='260.0' y='30' width='10.0' height='6'/%3E%3Crect x='280' y='46' width='46' height='34'/%3E%3Crect x='280.0' y='40' width='11.5' height='6'/%3E%3Crect x='303.0' y='40' width='11.5' height='6'/%3E%3Crect x='336' y='30' width='30' height='50'/%3E%3Crect x='336.0' y='24' width='10.0' height='6'/%3E%3Crect x='356.0' y='24' width='10.0' height='6'/%3E%3Crect x='376' y='52' width='40' height='28'/%3E%3Crect x='376.0' y='46' width='10.0' height='6'/%3E%3Crect x='396.0' y='46' width='10.0' height='6'/%3E%3Crect x='424' y='36' width='34' height='44'/%3E%3Crect x='424.0' y='30' width='11.3' height='6'/%3E%3Crect x='446.7' y='30' width='11.3' height='6'/%3E%3Crect x='200' y='6' width='2' height='20'/%3E%3Cpath d='M202 6 l14 5 -14 5z'/%3E%3C/g%3E%3C/svg%3E");--scene-eng:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='80' viewBox='0 0 480 80'%3E%3Cg fill='%231e7b4f'%3E%3Cpath d='M0 80 L17 44 L34 80z'/%3E%3Cpath d='M4 62 L17 38 L30 62z'/%3E%3Cpath d='M34 80 L51 31 L68 80z'/%3E%3Cpath d='M38 56 L51 25 L64 56z'/%3E%3Cpath d='M68 80 L85 18 L102 80z'/%3E%3Cpath d='M72 49 L85 12 L98 49z'/%3E%3Cpath d='M102 80 L119 33 L136 80z'/%3E%3Cpath d='M106 56 L119 27 L132 56z'/%3E%3Cpath d='M136 80 L153 20 L170 80z'/%3E%3Cpath d='M140 50 L153 14 L166 50z'/%3E%3Cpath d='M170 80 L187 35 L204 80z'/%3E%3Cpath d='M174 58 L187 29 L200 58z'/%3E%3Cpath d='M204 80 L221 22 L238 80z'/%3E%3Cpath d='M208 51 L221 16 L234 51z'/%3E%3Cpath d='M238 80 L255 37 L272 80z'/%3E%3Cpath d='M242 58 L255 31 L268 58z'/%3E%3Cpath d='M272 80 L289 24 L306 80z'/%3E%3Cpath d='M276 52 L289 18 L302 52z'/%3E%3Cpath d='M306 80 L323 39 L340 80z'/%3E%3Cpath d='M310 60 L323 33 L336 60z'/%3E%3Cpath d='M340 80 L357 26 L374 80z'/%3E%3Cpath d='M344 53 L357 20 L370 53z'/%3E%3Cpath d='M374 80 L391 41 L408 80z'/%3E%3Cpath d='M378 60 L391 35 L404 60z'/%3E%3Cpath d='M408 80 L425 28 L442 80z'/%3E%3Cpath d='M412 54 L425 22 L438 54z'/%3E%3Cpath d='M442 80 L459 43 L476 80z'/%3E%3Cpath d='M446 62 L459 37 L472 62z'/%3E%3Cpath d='M476 80 L493 30 L510 80z'/%3E%3Cpath d='M480 55 L493 24 L506 55z'/%3E%3C/g%3E%3C/svg%3E");--scene-sci:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='80' viewBox='0 0 480 80'%3E%3Cg fill='%23c8501f'%3E%3Cpath d='M20 80 L80 28 L92 28 L150 80z'/%3E%3Ccircle cx='86' cy='20' r='5'/%3E%3Ccircle cx='98' cy='12' r='3'/%3E%3Ccircle cx='76' cy='10' r='3'/%3E%3Cpath d='M210 80 L210 52 L200 36 L230 36 L220 52 L220 80z'/%3E%3Ccircle cx='208' cy='24' r='4'/%3E%3Ccircle cx='220' cy='16' r='3'/%3E%3Ccircle cx='226' cy='28' r='3'/%3E%3Cpath d='M300 80 L300 52 L290 36 L320 36 L310 52 L310 80z'/%3E%3Ccircle cx='298' cy='24' r='4'/%3E%3Ccircle cx='310' cy='16' r='3'/%3E%3Ccircle cx='316' cy='28' r='3'/%3E%3Cpath d='M390 80 L390 52 L380 36 L410 36 L400 52 L400 80z'/%3E%3Ccircle cx='388' cy='24' r='4'/%3E%3Ccircle cx='400' cy='16' r='3'/%3E%3Ccircle cx='406' cy='28' r='3'/%3E%3Cpath d='M430 80 L455 44 L480 80z'/%3E%3C/g%3E%3C/svg%3E")}
+
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:80px;background:var(--scene-home) repeat-x bottom/480px 80px;opacity:.16;pointer-events:none;z-index:0}
+body[data-realm=math]::after{background-image:var(--scene-math)}
+body[data-realm=eng]::after{background-image:var(--scene-eng)}
+body[data-realm=sci]::after{background-image:var(--scene-sci)}
+main,.top{position:relative;z-index:1}
+@media(prefers-color-scheme:dark){body{background-image:radial-gradient(#fff3 1.2px,transparent 1.4px),radial-gradient(#fff2 1px,transparent 1.2px);background-size:90px 90px,53px 53px;background-position:0 0,27px 31px}body::after{opacity:.3;filter:brightness(2.2)}}
+
+/* monsters */
+.mon{display:block;width:100%;height:auto;overflow:visible}
+.mon.shadow{filter:brightness(0) opacity(.28)}
+.mon .pupil{animation:blink 5s infinite}
+.sc-icon .mon{width:100%;height:100%}
+.sc-icon{background:rgba(255,255,255,.28)}
+
+/* battle arena at the top of a lesson */
+.arena{position:relative;border-radius:24px;padding:14px 18px 16px;margin:16px 0;color:#fff;overflow:hidden;box-shadow:0 5px 0 rgba(0,0,0,.18)}
+.arena.realm-math{background:linear-gradient(160deg,#5b3cc4,#3b2a7a)}
+.arena.realm-eng{background:linear-gradient(160deg,#2f9463,#175a3a)}
+.arena.realm-sci{background:linear-gradient(160deg,#e0662d,#a63a12)}
+.arena::before{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:var(--scene-math) repeat-x bottom/480px 80px;opacity:.22;filter:brightness(3)}
+.arena.realm-eng::before{background-image:var(--scene-eng)}.arena.realm-sci::before{background-image:var(--scene-sci)}
+.arena>*{position:relative}
+.ar-realm{font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.07em;opacity:.95}
+.arena.boss .ar-realm{color:#ffe27a}
+.ar-scene{display:flex;align-items:flex-end;justify-content:space-around;gap:8px;margin:6px 0 8px}
+.ar-knight{width:112px;flex:0 0 112px}.ar-knight .kn{width:112px}
+.ar-foe{width:120px;flex:0 0 120px;transform-origin:bottom center;animation:idle 2.6s ease-in-out infinite}
+.ar-vs{font-weight:900;font-size:1.5rem;color:#ffe27a;text-shadow:0 2px 0 rgba(0,0,0,.3);align-self:center}
+.arena.tamed .ar-foe{animation:bounce 1.2s ease-in-out infinite}
+.arena.hit .ar-foe{animation:shake .55s ease}
+.arena.hit .ar-knight{animation:lunge .55s ease}
+.arena.hit .ar-scene::after{content:"💥";position:absolute;left:50%;top:22%;font-size:2.2rem;animation:pow .55s ease forwards}
+.ar-calm{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.95rem}
+.ar-calm .meter{flex:1;background:rgba(255,255,255,.3);height:12px;border-radius:99px;overflow:hidden;margin:0}.ar-calm .meter i{display:block;height:100%;background:#7fe0c2;border-radius:99px;transition:width .5s}
+.ar-msg{margin-top:6px;font-weight:600;line-height:1.35}
+@keyframes idle{50%{transform:scale(1.03,.97)}}
+@keyframes bounce{50%{transform:translateY(-8px)}}
+@keyframes shake{20%{transform:translateX(-8px) rotate(-6deg)}50%{transform:translateX(7px) rotate(5deg)}80%{transform:translateX(-4px)}}
+@keyframes lunge{40%{transform:translateX(22px) rotate(6deg)}}
+@keyframes pow{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.6);opacity:0}}
+@media(max-width:520px){.ar-knight,.ar-knight .kn{width:84px;flex-basis:84px}.ar-foe{width:92px;flex-basis:92px}}
+@media(prefers-reduced-motion:reduce){.ar-foe,.arena.tamed .ar-foe,.arena.hit .ar-foe,.arena.hit .ar-knight,.mon .pupil{animation:none}.arena.hit .ar-scene::after{animation:none;opacity:0}}
+
+/* question monster peeking in the corner */
+.q{position:relative}
+.qmon{position:absolute;top:10px;right:12px;width:44px;opacity:.95}
+.qmon .mon{width:44px}
+.q.right .qmon{transform:rotate(-8deg)}
+
+/* map tiles are stepping stones guarded by monsters */
+.tile{padding-right:64px;min-height:78px}
+.tile-mon{position:absolute;top:8px;right:8px;width:46px;height:46px}
+.tile.next .tile-mon{animation:bounce 1.6s ease-in-out infinite}
+.tile.boss{border-color:#e0a800;border-width:3px;background:linear-gradient(135deg,var(--card),color-mix(in srgb,#ffd84d 22%,var(--card)))}
+.tile.boss small{color:#a87400;font-weight:800}
+.bossline{display:flex;align-items:center;gap:10px;font-weight:700;margin:6px 0 12px}
+.boss-pic{width:44px;flex:0 0 44px}
+
+/* monster book */
+.book-note{margin:-6px 0 14px}
+.stickers{grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
+.stk{position:relative;background:var(--card);padding:3px;border-width:2px}
+.stk .mon{width:100%}
+.stk.got,.stk.known{border-color:var(--sk);box-shadow:none}
+.stk.got{background:color-mix(in srgb,var(--sk) 16%,var(--card))}
+.stk.known{background:var(--card)}.stk.known .mon{opacity:.55}
+.stk .chk{position:absolute;right:-3px;bottom:-3px;background:var(--ok);color:#fff;border-radius:50%;width:18px;height:18px;font-size:.7rem;display:flex;align-items:center;justify-content:center}
+.stk.bossk{border-color:#e0a800}
+.rematch{display:flex;align-items:center;gap:10px;list-style:none;margin-left:-1.4em}
+.rm-pic{width:38px;flex:0 0 38px}
+
+/* rank and coins */
+.rank{display:grid;gap:4px;margin-bottom:12px;padding-bottom:12px;border-bottom:2px dashed var(--line)}
+.rank b{font-size:1.15rem}
+.rank .meter{height:10px;background:var(--pri2);border-radius:99px;overflow:hidden;margin:0}.rank .meter i{display:block;height:100%;background:linear-gradient(90deg,#ffd84d,#f5a623)}
+
+/* scroll-style cards and quest look */
+.card{border:3px solid var(--line);box-shadow:0 4px 0 color-mix(in srgb,var(--line) 70%,#000)}
+.card.hero{border:none;box-shadow:0 5px 0 rgba(0,0,0,.2)}
+h1{letter-spacing:-.01em}
+.steps button.on{background:linear-gradient(135deg,var(--pri),#8a5bd6)}
+.key{border:2px dashed color-mix(in srgb,var(--pri) 40%,transparent)}
+.callout.do{border-left-style:double}
+.sparkles{position:relative;height:0}
+.sparkles span{position:absolute;top:-10px;font-size:1.6rem;animation:rise 2.2s ease-out infinite;opacity:0}
+@keyframes rise{0%{transform:translateY(40px) scale(.6);opacity:0}25%{opacity:1}100%{transform:translateY(-70px) scale(1.1);opacity:0}}
+@media(prefers-reduced-motion:reduce){.sparkles span{animation:none;opacity:.8}}
+.newmon-face{width:84px;flex:0 0 84px;font-size:0}
+.newmon-face .mon{width:84px}
+.hero .newmon{overflow:hidden}
+.grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}

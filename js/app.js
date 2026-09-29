@@ -3,16 +3,17 @@
   const $app = document.getElementById('app');
   const KEY = 'grade1math.v1';
   const LV = { b: ['Squire', '🛡️'], c: ['Knight', '⚔️'], s: ['Champion', '🏅'], o: ['Dragon slayer', '🐉'] };
-  /* Every finished lesson makes a new monster friend. */
-  const MONSTERS = [['Blip', '👾'], ['Boo', '👻'], ['Ember', '🐲'], ['Rex', '🦖'], ['Inky', '🦑'], ['Ollie', '🐙'], ['Bolt', '🤖'], ['Zog', '👽'], ['Long-Neck', '🦕'], ['Drako', '🐉']];
-  const monsterFor = L => MONSTERS[(L.n * 3 + ({ math: 0, eng: 1, sci: 2 }[L.subj] || 0)) % MONSTERS.length];
+  /* Every lesson has a monster to tame (js/monsters.js); the last lesson of each week is a Big Boss. */
+  const monsterFor = L => Monsters.forLesson(L);
+  document.body.insertAdjacentHTML('afterbegin', Monsters.sprite());
+  const monPic = (L, cls, shadow) => { const m = monsterFor(L); return Monsters.use(m.i, m.boss, (cls || '') + (shadow ? ' shadow' : '')); };
+  /* Words for the grown-up-written labels in lesson data, in the knight story. */
+  const themeText = html => String(html).replace('<b>Olympiad tip:</b>', '<b>🐉 Dragon-slayer tip:</b>').replace('<b>Scientist tip:</b>', '<b>🧙 Wizard\'s tip:</b>').replace('<b>Hands-on:</b>', '<b>🛡️ Squire\'s task:</b>');
 
-  /* ---------- data ---------- */
-  /* Three subjects. Maths keeps plain numeric ids ("0".."39") so progress saved before English/Science existed still works. */
   const SUBJECTS = [
-    { key: 'math', name: 'Maths', realm: 'Number Keep', icon: '🧮', prefix: '', weeks: window.CURRICULUM || [], blurb: 'Singapore-style maths beyond school level, with olympiad thinking.' },
-    { key: 'eng', name: 'English', realm: 'Story Forest', icon: '📚', prefix: 'e', weeks: window.ENGLISH || [], blurb: 'Phonics, grammar, reading and word puzzles.' },
-    { key: 'sci', name: 'Science', realm: 'Dragon Lab', icon: '🔬', prefix: 's', weeks: window.SCIENCE || [], blurb: 'Living things, materials, forces, Earth and how scientists think.' }
+    { key: 'math', name: 'Maths', realm: 'Number Keep', icon: '🧮', prefix: '', weeks: window.CURRICULUM || [], blurb: 'The Number Keep is full of number monsters. Solve their puzzles to tame them.' },
+    { key: 'eng', name: 'English', realm: 'Story Forest', icon: '📚', prefix: 'e', weeks: window.ENGLISH || [], blurb: 'The Story Forest hides word monsters. Read, spell and write to tame them.' },
+    { key: 'sci', name: 'Science', realm: 'Dragon Lab', icon: '🔬', prefix: 's', weeks: window.SCIENCE || [], blurb: 'The Dragon Lab bubbles with science monsters. Ask questions and test ideas to tame them.' }
   ];
   const SUBJ = {}; const BYID = {};
   SUBJECTS.forEach(sb => {
@@ -96,7 +97,7 @@
     Adapt.dueSkills(S, todayStr(), L0.id).slice(0, 2).forEach(d => {
       const L = BYID[d.id]; if (!L || seen.has(L.id)) return; seen.add(L.id);
       const qi = Adapt.pickQuestion(L, d.e, n);
-      out.push({ L, qi, q: resolve(L, qi), why: d.weak ? 'from earlier, tricky last time' : 'from earlier, time for a refresher' });
+      out.push({ L, qi, q: resolve(L, qi), why: d.weak ? 'monster rematch: tricky last time' : 'monster rematch: time for a refresher' });
     });
     [1, 3, 7, 14].forEach((k, i) => {
       const L = list[n - k]; if (!L || out.length >= 4 || seen.has(L.id)) return; seen.add(L.id);
@@ -130,7 +131,7 @@
     const lv = LV[q.l];
     const fb = h('div', { class: 'fb' });
     const extra = h('div');
-    box.append(h('span', { class: 'lv ' + q.l }, lv[1] + ' ' + lv[0]));
+    box.append(h('span', { class: 'qmon', html: monPic(item.L) }), h('span', { class: 'lv ' + q.l }, lv[1] + ' ' + lv[0]));
     if (opts.tag) box.append(' ', h('span', { class: 'muted small' }, opts.tag));
     box.append(h('div', { class: 'text' }, q.q));
     const qp = q.gen ? q.p : (q.p || (item.L.subj === 'math' ? (window.QPICS || {})[item.L.n + ':' + item.qi] : null));
@@ -178,7 +179,7 @@
     } else {
       const input = h('input', { type: 'text', inputmode: (/^\d+$/.test(String([].concat(q.a)[0])) ? 'numeric' : 'text'), autocomplete: 'off', 'aria-label': 'Your answer', placeholder: 'Answer' });
       input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(input.value); });
-      box.append(h('div', { class: 'ans' }, input, q.u ? h('span', { class: 'muted' }, q.u) : '', h('button', { class: 'btn chk', onclick: () => submit(input.value) }, 'Check')));
+      box.append(h('div', { class: 'ans' }, input, q.u ? h('span', { class: 'muted' }, q.u) : '', h('button', { class: 'btn chk', onclick: () => submit(input.value) }, '⚔️ Check')));
     }
     box.append(fb, extra);
     return box;
@@ -186,12 +187,12 @@
 
   /* ---------- views ---------- */
   function setNav(name) { document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === name)); }
-  const pillOf = L => `${SUBJ[L.subj].icon} ${SUBJ[L.subj].name} · Week ${L.week} · ${DAYS[L.day - 1]} · ${L.theme}`;
+  const pillOf = L => `${SUBJ[L.subj].icon} ${SUBJ[L.subj].name} · Level ${L.week} · ${DAYS[L.day - 1]} · ${L.theme}`;
   let pick = null; // Set of lesson ids while choosing lessons to mark as known on the map
   function tile(L) {
     const done = S.done[L.id], nx = nextIdx(SUBJ[L.subj]) === L.n, choosing = !!pick;
-    const a = h('a', { class: 'tile ' + (done ? 'done ' : '') + (nx ? 'next ' : '') + (choosing ? 'pickable ' : '') + (choosing && pick.has(L.id) ? 'picked' : ''), href: '#/lesson/' + L.id },
-      h('small', {}, `Week ${L.week} · ${DAYS[L.day - 1]}`), h('b', {}, (done ? '✅ ' : nx && !pick ? '▶ ' : '') + L.t),
+    const a = h('a', { class: 'tile ' + (monsterFor(L).boss ? 'boss ' : '') + (done ? 'done ' : '') + (nx ? 'next ' : '') + (choosing ? 'pickable ' : '') + (choosing && pick.has(L.id) ? 'picked' : ''), href: '#/lesson/' + L.id },
+      h('span', { class: 'tile-mon', html: monPic(L, '', !done && !nx) }), h('small', {}, `Level ${L.week} · quest ${L.day}${monsterFor(L).boss ? ' · 👑 boss' : ''}`), h('b', {}, (done ? '✅ ' : nx && !pick ? '▶ ' : '') + L.t),
       done ? h('small', {}, scoreText(done)) : '',
       done && done.when ? h('span', { class: 'stamp' }, '✔ ' + doneLine(done)) : '');
     if (choosing) a.addEventListener('click', e => { e.preventDefault(); if (pick.has(L.id)) pick.delete(L.id); else pick.add(L.id); route(); });
@@ -226,12 +227,12 @@
   };
   const greeting = () => { const hr = new Date().getHours(); return hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'; };
   function subjCard(sb, primary) {
-    const n = nextIdx(sb), L = sb.lessons[n], icon = h('div', { class: 'sc-icon', html: ICONS[sb.key] });
+    const n = nextIdx(sb), L = sb.lessons[n], icon = h('div', { class: 'sc-icon', html: L ? monPic(L) : ICONS[sb.key] });
     if (!L) return h('section', { class: 'sc ' + sb.key }, icon, h('div', { class: 'sc-body' }, h('h2', {}, sb.name), h('p', {}, 'You finished every lesson!')), h('a', { class: 'go', href: '#/map/' + sb.key }, 'Map'));
     const cont = S.pos && S.pos.id === L.id && S.pos.step > 0;
     const card = h('section', { class: 'sc ' + sb.key + (primary ? '' : ' extra') }, icon,
       h('div', { class: 'sc-body' }, h('span', { class: 'sc-tag' }, sb.name + ' · ' + sb.realm + (primary ? '' : ' · extra')), h('h2', {}, L.t),
-        h('div', { class: 'meter light' }, h('i', { style: `width:${doneCount(sb) / sb.lessons.length * 100}%` })), h('small', {}, `Lesson ${n + 1} of ${sb.lessons.length}`)),
+        h('div', { class: 'meter light' }, h('i', { style: `width:${doneCount(sb) / sb.lessons.length * 100}%` })), h('small', {}, `Guarded by ${monsterFor(L).name} · quest ${n + 1} of ${sb.lessons.length}`)),
       h('a', { class: 'go', href: '#/lesson/' + L.id }, cont ? 'Keep going' : 'Start!'));
     const skip = h('button', { class: 'linkbtn', onclick: () => { if (confirm(`Mark "${L.t}" as already known? It will count as done without any questions. You can undo this.`)) { markKnown(L); const nx = sb.lessons.find(l => !S.done[l.id]); S.pos = nx ? { id: nx.id, step: 0 } : null; save(); route(); } } }, 'I already know this one');
     const check = doneCount(sb) === 0 && !S.placed[sb.key] ? h('a', { class: 'linkbtn', href: '#/placement/' + sb.key }, 'Not sure where to start? Take a quick check') : '';
@@ -255,9 +256,12 @@
     });
     return box;
   }
+  const friendCount = () => ALL.filter(L => S.done[L.id] && !S.done[L.id].skipped).length;
   function goalCard() {
     const st = streak(), wk = Adapt.week(S.days, todayStr()), goal = Math.min(5, Math.max(1, S.goal)), left = goal - wk.count, nxt = KnightWear.untilNext(S.days.length);
+    const rk = Monsters.rank(doneCount());
     const card = h('section', { class: 'goal' },
+      h('div', { class: 'rank' }, h('b', {}, `${rk.icon} Rank: ${rk.name}`), h('div', { class: 'meter' }, h('i', { style: `width:${rk.pct}%` })), h('small', { class: 'muted' }, rk.next ? `${rk.next.left} more quest${rk.next.left > 1 ? 's' : ''} to become a ${rk.next.name}` : 'The highest rank!')),
       h('div', { class: 'goal-top' }, h('b', {}, `🔥 ${st} ${st === 1 ? 'day' : 'days'} in a row`), h('span', { class: 'muted small' }, `Quest goal: ${goal} evening${goal > 1 ? 's' : ''} this week`)),
       h('div', { class: 'goal-days' }, wk.days.map((d, i) => h('div', { class: 'gd' + (d.on ? ' on' : '') + (d.today ? ' today' : '') }, h('small', {}, DAYS[i]), h('span', {}, d.on ? '⭐' : '')))),
       h('p', { class: 'goal-msg' }, left <= 0 ? '🎯 Quest goal reached. Well done, brave knight!' : `${left} more evening${left > 1 ? 's' : ''} to reach this week's quest goal.`),
@@ -287,15 +291,15 @@
       plan.optional.forEach(k => frag.append(subjCard(SUBJ[k], false)));
     }
     frag.append(h('div', { class: 'chips' },
-      h('div', { class: 'chip' }, h('b', {}, starCount()), 'stars'),
+      h('div', { class: 'chip' }, h('b', {}, '🪙 ' + starCount()), 'gold coins'),
       h('div', { class: 'chip' }, h('b', {}, S.days.length), S.days.length === 1 ? 'study day' : 'study days'),
-      h('div', { class: 'chip' }, h('b', {}, `${doneCount()}/${ALL.length}`), 'lessons done')));
+      h('div', { class: 'chip' }, h('b', {}, `${friendCount()}/${ALL.length}`), 'monster friends')));
     frag.append(h('a', { class: 'quick', href: '#/review' }, h('span', { class: 'quick-die', html: '⚔️' }), h('span', {}, h('b', {}, 'Monster training'), h('br'), 'Practise with questions from lessons you have done')));
-    const book = h('section', { class: 'book' }, h('h2', { class: 'sect' }, 'My monster book'));
+    const book = h('section', { class: 'book' }, h('h2', { class: 'sect' }, 'My monster book'), h('p', { class: 'muted book-note' }, 'Finish a quest to tame its monster. Big Bosses wear crowns.'));
     SUBJECTS.forEach(sb => {
       const nx = nextIdx(sb);
       book.append(h('div', { class: 'book-row' }, h('div', { class: 'book-label' }, h('b', {}, sb.name), h('small', {}, `${doneCount(sb)} of ${sb.lessons.length}`)),
-        h('div', { class: 'stickers' }, sb.lessons.map(L => { const r = S.done[L.id]; return h('a', { class: `stk ${sb.key} ${r ? (r.skipped ? 'known' : 'got') : ''} ${L.n === nx ? 'next' : ''}`, href: '#/lesson/' + L.id, title: r && !r.skipped ? `${monsterFor(L)[0]} the monster: ${L.t}` : L.t, 'aria-label': L.t + (r ? ' (done)' : '') }, r ? (r.skipped ? '✓' : monsterFor(L)[1]) : ''); }))));
+        h('div', { class: 'stickers' }, sb.lessons.map(L => { const r = S.done[L.id], m = monsterFor(L); return h('a', { class: `stk ${sb.key} ${r ? (r.skipped ? 'known' : 'got') : ''} ${L.n === nx ? 'next' : ''}${m.boss ? ' bossk' : ''}`, href: '#/lesson/' + L.id, title: r && !r.skipped ? `${m.name}: ${L.t}` : (r ? L.t : `A monster is waiting: ${L.t}`), 'aria-label': L.t + (r ? ' (done)' : ''), html: monPic(L, '', !r) + (r && r.skipped ? '<b class="chk">✓</b>' : '') }); }))));
     });
     frag.append(book);
     app(frag);
@@ -305,7 +309,7 @@
     setNav('map');
     const sb = SUBJ[key] || SUBJECTS[0];
     if (pick && pick.subj !== sb.key) pick = null;
-    const frag = h('div', {}, h('h1', {}, 'Quest Map'), subjTabs('map', sb.key), h('p', { class: 'muted' }, `${sb.blurb} 8 weeks, 5 lessons a week. Tap any lesson to open it.`));
+    const frag = h('div', {}, h('h1', {}, 'Quest Map'), subjTabs('map', sb.key), h('p', { class: 'muted' }, `${sb.blurb} 8 levels, 5 quests each. The last quest of every level is a Big Boss. Tap a quest to open it.`));
     if (!pick && doneCount(sb) === 0) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Not sure where to start? A short check (2 questions at a time) finds the right lesson.'), h('a', { class: 'btn', href: '#/placement/' + sb.key }, 'Take the quick check')));
     if (!pick) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Learned some already, or pressed done by mistake?'), h('button', { class: 'btn', onclick: () => { pick = new Set(); pick.subj = sb.key; route(); } }, 'Choose lessons to change')));
     else {
@@ -319,12 +323,12 @@
       const wl = sb.lessons.filter(l => l.week === w.week), wd = wl.filter(l => S.done[l.id]);
       const last = wd.map(l => S.done[l.id].when).sort().pop();
       const todo = wl.filter(l => !S.done[l.id]), known = wl.filter(l => S.done[l.id] && S.done[l.id].skipped);
-      frag.append(h('div', { class: 'weekh' }, h('h2', {}, `Week ${w.week}: ${w.theme}`),
-        h('span', { class: 'wk' + (wd.length === wl.length ? ' ok' : '') }, wd.length === wl.length ? `✅ Week complete ${fmtDate(last)}` : `${wd.length}/${wl.length} done`)), h('p', { class: 'muted' }, w.blurb),
+      frag.append(h('div', { class: 'weekh' }, h('h2', {}, `🏰 Level ${w.week}: ${w.theme}`),
+        h('span', { class: 'wk' + (wd.length === wl.length ? ' ok' : '') }, wd.length === wl.length ? `✅ Level cleared ${fmtDate(last)}` : `${wd.length}/${wl.length} tamed`)), h('p', { class: 'muted' }, w.blurb), (() => { const bl = wl[wl.length - 1], bm = monsterFor(bl); return h('p', { class: 'bossline' }, h('span', { class: 'boss-pic', html: monPic(bl, '', !S.done[bl.id]) }), `👑 Big Boss of this level: ${bm.name}` + (S.done[bl.id] ? ' (tamed!)' : '')); })(),
         h('div', { class: 'known-row' },
-          todo.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark the ${todo.length} unfinished lesson${todo.length > 1 ? 's' : ''} in Week ${w.week} as already known? They will count as done without questions. You can undo this.`)) { todo.forEach(markKnown); save(); route(); } } }, `✔ Already know all of Week ${w.week}`) : '',
+          todo.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark the ${todo.length} unfinished lesson${todo.length > 1 ? 's' : ''} in Level ${w.week} as already known? They will count as done without questions. You can undo this.`)) { todo.forEach(markKnown); save(); route(); } } }, `✔ Already know all of Level ${w.week}`) : '',
           known.length ? h('button', { class: 'btn alt small', onclick: () => { known.forEach(unmarkKnown); save(); route(); } }, `↩ Undo ${known.length} marked as known`) : '',
-          wd.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark all ${wd.length} finished lesson${wd.length > 1 ? 's' : ''} in Week ${w.week} as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { wd.forEach(unmarkDone); save(); route(); } } }, `↩ Mark Week ${w.week} as not done`) : ''));
+          wd.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark all ${wd.length} finished lesson${wd.length > 1 ? 's' : ''} in Level ${w.week} as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { wd.forEach(unmarkDone); save(); route(); } } }, `↩ Mark Level ${w.week} as not done`) : ''));
       frag.append(h('div', { class: 'grid' }, wl.map(tile)));
     });
     app(frag);
@@ -334,18 +338,38 @@
   function deepSections(L, body) {
     const d = (window.DEEP || {})[L.id]; if (!d) return;
     const sec = (cls, title, ...kids) => body.append(h('section', { class: 'deep ' + cls }, h('h3', {}, title), ...kids));
-    sec('why', '🔍 Explain it more', d.why.map(p => h('p', { html: p })));
-    sec('worked', '✍️ Try it step by step: ' + d.worked.t, h('ol', {}, d.worked.s.map(t => h('li', { html: t }))));
-    sec('watch', '⚠️ Watch out for', h('ul', {}, d.watch.map(t => h('li', { html: t }))));
-    sec('talk', '🗣️ Talk about it', h('ul', {}, d.talk.map(t => h('li', { html: t }))));
-    sec('words', '📖 Words to know', h('div', { class: 'wordlist' }, d.words.map(w => h('div', { class: 'word' }, h('b', {}, w[0]), h('span', {}, w[1])))));
+    sec('why', '🔮 Explain it more', d.why.map(p => h('p', { html: p })));
+    sec('worked', '🗡️ Try it step by step: ' + d.worked.t, h('ol', {}, d.worked.s.map(t => h('li', { html: t }))));
+    sec('watch', '🐉 Watch out for', h('ul', {}, d.watch.map(t => h('li', { html: t }))));
+    sec('talk', '🏰 Talk about it', h('ul', {}, d.talk.map(t => h('li', { html: t }))));
+    sec('words', '📜 Words to know', h('div', { class: 'wordlist' }, d.words.map(w => h('div', { class: 'word' }, h('b', {}, w[0]), h('span', {}, w[1])))));
   }
   /* Free outside resources found by web search (js/data/links.js). */
   function linkSection(L, body) {
     const ls = (window.LINKS || {})[L.id]; if (!ls || !ls.length) return;
-    body.append(h('section', { class: 'deep links' }, h('h3', {}, '🔗 Explore more (free websites)'),
+    body.append(h('section', { class: 'deep links' }, h('h3', {}, '🗺️ Explore more (free websites)'),
       h('ul', {}, ls.map(x => h('li', {}, h('a', { href: x[1], target: '_blank', rel: 'noopener noreferrer' }, x[0]), h('span', { class: 'muted' }, ' · ' + x[2])))),
       h('p', { class: 'muted small' }, 'These are outside websites. A grown-up should open them first. Some pages have adverts, and pages can change or move.')));
+  }
+
+  /* The battle scene at the top of a lesson: the knight against the lesson's monster. Solving puzzles calms the monster until it becomes a friend. */
+  function arena(L) {
+    const mon = monsterFor(L), total = L.q.length, right = () => S.right[L.id] || {}, sb = SUBJ[L.subj];
+    const foe = h('div', { class: 'ar-foe' }), calm = h('i'), msg = h('div', { class: 'ar-msg' }), pct = h('span', { class: 'ar-pct' });
+    const box = h('section', { class: `arena realm-${L.subj}${mon.boss ? ' boss' : ''}` },
+      h('div', { class: 'ar-realm' }, `${sb.icon} ${sb.realm}${mon.boss ? ' · 👑 Boss battle' : ''}`),
+      h('div', { class: 'ar-scene' }, h('div', { class: 'ar-knight', html: knightHtml() }), h('div', { class: 'ar-vs' }, 'VS'), foe),
+      h('div', { class: 'ar-calm' }, h('span', {}, 'Monster calm'), h('div', { class: 'meter' }, calm), pct), msg);
+    function update(hit) {
+      const g = Math.min(total, Object.keys(right()).length), d = S.done[L.id], friend = !!d || g >= total, ratio = friend ? 1 : g / total;
+      foe.innerHTML = Monsters.svg(mon.i, { boss: mon.boss, tamed: friend });
+      calm.style.width = Math.round(ratio * 100) + '%'; pct.textContent = Math.round(ratio * 100) + '%';
+      box.classList.toggle('tamed', friend);
+      msg.textContent = d && d.skipped ? `${mon.name} is already your friend.` : friend ? `${mon.name} is calm and happy. You tamed it!` : g ? `${mon.name} is getting calmer! ${g} of ${total} puzzles solved.` : `${mon.name} blocks the path! Solve puzzles to calm it down.`;
+      if (hit) { box.classList.remove('hit'); void box.offsetWidth; box.classList.add('hit'); }
+    }
+    update(false);
+    return { el: box, update };
   }
 
   function viewLesson(id) {
@@ -361,10 +385,12 @@
     const pracIdx = Q.map((q, qi) => qi).filter(qi => 'bc'.includes(Q[qi].l));
     const pracSolved = () => pracIdx.filter(qi => right[qi]).length;
     const chalLocked = () => !S.done[id] && !Adapt.practiceSolid(pracIdx.length, pracSolved()); // Challenge opens once Practice is mostly solved
+    let ar = null;
     function draw() {
       wrap.replaceChildren();
+      ar = arena(L);
       const steps = stepsBase.map(st => st[1] === 'chal' && chalLocked() ? ['🔒 Challenge', 'chal'] : st);
-      wrap.append(h('span', { class: 'pill dark ' + L.subj }, pillOf(L)), h('h1', {}, L.t));
+      wrap.append(h('span', { class: 'pill dark ' + L.subj }, pillOf(L)), h('h1', {}, L.t), ar.el);
       if (S.done[id]) {
         wrap.append(h('div', { class: 'badge-done' }, `✅ ${doneLine(S.done[id])}${S.done[id].skipped ? '' : ' · ' + scoreText(S.done[id])}`));
         wrap.append(h('div', { class: 'known-row' },
@@ -386,14 +412,14 @@
           qs.forEach(x => body.append(h('div', { class: 'callout' }, h('b', {}, x.L.t + ': '), x.L.key), questionEl(x, { tag: x.why || `from ${x.ago} lesson${x.ago > 1 ? 's' : ''} ago` })));
         }
       } else if (kind === 'learn') {
-        body.append(h('h2', {}, '📜 Today we learn: ' + L.sk), h('div', { class: 'key' }, '🎯 Goal: ' + L.goal));
+        body.append(h('h2', {}, '📜 Today we learn: ' + L.sk), h('div', { class: 'key' }, '⚔️ Your quest: ' + L.goal));
         const pics = L.subj === 'math' ? (window.PICS || {})[L.n] || [] : [];
         L.learn.forEach((p, i) => {
           body.append(h('div', { class: 'learn-p', html: vis(p) }));
           pics.filter(x => x[0] === i).forEach(x => body.append(h('div', { html: vis(x[1]) })));
         });
         deepSections(L, body);
-        body.append(h('div', { class: 'key' }, '🔑 Remember: ' + L.key), h('div', { class: 'callout do', html: L.do }), h('div', { class: 'callout oly', html: L.tip }),
+        body.append(h('div', { class: 'key' }, '📜 Scroll of wisdom: ' + L.key), h('div', { class: 'callout do', html: themeText(L.do) }), h('div', { class: 'callout oly', html: themeText(L.tip) }),
           h('div', { class: 'callout small', html: '<b>Parent note:</b> ' + L.parent }));
         linkSection(L, body);
       } else if (kind === 'chal' && chalLocked()) {
@@ -406,18 +432,18 @@
         body.append(h('h2', {}, kind === 'prac' ? '⚔️ Practice' : '🐉 Dragon challenge'),
           h('p', { class: 'muted' }, kind === 'prac' ? (L.subj === 'math' ? 'Draw a picture if you get stuck.' : 'Read each question slowly, twice.') : 'These are harder. Think, try, and use hints if you need them.'));
         set.forEach(x => {
-          const el = questionEl({ q: x.q, qi: x.qi, L }, { onRight: () => { right[x.qi] = true; markDay(); save(); } });
-          if (right[x.qi]) el.append(h('div', { class: 'muted small' }, '⭐ You solved this one before.'));
+          const el = questionEl({ q: x.q, qi: x.qi, L }, { onRight: () => { right[x.qi] = true; markDay(); save(); ar.update(true); } });
+          if (right[x.qi]) el.append(h('div', { class: 'muted small' }, '🪙 You won a coin for this one before.'));
           body.append(el);
         });
       } else {
         const total = L.q.length, got = counts(), nx = sb.lessons[L.n + 1];
         body.append(h('h2', {}, '🏰 Wrap-up'),
           h('p', { class: 'bigstars' }, '⭐'.repeat(Math.round((got / total) * 5)) + '☆'.repeat(5 - Math.round((got / total) * 5))),
-          h('p', {}, `You solved ${got} of ${total} questions in this lesson.`),
-          h('div', { class: 'key' }, '🔑 ' + L.key), h('p', {}, 'Tell a grown-up in your own words what you learned today.'),
+          h('p', {}, `You solved ${got} of ${total} puzzles. ${monsterFor(L).name} is ${got >= total ? 'calm and happy' : 'getting calmer'}.`),
+          h('div', { class: 'key' }, '📜 ' + L.key), h('p', {}, 'Tell a grown-up in your own words what you learned today.'),
           got < total ? h('p', { class: 'muted' }, 'Some questions are still unsolved. Go back and try them, or finish now. They will come back in Look Back.') : '');
-        body.append(h('button', { class: 'btn', onclick: () => { S.done[id] = { correct: counts(), total, when: (S.done[id] && S.done[id].when) || todayStr(), last: todayStr() }; S.pos = { id: nx ? nx.id : id, step: 0 }; markDay(); save(); go('#/done/' + id); } }, S.done[id] ? 'Save again' : '✅ Finish lesson'));
+        body.append(h('button', { class: 'btn', onclick: () => { S.done[id] = { correct: counts(), total, when: (S.done[id] && S.done[id].when) || todayStr(), last: todayStr() }; S.pos = { id: nx ? nx.id : id, step: 0 }; markDay(); save(); go('#/done/' + id); } }, S.done[id] ? 'Save again' : '🏰 Finish quest'));
       }
       wrap.append(body);
       const nav = h('div', { class: 'ans' });
@@ -433,8 +459,9 @@
     const L = BYID[id]; if (!L) return go('#/');
     const nx = SUBJ[L.subj].lessons[L.n + 1], r = S.done[id], mon = monsterFor(L);
     const news = knightNews();
-    app(h('div', {}, news || '', h('section', { class: 'card hero ' + L.subj }, h('h1', {}, '🏰 Quest complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? scoreText(r) : ''}`),
-      r && !r.skipped ? h('div', { class: 'newmon' }, h('span', { class: 'newmon-face' }, mon[1]), h('span', {}, h('b', {}, `You made a new monster friend: ${mon[0]}!`), h('br'), 'Find it in your monster book on the home page.')) : '',
+    app(h('div', {}, news || '', h('section', { class: 'card hero ' + L.subj }, h('h1', {}, mon.boss ? '👑 Big Boss tamed!' : '🏰 Quest complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? scoreText(r) : ''}`),
+      r && !r.skipped ? h('div', { class: 'newmon' }, h('span', { class: 'newmon-face', html: Monsters.svg(mon.i, { boss: mon.boss, tamed: true }) }), h('span', {}, h('b', {}, mon.boss ? `You tamed ${mon.name}, the Big Boss!` : `You tamed ${mon.name}, a new monster friend!`), h('br'), 'Find it in your monster book on the home page.')) : '',
+      h('div', { class: 'sparkles', 'aria-hidden': 'true' }, ['✨', '⭐', '🎉', '✨', '⭐', '🎉', '✨', '⭐'].map((e, k) => h('span', { style: `left:${8 + k * 12}%;animation-delay:${(k % 4) * 0.25}s` }, e))),
       nx ? h('p', {}, 'Next time: ' + nx.t) : h('p', {}, `🎓 That was the last ${SUBJ[L.subj].name} quest!`), h('a', { class: 'btn light', href: '#/' }, 'Back home'), h('p', { class: 'small', style: 'margin-top:20px' }, 'Playing on another device? ', h('a', { href: '#/parent', style: 'color:#fff;text-decoration:underline' }, 'Get your progress password')))));
   }
 
@@ -446,7 +473,7 @@
     function finish() {
       const k = Adapt.placement(probes, passed), todo = sb.lessons.slice(0, k).filter(l => !S.done[l.id]);
       S.placed[sb.key] = todayStr(); save();
-      wrap.replaceChildren(h('h1', {}, 'Check finished'), todo.length
+      wrap.replaceChildren(h('h1', {}, 'Trial finished'), todo.length
         ? h('section', { class: 'card' }, h('p', {}, `Great work! The first ${k} ${sb.name} lessons look easy for you (up to "${sb.lessons[k - 1].t}").`),
           h('p', { class: 'muted' }, 'Skipping marks them as already known. You can undo it any time from the map, and they still show up in Look Back.'),
           h('button', { class: 'btn', onclick: () => { todo.forEach(markKnown); const nx = sb.lessons.find(l => !S.done[l.id]); S.pos = nx ? { id: nx.id, step: 0 } : null; save(); go('#/'); } }, `Skip ${todo.length} lesson${todo.length > 1 ? 's' : ''} and start at lesson ${k + 1}`), ' ',
@@ -460,8 +487,8 @@
       const next = h('button', { class: 'btn', onclick: () => { passed.push(ok); if (ok && pi + 1 < probes.length) ask(pi + 1); else finish(); } }, pi + 1 < probes.length ? 'Next ▶' : 'See my result ▶');
       next.disabled = true;
       const onResult = first => { results.push(first); if (!first) ok = false; if (results.length === qs.length) next.disabled = false; };
-      wrap.replaceChildren(h('h1', {}, `Quick check: ${sb.name}`), h('p', { class: 'muted' }, `Check ${pi + 1} of ${probes.length}. Answer what you can. It is fine to get some wrong; this only helps us choose where to start.`),
-        ...qs.map(x => questionEl({ L, qi: x.qi, q: resolve(L, x.qi) }, { tag: 'quick check', onResult, noEasier: true })),
+      wrap.replaceChildren(h('h1', {}, `Squire's trial: ${sb.name}`), h('p', { class: 'muted' }, `Trial ${pi + 1} of ${probes.length}. Answer what you can. It is fine to get some wrong; this only helps us choose where to start.`),
+        ...qs.map(x => questionEl({ L, qi: x.qi, q: resolve(L, x.qi) }, { tag: 'squire trial', onResult, noEasier: true })),
         h('div', { class: 'ans', style: 'margin-top:14px' }, next, h('button', { class: 'btn alt', onclick: finish }, 'Stop here')));
       window.scrollTo(0, 0);
     }
@@ -482,8 +509,8 @@
     const due = Adapt.dueSkills(S, todayStr()).filter(d => BYID[d.id] && (!key || key === 'all' || BYID[d.id].subj === key));
     if (due.length) {
       const dbox = h('div');
-      frag.append(h('section', { class: 'card' }, h('h2', {}, '🎯 Skills to practise'), h('p', { class: 'muted' }, 'These come back because a question was tricky, or it has been a while. Seeing them again at growing gaps (1, 2, 4, 7, 14, 30 days) is what makes them stick.'),
-        h('ul', {}, due.slice(0, 8).map(d => h('li', {}, `${SUBJ[BYID[d.id].subj].icon} ${BYID[d.id].t} `, h('span', { class: 'pill dark' }, d.weak ? 'tricky' : 'due')))),
+      frag.append(h('section', { class: 'card' }, h('h2', {}, '🐲 Monster rematches'), h('p', { class: 'muted' }, 'These monsters are back because a question was tricky, or it has been a while. Seeing them again at growing gaps (1, 2, 4, 7, 14, 30 days) is what makes them stick.'),
+        h('ul', {}, due.slice(0, 8).map(d => h('li', { class: 'rematch' }, h('span', { class: 'rm-pic', html: monPic(BYID[d.id]) }), `${BYID[d.id].t} `, h('span', { class: 'pill dark' }, d.weak ? 'tricky' : 'due')))),
         h('button', { class: 'btn', onclick: () => { const qs = due.slice(0, 6).map(d => { const L = BYID[d.id], qi = Adapt.pickQuestion(L, d.e, Math.floor(Math.random() * 97)); return { L, qi, q: resolve(L, qi) }; }); dbox.replaceChildren(...qs.map(x => questionEl(x, { tag: 'from: ' + x.L.t }))); } }, 'Practise these'), dbox));
     }
     frag.append(h('section', { class: 'card' }, h('h2', {}, '📜 Scroll of facts'),
@@ -538,7 +565,7 @@
 
   function viewParent() {
     setNav('parent');
-    const frag = h('div', {}, h('h1', {}, '👨‍👩‍👧 Parent corner'), h('p', {}, h('button', { class: 'btn alt small', onclick: () => { GATE.lock(); go('#/'); } }, '🔒 Lock grown-ups area now'), h('span', { class: 'muted small' }, '  It also locks itself after 10 minutes.')));
+    const frag = h('div', {}, h('h1', {}, '🏰 The Keep (for grown-ups)'), h('p', {}, h('button', { class: 'btn alt small', onclick: () => { GATE.lock(); go('#/'); } }, '🔒 Lock grown-ups area now'), h('span', { class: 'muted small' }, '  It also locks itself after 10 minutes.')));
     const nm = h('input', { type: 'text', value: S.name, placeholder: 'Child\'s name', style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' });
     const pl = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' },
       [['rotate', 'Maths every day + English (Mon, Wed, Fri) or Science (Tue, Thu)'], ['all', 'All three subjects every day'], ['math', 'Maths every day, others optional']].map(([v, t]) => h('option', Object.assign({ value: v }, S.plan === v ? { selected: 'selected' } : {}), t)));
@@ -560,17 +587,17 @@
         h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong answers are fine, thinking is the point.'))));
     frag.append(passwordCard());
     const skipSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
-    const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Weeks 1 to ${n}`)));
+    const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Levels 1 to ${n}`)));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Already learned some of this, or marked by mistake?'),
       h('p', { class: 'muted' }, 'Mark lessons as done without questions when your child has already learned them elsewhere. Lessons already completed here keep their real scores. Marked lessons still appear in Look Back so old ideas are refreshed, and you can undo any time from the map.'),
       h('div', { class: 'ans' }, skipSel, weekSel, h('button', { class: 'btn', onclick: () => {
         const sb = SUBJ[skipSel.value], list = lessonsUpTo(sb, +weekSel.value).filter(l => !S.done[l.id]);
         if (!list.length) return alert('Everything in that range is already done.');
-        if (confirm(`Mark ${list.length} ${sb.name} lesson${list.length > 1 ? 's' : ''} (weeks 1 to ${weekSel.value}) as already known?`)) { list.forEach(markKnown); const nx = sb.lessons.find(l => !S.done[l.id]); if (nx) S.pos = { id: nx.id, step: 0 }; save(); alert(`Done. ${list.length} lesson${list.length > 1 ? 's' : ''} marked.`); route(); }
+        if (confirm(`Mark ${list.length} ${sb.name} lesson${list.length > 1 ? 's' : ''} (levels 1 to ${weekSel.value}) as already known?`)) { list.forEach(markKnown); const nx = sb.lessons.find(l => !S.done[l.id]); if (nx) S.pos = { id: nx.id, step: 0 }; save(); alert(`Done. ${list.length} lesson${list.length > 1 ? 's' : ''} marked.`); route(); }
       } }, 'Mark as known'), h('button', { class: 'btn alt', onclick: () => {
         const sb = SUBJ[skipSel.value], list = lessonsUpTo(sb, +weekSel.value).filter(l => S.done[l.id]);
         if (!list.length) return alert('Nothing in that range is marked done.');
-        if (confirm(`Mark ${list.length} ${sb.name} lesson${list.length > 1 ? 's' : ''} (weeks 1 to ${weekSel.value}) as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { list.forEach(unmarkDone); save(); alert(`Done. ${list.length} lesson${list.length > 1 ? 's' : ''} reset.`); route(); }
+        if (confirm(`Mark ${list.length} ${sb.name} lesson${list.length > 1 ? 's' : ''} (levels 1 to ${weekSel.value}) as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { list.forEach(unmarkDone); save(); alert(`Done. ${list.length} lesson${list.length > 1 ? 's' : ''} reset.`); route(); }
       } }, '↩ Mark as not done'))));
     SUBJECTS.forEach(sb => {
       const t = h('table', {}, h('tr', {}, h('th', {}, 'Lesson'), h('th', {}, 'Score'), h('th', {}, 'Completed'), h('th', {}, 'Answers')));
@@ -606,6 +633,8 @@
       return GATE.require(route, () => go('#/'));
     }
     if (gated && window.GATE) GATE.touch();
+    const rl = p[0] === 'lesson' ? (BYID[p[1]] || {}).subj : p[0] === 'map' ? (SUBJ[p[1]] ? p[1] : 'math') : p[0] === 'placement' ? p[1] : '';
+    document.body.dataset.realm = rl || 'home';
     ({ '': viewHome, placement: () => viewPlacement(p[1]), map: () => viewMap(p[1]), lesson: () => viewLesson(p[1]), done: () => viewDone(p[1]), review: () => viewReview(p[1]), parent: viewParent, key: () => viewKey(p[1]) }[p[0]] || viewHome)();
   }
   window.addEventListener('hashchange', route);

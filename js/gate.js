@@ -29,12 +29,12 @@
     let entry = pick(), tries = 0;
     const back = document.createElement('div'); back.className = 'gate-back';
     back.innerHTML = `<div class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
-      <h2 id="gate-title">Grown-ups only</h2>
-      <p>To open this area, type the <b>-ology</b> word for this:</p>
+      <h2 id="gate-title">🏰 Halt! Grown-ups only</h2>
+      <p>The gate guard says: to enter the keep, type the <b>-ology</b> word for this:</p>
       <p class="gate-hint"></p>
       <input class="gate-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" aria-label="The -ology word" placeholder="Type the word here">
       <p class="gate-msg" role="status"></p>
-      <div class="gate-row"><button class="btn" data-ok>Open</button><button class="btn alt" data-cancel>Back to Home</button></div>
+      <div class="gate-row"><button class="btn" data-ok>Open the gate</button><button class="btn alt" data-cancel>Back to the quest</button></div>
     </div>`;
     const hint = back.querySelector('.gate-hint'), input = back.querySelector('.gate-input'), msg = back.querySelector('.gate-msg');
     const show = () => { hint.textContent = 'The study of ' + entry[0] + '.'; input.value = ''; };
