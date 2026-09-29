@@ -1,6 +1,6 @@
-# Math Adventure: Grade 1 Home Curriculum
+# Learning Adventure: Grade 1 Home Curriculum
 
-A no-build web app for a 6-year-old to study maths at home, Monday to Friday evenings.
+A no-build web app for a 6-year-old to study Maths, English and Science at home on weekday evenings.
 Singapore-style (concrete, pictorial, abstract) with material pushed beyond the usual
 P1 level, plus olympiad-style thinking in every lesson.
 
@@ -45,3 +45,11 @@ Most warm-up, core and stretch questions are generated with fresh numbers every 
 (`js/gen.js`, wired up in `js/data/gens.js` as `"lesson:question" -> generator`). The static question in
 `weekN.js` stays as the fallback and defines the level. Run `node tests/gen.test.js` to check every generator
 1,500 times against independent calculations.
+
+## Subjects
+
+Each subject has 8 weeks x 5 lessons (`js/data/weekN.js` for maths, `englishN.js`, `scienceN.js`). English and Science use the
+authoring helpers in `js/data/helpers.js` (`MC`, `TP`, `LS`) and illustration tokens from `js/illustrations2.js`
+(`cards, seq, cycle, table, sentence, blend, states, plant, magnet, shadow, planets, moon, circuit, lever`).
+Home shows a daily plan (Maths every weekday, plus English on Mon/Wed/Fri or Science on Tue/Thu; change it in Parent corner).
+Run `node tests/data.test.js` to validate all lesson data.

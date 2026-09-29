@@ -166,3 +166,34 @@ figure.groups figcaption{flex-basis:100%}
 figure.ill.wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
 figure.ill.wide svg{min-width:520px}
 figure.ill.wide figcaption{position:sticky;left:0}
+/* English & science illustrations */
+.pcard{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:92px;max-width:120px;padding:10px 8px;background:var(--card);border:2px solid var(--line);border-radius:14px;line-height:1.25;text-align:center}
+.pcard .em{font-size:2.2rem;line-height:1.1}
+.pcard b{font-size:.85rem}
+figure.ill.seq .arr,.cyc .arr{color:var(--pri);font-size:1.6rem;font-weight:800}
+.cyc{display:grid;grid-template-columns:auto auto auto;gap:6px 10px;align-items:center;justify-items:center;width:max-content;margin:0 auto}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+.tile-w{padding:8px 14px;background:var(--card);border:2px solid var(--pri);border-radius:10px;font-size:1.4rem;font-weight:700}
+.tile-w.word{background:var(--pri);color:#fff}
+.tile-w.punc{border-style:dashed}
+.tiles .plus{font-size:1.4rem;font-weight:800;color:var(--pri)}
+.tbl{border-collapse:collapse;margin:0 auto;background:var(--card);border-radius:10px;overflow:hidden;max-width:100%}
+.tbl th{background:var(--pri);color:#fff;padding:8px 14px;font-size:.95rem}
+.tbl td{padding:8px 14px;border-top:1px solid var(--line);font-size:.95rem}
+.q .text{white-space:pre-line}
+
+/* subjects */
+.hero.eng{background:linear-gradient(135deg,#0f9d8a,#2b7de0)}
+.hero.sci{background:linear-gradient(135deg,#e0862b,#d64a7a)}
+.hero.optional{opacity:.92}
+.hero h2{color:#fff;margin:.4em 0 .3em;font-size:1.6rem}
+.subj-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 24px}
+.subj-tabs a{padding:8px 16px;border:2px solid var(--line);border-radius:99px;text-decoration:none;color:var(--ink);font-weight:700;background:var(--card)}
+.subj-tabs a.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.subj-tabs a.on.eng{background:#0f9d8a;border-color:#0f9d8a}
+.subj-tabs a.on.sci{background:#e0862b;border-color:#e0862b}
+.pill.dark.eng{background:#d7f4ef;color:#0b7d6d}
+.pill.dark.sci{background:#ffe9d2;color:#b25d0d}
+.subj-progress{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;margin:8px 0 24px}
+.meter{height:12px;border-radius:99px;background:var(--pri2);overflow:hidden;margin:6px 0}
+.meter i{display:block;height:100%;background:var(--pri)}.meter i.eng{background:#0f9d8a}.meter i.sci{background:#e0862b}
