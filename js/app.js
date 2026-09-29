@@ -209,6 +209,14 @@
     eng: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 14 Q32 4 32 14 V56 Q32 46 6 56 Z" fill="#fff"/><path d="M58 14 Q32 4 32 14 V56 Q32 46 58 56 Z" fill="#ffe6a3"/><path d="M32 14 V56" stroke="#0f9d8a" stroke-width="3"/><text x="19" y="42" font-family="ui-rounded,system-ui" font-weight="800" font-size="22" fill="#0f9d8a" text-anchor="middle">A</text><text x="45" y="42" font-family="ui-rounded,system-ui" font-weight="800" font-size="22" fill="#e0862b" text-anchor="middle">b</text></svg>`,
     sci: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M25 6 h14 v18 l15 27 q4 9 -6 9 h-32 q-10 0 -6 -9 l15 -27 z" fill="#fff" fill-opacity=".92"/><path d="M17 44 h30 l7 12 q1 3 -3 3 h-38 q-4 0 -3 -3 z" fill="#7fe0c2"/><circle cx="28" cy="38" r="3" fill="#fff"/><circle cx="37" cy="30" r="2.4" fill="#fff"/><circle cx="34" cy="46" r="2" fill="#fff"/></svg>`
   };
+  /* A random fun fact each time; never the same one twice in a row, even across page loads. */
+  const nextFact = () => {
+    const T = window.TRIVIA || [`Owls can turn their heads almost all the way round.`]; let last = -1;
+    try { last = +sessionStorage.getItem('lastFact'); } catch (e) { /* private mode */ }
+    let i; do { i = Math.floor(Math.random() * T.length); } while (T.length > 1 && i === last);
+    try { sessionStorage.setItem('lastFact', String(i)); } catch (e) { /* private mode */ }
+    return T[i];
+  };
   const greeting = () => { const hr = new Date().getHours(); return hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'; };
   function subjCard(sb, primary) {
     const n = nextIdx(sb), L = sb.lessons[n], icon = h('div', { class: 'sc-icon', html: ICONS[sb.key] });
@@ -225,9 +233,12 @@
   function viewHome() {
     setNav('home');
     const frag = h('div'), plan = todayPlan();
-    frag.append(h('section', { class: 'hello' }, h('div', { class: 'owl-wrap', html: OWL }),
+    const fact = h('span', {}), hop = () => { const o = frag.querySelector('.owl-wrap'); if (o) { o.classList.remove('hop'); void o.offsetWidth; o.classList.add('hop'); } };
+    const another = () => { fact.textContent = nextFact(); hop(); };
+    fact.textContent = nextFact();
+    frag.append(h('section', { class: 'hello' }, h('button', { class: 'owl-wrap', 'aria-label': 'Tap the owl for a fun fact', onclick: another, html: OWL }),
       h('div', { class: 'bubble' }, h('h1', {}, `${greeting()}, ${S.name || 'friend'}!`),
-        h('p', {}, plan.weekend ? 'It is the weekend. Pick anything you like!' : 'Your adventures for today are waiting.'))));
+        h('p', { class: 'fact' }, h('b', {}, 'Did you know? '), fact), h('button', { class: 'linkbtn', onclick: another }, 'Tell me another!'))));
     frag.append(h('h2', { class: 'sect' }, plan.weekend ? 'Pick an adventure' : 'Today\'s adventures'));
     plan.main.forEach(k => frag.append(subjCard(SUBJ[k], true)));
     if (plan.optional.length) {

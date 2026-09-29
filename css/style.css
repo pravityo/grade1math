@@ -283,3 +283,12 @@ body{font-family:ui-rounded,"SF Pro Rounded","Nunito","Quicksand",system-ui,-app
 .gate-input{width:100%;font:inherit;font-size:1.3rem;padding:12px 14px;border-radius:12px;border:3px solid var(--line);background:var(--bg);color:var(--ink)}
 .gate-msg{min-height:1.6em;margin:.6em 0;color:var(--bad);font-weight:700}
 .gate-row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* owl trivia */
+button.owl-wrap{background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.owl-wrap.hop{animation:hop .5s ease}
+@keyframes hop{30%{transform:translateY(-14px) rotate(-4deg)}60%{transform:translateY(0) rotate(3deg)}}
+.bubble .fact{color:var(--ink);font-size:1.12rem;line-height:1.5;margin:.2em 0 0}
+.bubble .fact b{color:var(--pri)}
+.bubble .linkbtn{padding:6px 0;min-height:36px;color:var(--pri);font-weight:700}
+@media(prefers-reduced-motion:reduce){.owl-wrap.hop{animation:none}}
