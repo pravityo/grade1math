@@ -80,10 +80,10 @@ question offers an easier one from the same lesson. Challenge stays locked until
 has a quick placement check (`#/placement/<subject>`, 2 questions from every 5th lesson, stops at the first miss) that
 can mark earlier lessons as already known.
 
-## Streaks, weekly goal and owl accessories (`js/owlwear.js`)
+## Streaks, weekly goal and knight armour (`js/knightwear.js`)
 The home page shows the streak (weekends never break it, one missed weekday in five is forgiven) and progress towards
-the weekly goal (parent-set, 1 to 5 evenings). The owl earns one of 12 accessories for every 3 study days (days with a
-solved question or finished lesson) and wears it straight away; the child can change outfits under "Dress my owl".
+the weekly goal (parent-set, 1 to 5 evenings). The little knight earns one of 12 pieces of armour for every 3 study days (days with a
+solved question or finished lesson) and wears it straight away; the child can change outfits under "Open the armoury".
 Study days live on the device, so accessories are not part of the progress password.
 `node tests/adapt.test.js` covers all of this.
 

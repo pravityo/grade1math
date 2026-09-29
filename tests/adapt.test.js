@@ -1,8 +1,8 @@
-/* Run: node tests/adapt.test.js  (adaptive learning, streaks, weekly goal, owl accessories) */
+/* Run: node tests/adapt.test.js  (adaptive learning, streaks, weekly goal, knight accessories) */
 globalThis.window = globalThis; const fs = require('fs'), path = require('path');
-for (const f of ['adapt', 'owlwear']) eval(fs.readFileSync(path.join(__dirname, '..', 'js', f + '.js'), 'utf8'));
+for (const f of ['adapt', 'knightwear']) eval(fs.readFileSync(path.join(__dirname, '..', 'js', f + '.js'), 'utf8'));
 let bad = 0; const eq = (name, got, want) => { if (JSON.stringify(got) !== JSON.stringify(want)) { bad++; console.log('FAIL', name, 'got', JSON.stringify(got), 'want', JSON.stringify(want)); } };
-const A = Adapt, W = OwlWear;
+const A = Adapt, W = KnightWear;
 
 /* ---- spaced repetition ---- */
 let S = {};
@@ -62,22 +62,22 @@ eq('week starts Monday', wk.days[0].iso, '2025-03-03'); eq('5 weekdays', wk.days
 eq('marks studied days', wk.days.map(d => d.on), [true, false, true, false, false]); eq('count includes weekend, not next week', wk.count, 3); eq('today flagged', wk.days.findIndex(d => d.today), 3);
 eq('Sunday belongs to the week before', A.week([], '2025-03-09').days[0].iso, '2025-03-03');
 
-/* ---- owl accessories: one per 3 study days ---- */
+/* ---- knight accessories: one per 3 study days ---- */
 eq('12 accessories', W.ACC.length, 12); eq('unique ids', new Set(W.ACC.map(a => a.id)).size, 12);
 eq('every slot valid', W.ACC.every(a => W.SLOTS.includes(a.slot) && /^</.test(a.svg)), true);
 [[0, 0], [2, 0], [3, 1], [5, 1], [6, 2], [35, 11], [36, 12], [99, 12]].forEach(([d, n]) => eq(`${d} days -> ${n} earned`, W.earned(d), n));
 eq('2 more days to next', W.untilNext(4), 2); eq('3 days to next after a gift', W.untilNext(3), 3); eq('all collected', W.untilNext(36), 0);
-let owl = {}; let fresh = W.sync(owl, 2); eq('nothing new at 2 days', fresh.length, 0);
-fresh = W.sync(owl, 3); eq('first gift at 3 days', fresh.map(a => a.id), ['party']); eq('worn at once', owl.worn.head, 'party');
-eq('celebrated only once', W.sync(owl, 4).length, 0);
-fresh = W.sync(owl, 9); eq('two gifts at once when days jump', fresh.map(a => a.id), ['glasses', 'bowtie']);
-W.sync(owl, 15); eq('new crown replaces party hat', owl.worn.head, 'crown');
-eq('can put the party hat back on', W.toggle(owl, 'party', 15), true); eq('now worn', owl.worn.head, 'party');
-eq('take it off', W.toggle(owl, 'party', 15) && owl.worn.head, undefined);
-eq('cannot wear a locked item', W.toggle(owl, 'medal', 15), false);
-const owl2 = { worn: { head: 'wizard' }, seen: 12 }; W.sync(owl2, 6); eq('unearned item dropped after progress reset', owl2.worn.head, undefined);
+let knight = {}; let fresh = W.sync(knight, 2); eq('nothing new at 2 days', fresh.length, 0);
+fresh = W.sync(knight, 3); eq('first gift at 3 days', fresh.map(a => a.id), ['plume']); eq('worn at once', knight.worn.head, 'plume');
+eq('celebrated only once', W.sync(knight, 4).length, 0);
+fresh = W.sync(knight, 9); eq('two gifts at once when days jump', fresh.map(a => a.id), ['glasses', 'scarf']);
+W.sync(knight, 15); eq('new crown replaces the plume', knight.worn.head, 'crown');
+eq('can put the plume back on', W.toggle(knight, 'plume', 15), true); eq('now worn', knight.worn.head, 'plume');
+eq('take it off', W.toggle(knight, 'plume', 15) && knight.worn.head, undefined);
+eq('cannot wear a locked item', W.toggle(knight, 'medal', 15), false);
+const hero2 = { worn: { head: 'wizard' }, seen: 12 }; W.sync(hero2, 6); eq('unearned item dropped after progress reset', hero2.worn.head, undefined);
 const body = '<circle r="1"/>';
-eq('svg has the owl body', W.svg({}, body).includes(body), true);
-const capeSvg = W.svg({ back: 'cape', head: 'party' }, body); eq('cape is drawn behind the body', capeSvg.indexOf(W.byId('cape').svg) < capeSvg.indexOf(body), true); eq('hat is drawn in front', capeSvg.indexOf(W.byId('party').svg) > capeSvg.indexOf(body), true);
-eq('svg is well formed', (W.svg({ head: 'crown', face: 'shades', neck: 'medal', back: 'pack' }, body).match(/<svg/g) || []).length, 1);
-console.log(bad ? bad + ' failures' : 'adaptive, streak, goal and owl tests OK'); process.exit(bad ? 1 : 0);
+eq('svg has the knight body', W.svg({}, body).includes(body), true);
+const capeSvg = W.svg({ back: 'cape', head: 'plume' }, body); eq('cape is drawn behind the body', capeSvg.indexOf(W.byId('cape').svg) < capeSvg.indexOf(body), true); eq('hat is drawn in front', capeSvg.indexOf(W.byId('plume').svg) > capeSvg.indexOf(body), true);
+eq('svg is well formed', (W.svg({ head: 'crown', face: 'shades', neck: 'medal', back: 'wings' }, body).match(/<svg/g) || []).length, 1);
+console.log(bad ? bad + ' failures' : 'adaptive, streak, goal and knight tests OK'); process.exit(bad ? 1 : 0);

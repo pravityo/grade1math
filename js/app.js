@@ -2,14 +2,17 @@
   'use strict';
   const $app = document.getElementById('app');
   const KEY = 'grade1math.v1';
-  const LV = { b: ['Warm-up', '🌱'], c: ['Core', '⭐'], s: ['Stretch', '🚀'], o: ['Olympiad', '🏆'] };
+  const LV = { b: ['Squire', '🛡️'], c: ['Knight', '⚔️'], s: ['Champion', '🏅'], o: ['Dragon slayer', '🐉'] };
+  /* Every finished lesson makes a new monster friend. */
+  const MONSTERS = [['Blip', '👾'], ['Boo', '👻'], ['Ember', '🐲'], ['Rex', '🦖'], ['Inky', '🦑'], ['Ollie', '🐙'], ['Bolt', '🤖'], ['Zog', '👽'], ['Long-Neck', '🦕'], ['Drako', '🐉']];
+  const monsterFor = L => MONSTERS[(L.n * 3 + ({ math: 0, eng: 1, sci: 2 }[L.subj] || 0)) % MONSTERS.length];
 
   /* ---------- data ---------- */
   /* Three subjects. Maths keeps plain numeric ids ("0".."39") so progress saved before English/Science existed still works. */
   const SUBJECTS = [
-    { key: 'math', name: 'Maths', icon: '🧮', prefix: '', weeks: window.CURRICULUM || [], blurb: 'Singapore-style maths beyond school level, with olympiad thinking.' },
-    { key: 'eng', name: 'English', icon: '📚', prefix: 'e', weeks: window.ENGLISH || [], blurb: 'Phonics, grammar, reading and word puzzles.' },
-    { key: 'sci', name: 'Science', icon: '🔬', prefix: 's', weeks: window.SCIENCE || [], blurb: 'Living things, materials, forces, Earth and how scientists think.' }
+    { key: 'math', name: 'Maths', realm: 'Number Keep', icon: '🧮', prefix: '', weeks: window.CURRICULUM || [], blurb: 'Singapore-style maths beyond school level, with olympiad thinking.' },
+    { key: 'eng', name: 'English', realm: 'Story Forest', icon: '📚', prefix: 'e', weeks: window.ENGLISH || [], blurb: 'Phonics, grammar, reading and word puzzles.' },
+    { key: 'sci', name: 'Science', realm: 'Dragon Lab', icon: '🔬', prefix: 's', weeks: window.SCIENCE || [], blurb: 'Living things, materials, forces, Earth and how scientists think.' }
   ];
   const SUBJ = {}; const BYID = {};
   SUBJECTS.forEach(sb => {
@@ -35,7 +38,7 @@
     try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
     if (!S || typeof S !== 'object') S = {};
     S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate';
-    S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.owl = S.owl || {}; S.placed = S.placed || {};
+    S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {};
     if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; // saved before subjects existed
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ } }
@@ -137,14 +140,14 @@
     function win() {
       solved = true; box.classList.remove('wrong'); box.classList.add('right');
       track(tries === 0);
-      fb.className = 'fb ok'; fb.textContent = ['Yes! ', 'Great job! ', 'Correct! ', 'Awesome! '][(item.qi + tries) % 4] + '✅';
+      fb.className = 'fb ok'; fb.textContent = ['Huzzah! ', 'Well fought! ', 'Correct! ', 'Brilliant, brave knight! '][(item.qi + tries) % 4] + '✅';
       extra.replaceChildren(); showSol();
       if (opts.onRight) opts.onRight();
       box.querySelectorAll('input,button.chk').forEach(x => x.disabled = true);
     }
     function lose() {
       tries++; track(false); box.classList.add('wrong'); fb.className = 'fb no';
-      fb.textContent = tries === 1 ? 'Not quite. Have another go!' : 'Hmm, not yet. Try the hint, or tap Show answer.';
+      fb.textContent = tries === 1 ? 'Not quite, brave knight. Have another go!' : 'Hmm, not yet. Try the hint, or tap Show answer.';
       extra.replaceChildren();
       const bar = h('div', { class: 'ans', style: 'margin-top:8px' });
       if (q.h) bar.append(h('button', { class: 'btn alt small', onclick: () => { hintEl.style.display = 'block'; } }, '💭 Hint'));
@@ -205,20 +208,9 @@
     else if (plan === 'rotate') main = ['math', [1, 3, 5].includes(dow) ? 'eng' : 'sci'];
     return { weekend, main: weekend ? [] : main, optional: SUBJECTS.map(x => x.key).filter(k => weekend || !main.includes(k)) };
   }
-  /* ---- home: friendly owl, big adventure cards, sticker book ---- */
-  const OWL = `<svg class="owl" viewBox="0 0 120 132">
-    <path d="M20 46 L28 12 L52 34 Z M100 46 L92 12 L68 34 Z" fill="#8a5730"/>
-    <ellipse cx="60" cy="82" rx="42" ry="44" fill="#a86a3c"/><ellipse cx="60" cy="92" rx="26" ry="29" fill="#f6dcae"/>
-    <circle cx="60" cy="52" r="37" fill="#b9793f"/>
-    <circle cx="44" cy="52" r="16" fill="#fff"/><circle cx="76" cy="52" r="16" fill="#fff"/>
-    <circle class="pupil" cx="46" cy="54" r="7" fill="#2b2a4c"/><circle class="pupil" cx="74" cy="54" r="7" fill="#2b2a4c"/>
-    <circle cx="48.5" cy="51" r="2.4" fill="#fff"/><circle cx="76.5" cy="51" r="2.4" fill="#fff"/>
-    <path d="M53 64 L60 77 L67 64 Z" fill="#f5a623"/>
-    <path d="M14 88 Q4 104 22 112 Q22 96 30 86 Z" fill="#8a5730"/>
-    <g class="wave"><path d="M106 88 Q118 72 112 58 Q104 66 98 84 Z" fill="#8a5730"/></g>
-    <ellipse cx="46" cy="124" rx="10" ry="5" fill="#f5a623"/><ellipse cx="74" cy="124" rx="10" ry="5" fill="#f5a623"/></svg>`;
-  const OWL_BODY = OWL.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
-  const owlHtml = () => OwlWear.svg(S.owl.worn, OWL_BODY);
+  /* ---- home: a friendly little knight, quest cards, monster book ---- */
+  const MONSTER = `<svg class="mon" viewBox="0 0 100 100" aria-hidden="true"><path d="M22 30 L30 6 L44 24 Z M78 30 L70 6 L56 24 Z" fill="#f4ead2" stroke="#c9b98f" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="30" cy="94" rx="12" ry="6" fill="#ff9f43"/><ellipse cx="70" cy="94" rx="12" ry="6" fill="#ff9f43"/><path d="M50 14 C80 14 92 38 90 60 C88 84 72 94 50 94 C28 94 12 84 10 60 C8 38 20 14 50 14Z" fill="#8f6bff"/><ellipse cx="50" cy="74" rx="26" ry="17" fill="#b9a2ff"/><circle cx="24" cy="44" r="4" fill="#7551e6"/><circle cx="78" cy="38" r="3.4" fill="#7551e6"/><circle cx="72" cy="60" r="3" fill="#7551e6"/><circle cx="37" cy="46" r="12" fill="#fff"/><circle cx="63" cy="46" r="12" fill="#fff"/><circle class="pupil" cx="39" cy="48" r="6" fill="#2b2a4c"/><circle class="pupil" cx="61" cy="48" r="6" fill="#2b2a4c"/><circle cx="41" cy="45.5" r="2" fill="#fff"/><circle cx="63" cy="45.5" r="2" fill="#fff"/><path d="M34 68 Q50 84 66 68 Z" fill="#3b1f66"/><path d="M42 69.5 V75 M58 69.5 V75" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>`;
+  const knightHtml = () => KnightWear.svg(S.hero.worn);
   const ICONS = {
     math: `<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="18" y="6" width="26" height="26" rx="6" fill="#7fe0c2" stroke="#fff" stroke-width="3"/><rect x="4" y="34" width="26" height="26" rx="6" fill="#ffd84d" stroke="#fff" stroke-width="3"/><rect x="34" y="34" width="26" height="26" rx="6" fill="#ff7a90" stroke="#fff" stroke-width="3"/><g font-family="ui-rounded,system-ui" font-weight="800" font-size="20" fill="#fff" text-anchor="middle"><text x="31" y="27">3</text><text x="17" y="55">1</text><text x="47" y="55">2</text></g></svg>`,
     eng: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 14 Q32 4 32 14 V56 Q32 46 6 56 Z" fill="#fff"/><path d="M58 14 Q32 4 32 14 V56 Q32 46 58 56 Z" fill="#ffe6a3"/><path d="M32 14 V56" stroke="#0f9d8a" stroke-width="3"/><text x="19" y="42" font-family="ui-rounded,system-ui" font-weight="800" font-size="22" fill="#0f9d8a" text-anchor="middle">A</text><text x="45" y="42" font-family="ui-rounded,system-ui" font-weight="800" font-size="22" fill="#e0862b" text-anchor="middle">b</text></svg>`,
@@ -226,7 +218,7 @@
   };
   /* A random fun fact each time; never the same one twice in a row, even across page loads. */
   const nextFact = () => {
-    const T = window.TRIVIA || [`Owls can turn their heads almost all the way round.`]; let last = -1;
+    const T = window.TRIVIA || [`Knights in shining armour were once children who trained hard, just like you.`]; let last = -1;
     try { last = +sessionStorage.getItem('lastFact'); } catch (e) { /* private mode */ }
     let i; do { i = Math.floor(Math.random() * T.length); } while (T.length > 1 && i === last);
     try { sessionStorage.setItem('lastFact', String(i)); } catch (e) { /* private mode */ }
@@ -238,72 +230,72 @@
     if (!L) return h('section', { class: 'sc ' + sb.key }, icon, h('div', { class: 'sc-body' }, h('h2', {}, sb.name), h('p', {}, 'You finished every lesson!')), h('a', { class: 'go', href: '#/map/' + sb.key }, 'Map'));
     const cont = S.pos && S.pos.id === L.id && S.pos.step > 0;
     const card = h('section', { class: 'sc ' + sb.key + (primary ? '' : ' extra') }, icon,
-      h('div', { class: 'sc-body' }, h('span', { class: 'sc-tag' }, sb.name + (primary ? '' : ' · extra')), h('h2', {}, L.t),
+      h('div', { class: 'sc-body' }, h('span', { class: 'sc-tag' }, sb.name + ' · ' + sb.realm + (primary ? '' : ' · extra')), h('h2', {}, L.t),
         h('div', { class: 'meter light' }, h('i', { style: `width:${doneCount(sb) / sb.lessons.length * 100}%` })), h('small', {}, `Lesson ${n + 1} of ${sb.lessons.length}`)),
-      h('a', { class: 'go', href: '#/lesson/' + L.id }, cont ? 'Keep going' : 'Go!'));
+      h('a', { class: 'go', href: '#/lesson/' + L.id }, cont ? 'Keep going' : 'Start!'));
     const skip = h('button', { class: 'linkbtn', onclick: () => { if (confirm(`Mark "${L.t}" as already known? It will count as done without any questions. You can undo this.`)) { markKnown(L); const nx = sb.lessons.find(l => !S.done[l.id]); S.pos = nx ? { id: nx.id, step: 0 } : null; save(); route(); } } }, 'I already know this one');
     const check = doneCount(sb) === 0 && !S.placed[sb.key] ? h('a', { class: 'linkbtn', href: '#/placement/' + sb.key }, 'Not sure where to start? Take a quick check') : '';
     return h('div', { class: 'sc-wrap' }, card, skip, check);
   }
 
-  /* A newly earned owl accessory (one per 3 study days) is worn straight away and announced once. */
-  function owlNews() {
-    const fresh = OwlWear.sync(S.owl, S.days.length); if (!fresh.length) return null; save();
-    return h('div', { class: 'news' }, h('b', {}, '🎉 New for your owl: '), fresh.map(a => a.name).join(', '), '! ', h('span', { class: 'muted small' }, 'It is wearing it now. Tap "Dress my owl" to change.'));
+  /* A newly earned piece of armour (one per 3 study days) is worn straight away and announced once. */
+  function knightNews() {
+    const fresh = KnightWear.sync(S.hero, S.days.length); if (!fresh.length) return null; save();
+    return h('div', { class: 'news' }, h('b', {}, '🎉 New armour for your knight: '), fresh.map(a => a.name).join(', '), '! ', h('span', { class: 'muted small' }, 'It is wearing it now. Tap "Armoury" to change.'));
   }
   function wardrobe(onChange) {
-    const n = OwlWear.earned(S.days.length), box = h('div', { class: 'ward' });
-    OwlWear.ACC.forEach((a, i) => {
-      const got = i < n, on = got && (S.owl.worn || {})[a.slot] === a.id;
-      const b = h('button', { class: 'acc' + (on ? ' on' : '') + (got ? '' : ' locked'), 'aria-pressed': String(on), title: got ? a.name : `Unlocks after ${(i + 1) * OwlWear.EVERY} study days`,
-        onclick: () => { if (OwlWear.toggle(S.owl, a.id, S.days.length)) { save(); onChange(); } } },
-        h('span', { class: 'acc-pic', html: got ? OwlWear.svg({ [a.slot]: a.id }, OWL_BODY, a.name) : '🔒' }), h('small', {}, got ? a.name : `After ${(i + 1) * OwlWear.EVERY} days`));
+    const n = KnightWear.earned(S.days.length), box = h('div', { class: 'ward' });
+    KnightWear.ACC.forEach((a, i) => {
+      const got = i < n, on = got && (S.hero.worn || {})[a.slot] === a.id;
+      const b = h('button', { class: 'acc' + (on ? ' on' : '') + (got ? '' : ' locked'), 'aria-pressed': String(on), title: got ? a.name : `Unlocks after ${(i + 1) * KnightWear.EVERY} study days`,
+        onclick: () => { if (KnightWear.toggle(S.hero, a.id, S.days.length)) { save(); onChange(); } } },
+        h('span', { class: 'acc-pic', html: got ? KnightWear.svg({ [a.slot]: a.id }, null, a.name) : '🔒' }), h('small', {}, got ? a.name : `After ${(i + 1) * KnightWear.EVERY} days`));
       if (!got) b.disabled = true;
       box.append(b);
     });
     return box;
   }
   function goalCard() {
-    const st = streak(), wk = Adapt.week(S.days, todayStr()), goal = Math.min(5, Math.max(1, S.goal)), left = goal - wk.count, nxt = OwlWear.untilNext(S.days.length);
+    const st = streak(), wk = Adapt.week(S.days, todayStr()), goal = Math.min(5, Math.max(1, S.goal)), left = goal - wk.count, nxt = KnightWear.untilNext(S.days.length);
     const card = h('section', { class: 'goal' },
-      h('div', { class: 'goal-top' }, h('b', {}, `🔥 ${st} ${st === 1 ? 'day' : 'days'} in a row`), h('span', { class: 'muted small' }, `Goal: ${goal} evening${goal > 1 ? 's' : ''} this week`)),
+      h('div', { class: 'goal-top' }, h('b', {}, `🔥 ${st} ${st === 1 ? 'day' : 'days'} in a row`), h('span', { class: 'muted small' }, `Quest goal: ${goal} evening${goal > 1 ? 's' : ''} this week`)),
       h('div', { class: 'goal-days' }, wk.days.map((d, i) => h('div', { class: 'gd' + (d.on ? ' on' : '') + (d.today ? ' today' : '') }, h('small', {}, DAYS[i]), h('span', {}, d.on ? '⭐' : '')))),
-      h('p', { class: 'goal-msg' }, left <= 0 ? '🎯 Weekly goal reached. Fantastic!' : `${left} more evening${left > 1 ? 's' : ''} to reach this week's goal.`),
-      h('p', { class: 'goal-owl' }, nxt ? `🦉 Owl surprise after ${nxt} more study day${nxt > 1 ? 's' : ''}. (${OwlWear.earned(S.days.length)} of ${OwlWear.ACC.length} collected)` : '🦉 Your owl has collected everything!'));
+      h('p', { class: 'goal-msg' }, left <= 0 ? '🎯 Quest goal reached. Well done, brave knight!' : `${left} more evening${left > 1 ? 's' : ''} to reach this week's quest goal.`),
+      h('p', { class: 'goal-gear' }, nxt ? `🛡️ New armour after ${nxt} more study day${nxt > 1 ? 's' : ''}. (${KnightWear.earned(S.days.length)} of ${KnightWear.ACC.length} collected)` : '🛡️ Your knight has every piece of armour!'));
     return { card };
   }
   function viewHome() {
     setNav('home');
     const frag = h('div'), plan = todayPlan();
-    const news = owlNews(); // may give the owl a new accessory, so do it before the owl is drawn
-    const fact = h('span', {}), hop = () => { const o = frag.querySelector('.owl-wrap'); if (o) { o.classList.remove('hop'); void o.offsetWidth; o.classList.add('hop'); } };
+    const news = knightNews(); // may give the knight new armour, so do it before the knight is drawn
+    const fact = h('span', {}), hop = () => { const o = frag.querySelector('.kn-wrap'); if (o) { o.classList.remove('hop'); void o.offsetWidth; o.classList.add('hop'); } };
     const another = () => { fact.textContent = nextFact(); hop(); };
     fact.textContent = nextFact();
-    frag.append(h('section', { class: 'hello' }, h('button', { class: 'owl-wrap', 'aria-label': 'Tap the owl for a fun fact', onclick: another, html: owlHtml() }),
-      h('div', { class: 'bubble' }, h('h1', {}, `${greeting()}, ${S.name || 'friend'}!`),
-        h('p', { class: 'fact' }, h('b', {}, 'Did you know? '), fact), h('button', { class: 'linkbtn', onclick: another }, 'Tell me another!'))));
+    frag.append(h('section', { class: 'hello' }, h('button', { class: 'kn-wrap', 'aria-label': 'Tap the knight for a fun fact', onclick: another, html: knightHtml() }),
+      h('div', { class: 'bubble' }, h('h1', {}, `${greeting()}, ${S.name || 'brave knight'}!`),
+        h('p', { class: 'fact' }, h('b', {}, 'Did you know? '), fact), h('button', { class: 'linkbtn', onclick: another }, 'Tell me another!')), h('div', { class: 'buddy', html: MONSTER })));
     if (news) frag.append(news);
-    const refreshOwl = () => { const o = frag.querySelector('.owl-wrap'); if (o) o.innerHTML = owlHtml(); };
+    const refreshKnight = () => { const o = frag.querySelector('.kn-wrap'); if (o) o.innerHTML = knightHtml(); };
     const gc = goalCard(), wardEl = h('div', { class: 'ward-wrap', style: 'display:none' });
-    const drawWard = () => wardEl.replaceChildren(wardrobe(() => { refreshOwl(); drawWard(); }));
+    const drawWard = () => wardEl.replaceChildren(wardrobe(() => { refreshKnight(); drawWard(); }));
     drawWard();
-    frag.append(gc.card, h('button', { class: 'linkbtn', style: 'margin:6px 0 0', onclick: () => { wardEl.style.display = wardEl.style.display === 'none' ? 'block' : 'none'; } }, '👕 Dress my owl'), wardEl);
-    frag.append(h('h2', { class: 'sect' }, plan.weekend ? 'Pick an adventure' : 'Today\'s adventures'));
+    frag.append(gc.card, h('button', { class: 'linkbtn', style: 'margin:6px 0 0', onclick: () => { wardEl.style.display = wardEl.style.display === 'none' ? 'block' : 'none'; } }, '🛡️ Open the armoury'), wardEl);
+    frag.append(h('h2', { class: 'sect' }, plan.weekend ? 'Pick a quest' : 'Today\'s quests'));
     plan.main.forEach(k => frag.append(subjCard(SUBJ[k], true)));
     if (plan.optional.length) {
-      frag.append(h('h2', { class: 'sect' }, plan.main.length ? 'Want more?' : 'All adventures'));
+      frag.append(h('h2', { class: 'sect' }, plan.main.length ? 'Want more quests?' : 'All quests'));
       plan.optional.forEach(k => frag.append(subjCard(SUBJ[k], false)));
     }
     frag.append(h('div', { class: 'chips' },
       h('div', { class: 'chip' }, h('b', {}, starCount()), 'stars'),
       h('div', { class: 'chip' }, h('b', {}, S.days.length), S.days.length === 1 ? 'study day' : 'study days'),
       h('div', { class: 'chip' }, h('b', {}, `${doneCount()}/${ALL.length}`), 'lessons done')));
-    frag.append(h('a', { class: 'quick', href: '#/review' }, h('span', { class: 'quick-die', html: '🎲' }), h('span', {}, h('b', {}, 'Quick game'), h('br'), 'Questions from lessons you have done')));
-    const book = h('section', { class: 'book' }, h('h2', { class: 'sect' }, 'My sticker book'));
+    frag.append(h('a', { class: 'quick', href: '#/review' }, h('span', { class: 'quick-die', html: '⚔️' }), h('span', {}, h('b', {}, 'Monster training'), h('br'), 'Practise with questions from lessons you have done')));
+    const book = h('section', { class: 'book' }, h('h2', { class: 'sect' }, 'My monster book'));
     SUBJECTS.forEach(sb => {
       const nx = nextIdx(sb);
       book.append(h('div', { class: 'book-row' }, h('div', { class: 'book-label' }, h('b', {}, sb.name), h('small', {}, `${doneCount(sb)} of ${sb.lessons.length}`)),
-        h('div', { class: 'stickers' }, sb.lessons.map(L => { const r = S.done[L.id]; return h('a', { class: `stk ${sb.key} ${r ? (r.skipped ? 'known' : 'got') : ''} ${L.n === nx ? 'next' : ''}`, href: '#/lesson/' + L.id, title: L.t, 'aria-label': L.t + (r ? ' (done)' : '') }, r ? (r.skipped ? '✓' : '★') : ''); }))));
+        h('div', { class: 'stickers' }, sb.lessons.map(L => { const r = S.done[L.id]; return h('a', { class: `stk ${sb.key} ${r ? (r.skipped ? 'known' : 'got') : ''} ${L.n === nx ? 'next' : ''}`, href: '#/lesson/' + L.id, title: r && !r.skipped ? `${monsterFor(L)[0]} the monster: ${L.t}` : L.t, 'aria-label': L.t + (r ? ' (done)' : '') }, r ? (r.skipped ? '✓' : monsterFor(L)[1]) : ''); }))));
     });
     frag.append(book);
     app(frag);
@@ -313,7 +305,7 @@
     setNav('map');
     const sb = SUBJ[key] || SUBJECTS[0];
     if (pick && pick.subj !== sb.key) pick = null;
-    const frag = h('div', {}, h('h1', {}, 'Adventure Map'), subjTabs('map', sb.key), h('p', { class: 'muted' }, `${sb.blurb} 8 weeks, 5 lessons a week. Tap any lesson to open it.`));
+    const frag = h('div', {}, h('h1', {}, 'Quest Map'), subjTabs('map', sb.key), h('p', { class: 'muted' }, `${sb.blurb} 8 weeks, 5 lessons a week. Tap any lesson to open it.`));
     if (!pick && doneCount(sb) === 0) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Not sure where to start? A short check (2 questions at a time) finds the right lesson.'), h('a', { class: 'btn', href: '#/placement/' + sb.key }, 'Take the quick check')));
     if (!pick) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Learned some already, or pressed done by mistake?'), h('button', { class: 'btn', onclick: () => { pick = new Set(); pick.subj = sb.key; route(); } }, 'Choose lessons to change')));
     else {
@@ -360,7 +352,7 @@
     setNav('home');
     const L = BYID[id]; if (!L) return go('#/');
     const sb = SUBJ[L.subj];
-    const stepsBase = [['🔁 Look Back', 'lb'], ['📖 Learn', 'learn'], ['✏️ Practice', 'prac'], ['🚀 Challenge', 'chal'], ['🏁 Wrap-up', 'wrap']];
+    const stepsBase = [['🛡️ Look Back', 'lb'], ['📜 Learn', 'learn'], ['⚔️ Practice', 'prac'], ['🐉 Challenge', 'chal'], ['🏰 Wrap-up', 'wrap']];
     let cur = S.pos && S.pos.id === id ? Math.min(S.pos.step | 0, stepsBase.length - 1) : 0; const seen = new Set();
     const wrap = h('div');
     const right = S.right[id] = S.right[id] || {};
@@ -387,14 +379,14 @@
       const kind = steps[cur][1];
       if (kind === 'lb') {
         const qs = lookBackQs(L);
-        body.append(h('h2', {}, '🔁 Look Back'));
+        body.append(h('h2', {}, '🛡️ Look Back'));
         if (!qs.length) body.append(h('p', {}, 'This is one of the first lessons, so there is nothing to look back on yet. Let us begin!'));
         else {
           body.append(h('p', { class: 'muted' }, 'Before something new, remember something old.'));
           qs.forEach(x => body.append(h('div', { class: 'callout' }, h('b', {}, x.L.t + ': '), x.L.key), questionEl(x, { tag: x.why || `from ${x.ago} lesson${x.ago > 1 ? 's' : ''} ago` })));
         }
       } else if (kind === 'learn') {
-        body.append(h('h2', {}, '📖 Today we learn: ' + L.sk), h('div', { class: 'key' }, '🎯 Goal: ' + L.goal));
+        body.append(h('h2', {}, '📜 Today we learn: ' + L.sk), h('div', { class: 'key' }, '🎯 Goal: ' + L.goal));
         const pics = L.subj === 'math' ? (window.PICS || {})[L.n] || [] : [];
         L.learn.forEach((p, i) => {
           body.append(h('div', { class: 'learn-p', html: vis(p) }));
@@ -405,13 +397,13 @@
           h('div', { class: 'callout small', html: '<b>Parent note:</b> ' + L.parent }));
         linkSection(L, body);
       } else if (kind === 'chal' && chalLocked()) {
-        body.append(h('h2', {}, '🔒 Challenge is still closed'),
+        body.append(h('h2', {}, '🔒 The Dragon\'s Gate is still closed'),
           h('p', {}, `It opens when you have solved most of the Practice questions. You have solved ${pracSolved()} of ${pracIdx.length} so far.`),
           h('p', { class: 'muted' }, 'That way the hard puzzles are fun, not frustrating. Go and finish Practice first!'),
-          h('button', { class: 'btn', onclick: () => { cur = 2; draw(); window.scrollTo(0, 0); } }, '✏️ Back to Practice'));
+          h('button', { class: 'btn', onclick: () => { cur = 2; draw(); window.scrollTo(0, 0); } }, '⚔️ Back to Practice'));
       } else if (kind === 'prac' || kind === 'chal') {
         const set = Q.map((q, qi) => ({ q, qi })).filter(x => (kind === 'prac' ? 'bc' : 'so').includes(x.q.l));
-        body.append(h('h2', {}, kind === 'prac' ? '✏️ Practice' : '🚀 Challenge time'),
+        body.append(h('h2', {}, kind === 'prac' ? '⚔️ Practice' : '🐉 Dragon challenge'),
           h('p', { class: 'muted' }, kind === 'prac' ? (L.subj === 'math' ? 'Draw a picture if you get stuck.' : 'Read each question slowly, twice.') : 'These are harder. Think, try, and use hints if you need them.'));
         set.forEach(x => {
           const el = questionEl({ q: x.q, qi: x.qi, L }, { onRight: () => { right[x.qi] = true; markDay(); save(); } });
@@ -420,7 +412,7 @@
         });
       } else {
         const total = L.q.length, got = counts(), nx = sb.lessons[L.n + 1];
-        body.append(h('h2', {}, '🏁 Wrap-up'),
+        body.append(h('h2', {}, '🏰 Wrap-up'),
           h('p', { class: 'bigstars' }, '⭐'.repeat(Math.round((got / total) * 5)) + '☆'.repeat(5 - Math.round((got / total) * 5))),
           h('p', {}, `You solved ${got} of ${total} questions in this lesson.`),
           h('div', { class: 'key' }, '🔑 ' + L.key), h('p', {}, 'Tell a grown-up in your own words what you learned today.'),
@@ -439,10 +431,11 @@
   function viewDone(id) {
     setNav('home');
     const L = BYID[id]; if (!L) return go('#/');
-    const nx = SUBJ[L.subj].lessons[L.n + 1], r = S.done[id];
-    const news = owlNews();
-    app(h('div', {}, news || '', h('section', { class: 'card hero ' + L.subj }, h('h1', {}, '🎉 Lesson complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? scoreText(r) : ''}`),
-      nx ? h('p', {}, 'Next time: ' + nx.t) : h('p', {}, `🎓 That was the last ${SUBJ[L.subj].name} lesson!`), h('a', { class: 'btn light', href: '#/' }, 'Back home'), h('p', { class: 'small', style: 'margin-top:20px' }, 'Playing on another device? ', h('a', { href: '#/parent', style: 'color:#fff;text-decoration:underline' }, 'Get your progress password')))));
+    const nx = SUBJ[L.subj].lessons[L.n + 1], r = S.done[id], mon = monsterFor(L);
+    const news = knightNews();
+    app(h('div', {}, news || '', h('section', { class: 'card hero ' + L.subj }, h('h1', {}, '🏰 Quest complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? scoreText(r) : ''}`),
+      r && !r.skipped ? h('div', { class: 'newmon' }, h('span', { class: 'newmon-face' }, mon[1]), h('span', {}, h('b', {}, `You made a new monster friend: ${mon[0]}!`), h('br'), 'Find it in your monster book on the home page.')) : '',
+      nx ? h('p', {}, 'Next time: ' + nx.t) : h('p', {}, `🎓 That was the last ${SUBJ[L.subj].name} quest!`), h('a', { class: 'btn light', href: '#/' }, 'Back home'), h('p', { class: 'small', style: 'margin-top:20px' }, 'Playing on another device? ', h('a', { href: '#/parent', style: 'color:#fff;text-decoration:underline' }, 'Get your progress password')))));
   }
 
   /* ---- quick placement check: 2 questions from every 5th lesson, stops at the first miss ---- */
@@ -478,13 +471,13 @@
 
   function viewReview(key) {
     setNav('review');
-    const frag = h('div', {}, h('h1', {}, '🔁 Look Back'), subjTabs('review', key || 'all', true));
+    const frag = h('div', {}, h('h1', {}, '🛡️ Look Back'), subjTabs('review', key || 'all', true));
     const pool = ALL.filter(l => (!key || key === 'all' || l.subj === key) && (S.done[l.id] || (S.pos && S.pos.id === l.id)));
     const doneList = pool.filter(l => S.done[l.id]);
     frag.append(h('p', { class: 'muted' }, 'Revisit old ideas. Spaced repetition (seeing things again after some days) is how memory sticks.'));
-    const quiz = h('section', { class: 'card' }, h('h2', {}, '🎲 Mixed review quiz'), h('p', {}, 'Six random questions from lessons you have already started.'));
+    const quiz = h('section', { class: 'card' }, h('h2', {}, '⚔️ Training arena'), h('p', {}, 'Six random questions from lessons you have already started.'));
     const qbox = h('div');
-    quiz.append(h('button', { class: 'btn', onclick: () => { const qs = mixedQs(pool, 6); qbox.replaceChildren(...(qs.length ? qs.map(x => questionEl(x, { tag: 'from: ' + x.L.t })) : [h('p', { class: 'muted' }, 'Finish a lesson first, then come back.')])); } }, 'Start quiz'), qbox);
+    quiz.append(h('button', { class: 'btn', onclick: () => { const qs = mixedQs(pool, 6); qbox.replaceChildren(...(qs.length ? qs.map(x => questionEl(x, { tag: 'from: ' + x.L.t })) : [h('p', { class: 'muted' }, 'Finish a lesson first, then come back.')])); } }, 'Start training'), qbox);
     frag.append(quiz);
     const due = Adapt.dueSkills(S, todayStr()).filter(d => BYID[d.id] && (!key || key === 'all' || BYID[d.id].subj === key));
     if (due.length) {
@@ -493,7 +486,7 @@
         h('ul', {}, due.slice(0, 8).map(d => h('li', {}, `${SUBJ[BYID[d.id].subj].icon} ${BYID[d.id].t} `, h('span', { class: 'pill dark' }, d.weak ? 'tricky' : 'due')))),
         h('button', { class: 'btn', onclick: () => { const qs = due.slice(0, 6).map(d => { const L = BYID[d.id], qi = Adapt.pickQuestion(L, d.e, Math.floor(Math.random() * 97)); return { L, qi, q: resolve(L, qi) }; }); dbox.replaceChildren(...qs.map(x => questionEl(x, { tag: 'from: ' + x.L.t }))); } }, 'Practise these'), dbox));
     }
-    frag.append(h('section', { class: 'card' }, h('h2', {}, '📚 Recap cards'),
+    frag.append(h('section', { class: 'card' }, h('h2', {}, '📜 Scroll of facts'),
       doneList.length ? doneList.map(L => h('div', { class: 'recap', style: 'margin:8px 0' }, h('span', {}, h('b', {}, `${SUBJ[L.subj].icon} ${L.t}: `), L.key, h('br'), h('small', { class: 'muted' }, '✔ ' + doneLine(S.done[L.id]))), h('a', { class: 'btn alt small', href: '#/lesson/' + L.id }, 'Redo'))) : h('p', { class: 'muted' }, 'Finish a lesson and its recap card appears here.')));
     app(frag);
   }
@@ -553,7 +546,7 @@
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Setup'), h('div', { class: 'ans' }, nm, h('button', { class: 'btn', onclick: () => { S.name = nm.value.trim(); save(); alert('Saved'); } }, 'Save name')),
       h('h3', { style: 'margin-top:24px' }, 'Daily plan'), h('div', { class: 'ans' }, pl, h('button', { class: 'btn', onclick: () => { S.plan = pl.value; save(); alert('Saved'); } }, 'Save plan')),
       h('h3', { style: 'margin-top:24px' }, 'Weekly goal'), h('div', { class: 'ans' }, gl, h('button', { class: 'btn', onclick: () => { S.goal = +gl.value; save(); alert('Saved'); } }, 'Save goal')),
-      h('p', { class: 'muted small' }, 'Study evenings per week (any day with a solved question or a finished lesson counts). Every 3 study days the owl earns a new accessory.'),
+      h('p', { class: 'muted small' }, 'Study evenings per week (any day with a solved question or a finished lesson counts). Every 3 study days the knight earns a new piece of armour.'),
       h('p', { class: 'muted small' }, 'Each subject moves forward one lesson at a time, so a subject that is studied 3 times a week takes about 13 weeks to finish.')));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'How the curriculum works'),
       h('ul', {}, h('li', {}, h('b', {}, 'Maths: '), 'Singapore-style concrete, pictorial, abstract (CPA) with bar models, number bonds and ten-frames. Goes beyond P1 into 3-digit numbers, multiplication, fractions of sets and Venn diagrams, plus olympiad tools (parity, Gauss pairing, working backwards, pigeonhole).'),
@@ -561,7 +554,7 @@
         h('li', {}, h('b', {}, 'Science: '), 'living things, plants, body, materials, forces, Earth and sky, the environment, and fair-test thinking. Beyond school level at this age, and each lesson has a safe hands-on activity.'),
         h('li', {}, h('b', {}, 'Rhythm: '), 'About 25 minutes per subject. Progress is lesson-based, so missed days do not skip content.'),
         h('li', {}, h('b', {}, 'Coach tips: '), 'Ask "How do you know?", let them draw, praise effort, and read questions aloud together for English and Science.'),
-        h('li', {}, h('b', {}, 'Levels: '), '🌱 Warm-up, ⭐ Core, 🚀 Stretch, 🏆 Olympiad.'))));
+        h('li', {}, h('b', {}, 'Levels: '), '🛡️ Squire, ⚔️ Knight, 🏅 Champion, 🐉 Dragon slayer.'))));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'A good evening (about 25 minutes per subject)'),
       h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
         h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong answers are fine, thinking is the point.'))));
@@ -591,7 +584,7 @@
       h('p', {}, h('button', { class: 'btn', style: 'background:var(--bad)', onclick: () => { if (confirm('Erase all progress?')) { S = {}; load2(); save(); go('#/'); } } }, 'Reset all progress'))));
     app(frag);
   }
-  function load2() { S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate'; S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.owl = S.owl || {}; S.placed = S.placed || {}; if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; }
+  function load2() { S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate'; S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; }
 
   function viewKey(id) {
     setNav('parent');

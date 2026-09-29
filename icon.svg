@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#5b5bd6"/><text x="50" y="68" font-size="56" font-family="system-ui,sans-serif" font-weight="800" fill="#fff" text-anchor="middle">1+2</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3b2a7a"/>
+<path d="M50 30 C78 30 90 50 88 68 C86 88 70 96 50 96 C30 96 14 88 12 68 C10 50 22 30 50 30Z" fill="#8f6bff"/>
+<path d="M14 46 Q4 34 8 18 Q22 26 26 40 Z M86 46 Q96 34 92 18 Q78 26 74 40 Z" fill="#f4ead2" stroke="#c9b98f" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="36" cy="66" r="11" fill="#fff"/><circle cx="64" cy="66" r="11" fill="#fff"/><circle cx="38" cy="68" r="5.6" fill="#2b2a4c"/><circle cx="62" cy="68" r="5.6" fill="#2b2a4c"/>
+<path d="M36 82 Q50 94 64 82 Z" fill="#3b1f66"/><path d="M43 83 V87.5 M57 83 V87.5" stroke="#fff" stroke-width="4.4" stroke-linecap="round"/>
+<path d="M20 52 Q20 14 50 14 Q80 14 80 52 Z" fill="#b4c5d8" stroke="#8ea3b8" stroke-width="3" stroke-linejoin="round"/>
+<path d="M50 15 V40" stroke="#8ea3b8" stroke-width="4"/><rect x="24" y="44" width="52" height="7" rx="3" fill="#8ea3b8"/>
+<path d="M50 14 Q38 4 46 -2 Q64 -2 66 8 Q56 8 52 14 Z" fill="#e0475f" stroke="#fff" stroke-width="1.5"/><circle cx="50" cy="12" r="3.5" fill="#ffd84d"/></svg>

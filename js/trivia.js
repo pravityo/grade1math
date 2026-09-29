@@ -1,4 +1,4 @@
-/* Fun facts the owl tells on the home page. Keep each one short, true and easy to read aloud. */
+/* Fun facts the little knight tells on the home page. Keep each one short, true and easy to read aloud. */
 window.TRIVIA = [
   `An octopus has three hearts.`,
   `A group of flamingos is called a flamboyance.`,
@@ -68,5 +68,16 @@ window.TRIVIA = [
   `Some bamboo can grow almost a metre in one day.`,
   `A big fluffy cloud can weigh as much as a hundred elephants.`,
   `Ice floats because it is lighter than water.`,
-  `Popcorn pops because the tiny drop of water inside turns to steam.`
+  `Popcorn pops because the tiny drop of water inside turns to steam.`,
+  `A knight's suit of armour could weigh as much as a big dog.`,
+  `Castles often had a moat, a ditch full of water, to keep visitors out.`,
+  `Long ago, young knights started as pages and then became squires before they were knights.`,
+  `The Komodo dragon is a real giant lizard. It can grow longer than a bed.`,
+  `A narwhal is a whale with a long tooth like a unicorn's horn.`,
+  `The biggest dinosaurs, like Argentinosaurus, were longer than two buses.`,
+  `A shield with a picture on it was called a coat of arms.`,
+  `Dragons are only in stories, but lizards called geckos can walk up walls.`,
+  `Poison dart frogs are tiny, but their bright colours warn other animals to stay away.`,
+  `A chameleon can look in two different directions at the same time.`,
+  `Long ago, trumpets were played to announce that a king or queen was coming.`
 ];
