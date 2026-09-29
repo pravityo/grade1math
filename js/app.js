@@ -19,6 +19,11 @@
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ } }
   load();
+  // Safari can drop site data after ~7 idle days unless storage is persisted or the app is added to the Home Screen.
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* unsupported */ }
+  // Flush on every way Safari can background or close the page (iOS rarely fires unload).
+  window.addEventListener('pagehide', save);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
 
   const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
   const isWeekend = () => [0, 6].includes(new Date().getDay());
@@ -149,7 +154,7 @@
         h('h1', {}, hi + 'Today: ' + L.t),
         h('p', {}, L.goal),
         isWeekend() ? h('p', {}, '🌴 It is the weekend. Rest is good, but you can still start the next lesson or do a Look Back.') : '',
-        h('a', { class: 'btn light', href: '#/lesson/' + n }, '▶ Start today\'s lesson')));
+        h('a', { class: 'btn light', href: '#/lesson/' + n }, S.pos && S.pos.n === n && S.pos.step > 0 ? '▶ Continue where you stopped' : '▶ Start today\'s lesson')));
     }
     frag.append(h('div', { class: 'stats' },
       h('div', { class: 'stat' }, h('b', {}, `${doneCount()}/${LESSONS.length}`), 'lessons done'),
@@ -185,7 +190,7 @@
     setNav('home');
     const L = LESSONS[n]; if (!L) return go('#/');
     const steps = [['🔁 Look Back', 'lb'], ['📖 Learn', 'learn'], ['✏️ Practice', 'prac'], ['🚀 Challenge', 'chal'], ['🏁 Wrap-up', 'wrap']];
-    let cur = 0; const seen = new Set();
+    let cur = S.pos && S.pos.n === n ? Math.min(S.pos.step | 0, steps.length - 1) : 0; const seen = new Set();
     const wrap = h('div');
     const right = S.right[n] = S.right[n] || {};
     const counts = () => Object.keys(right).length;
@@ -193,7 +198,7 @@
       wrap.replaceChildren();
       wrap.append(h('span', { class: 'pill dark' }, `Week ${L.week} · ${DAYS[L.day - 1]} · ${L.theme}`), h('h1', {}, L.t));
       wrap.append(h('div', { class: 'steps' }, steps.map((s, i) => h('button', { class: (i === cur ? 'on ' : '') + (seen.has(i) && i !== cur ? 'done' : ''), onclick: () => { cur = i; draw(); window.scrollTo(0, 0); } }, s[0]))));
-      seen.add(cur);
+      seen.add(cur); S.pos = { n, step: cur }; save();
       const body = h('section', { class: 'card' });
       const kind = steps[cur][1];
       if (kind === 'lb') {
@@ -225,7 +230,7 @@
           h('p', {}, `You solved ${got} of ${total} questions in this lesson.`),
           h('div', { class: 'key' }, '🔑 ' + L.key), h('p', {}, 'Tell a grown-up in your own words what you learned today.'),
           got < total ? h('p', { class: 'muted' }, 'Go back to Practice or Challenge to try the unsolved ones. You can also finish now and revisit them later on the Look Back page.') : '');
-        body.append(h('button', { class: 'btn', onclick: () => { S.done[n] = { correct: counts(), total, when: todayStr() }; markDay(); save(); go(n + 1 < LESSONS.length ? '#/done/' + n : '#/'); } }, S.done[n] ? 'Save again' : '✅ Finish lesson'));
+        body.append(h('button', { class: 'btn', onclick: () => { S.done[n] = { correct: counts(), total, when: todayStr() }; S.pos = { n: n + 1, step: 0 }; markDay(); save(); go(n + 1 < LESSONS.length ? '#/done/' + n : '#/'); } }, S.done[n] ? 'Save again' : '✅ Finish lesson'));
       }
       wrap.append(body);
       const nav = h('div', { class: 'ans' });
@@ -299,4 +304,5 @@
   }
   window.addEventListener('hashchange', route);
   route();
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
