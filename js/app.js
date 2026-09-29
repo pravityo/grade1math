@@ -144,7 +144,7 @@
     }
     function lose() {
       tries++; track(false); box.classList.add('wrong'); fb.className = 'fb no';
-      fb.textContent = tries === 1 ? 'Not quite. Have another go!' : 'Still not it. Look at the hint or show the answer.';
+      fb.textContent = tries === 1 ? 'Not quite. Have another go!' : 'Hmm, not yet. Try the hint, or tap Show answer.';
       extra.replaceChildren();
       const bar = h('div', { class: 'ans', style: 'margin-top:8px' });
       if (q.h) bar.append(h('button', { class: 'btn alt small', onclick: () => { hintEl.style.display = 'block'; } }, '💭 Hint'));
@@ -406,8 +406,8 @@
         linkSection(L, body);
       } else if (kind === 'chal' && chalLocked()) {
         body.append(h('h2', {}, '🔒 Challenge is still closed'),
-          h('p', {}, `It opens when you have solved most of the Practice questions. So far: ${pracSolved()} of ${pracIdx.length}.`),
-          h('p', { class: 'muted' }, 'This keeps the hard puzzles fun instead of frustrating. Go and finish Practice first!'),
+          h('p', {}, `It opens when you have solved most of the Practice questions. You have solved ${pracSolved()} of ${pracIdx.length} so far.`),
+          h('p', { class: 'muted' }, 'That way the hard puzzles are fun, not frustrating. Go and finish Practice first!'),
           h('button', { class: 'btn', onclick: () => { cur = 2; draw(); window.scrollTo(0, 0); } }, '✏️ Back to Practice'));
       } else if (kind === 'prac' || kind === 'chal') {
         const set = Q.map((q, qi) => ({ q, qi })).filter(x => (kind === 'prac' ? 'bc' : 'so').includes(x.q.l));
@@ -424,7 +424,7 @@
           h('p', { class: 'bigstars' }, '⭐'.repeat(Math.round((got / total) * 5)) + '☆'.repeat(5 - Math.round((got / total) * 5))),
           h('p', {}, `You solved ${got} of ${total} questions in this lesson.`),
           h('div', { class: 'key' }, '🔑 ' + L.key), h('p', {}, 'Tell a grown-up in your own words what you learned today.'),
-          got < total ? h('p', { class: 'muted' }, 'Go back to Practice or Challenge to try the unsolved ones. You can also finish now and revisit them later on the Look Back page.') : '');
+          got < total ? h('p', { class: 'muted' }, 'Some questions are still unsolved. Go back and try them, or finish now. They will come back in Look Back.') : '');
         body.append(h('button', { class: 'btn', onclick: () => { S.done[id] = { correct: counts(), total, when: (S.done[id] && S.done[id].when) || todayStr(), last: todayStr() }; S.pos = { id: nx ? nx.id : id, step: 0 }; markDay(); save(); go('#/done/' + id); } }, S.done[id] ? 'Save again' : '✅ Finish lesson'));
       }
       wrap.append(body);

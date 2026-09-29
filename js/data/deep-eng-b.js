@@ -1,6 +1,6 @@
 D('e20',
  [`<b>Past tense.</b> To talk about something that already happened, most verbs add <b>-ed</b>: walk, walked. There are spelling changes: if the verb ends in e, add just d (bake, baked); if it ends in one vowel and one consonant, double the consonant (clap, clapped); if it ends in consonant + y, change y to ied (carry, carried).`, `<b>Time clues.</b> Words like yesterday, last week, ago and last night tell you to use the past. Say the sentence with "yesterday" in front to test.`],
- [`Make the past of "clap"`, `Look at the ending: vowel (a) then consonant (p).`, `Double the last letter: clapp.`, `Add -ed: clapped.`, `Use it in a sentence: Yesterday we clapped.`],
+ [`Make the past of "clap"`, `Look at the end of the word: a vowel (a) then a consonant (p).`, `Double the last letter: clapp.`, `Add -ed: clapped.`, `Use it in a sentence: Yesterday we clapped.`],
  [`Forgetting to double the consonant (claped).`, `Adding -ed to irregular verbs (goed).`],
  [`What did you do yesterday? Use past tense verbs.`, `What is the past of "stop"? Why two p's?`, `What is the past of "bake"? Why only d?`],
  [[`past tense`, `verbs that tell what already happened`], [`regular verb`, `a verb that adds -ed in the past`]]);
@@ -12,7 +12,7 @@ D('e21',
  [[`irregular verb`, `a verb whose past tense does not end in -ed`], [`exception`, `a case that does not follow the rule`]]);
 D('e22',
  [`<b>Pronouns replace nouns.</b> Instead of repeating "Ali", use <b>he</b>. Pronouns: I, you, he, she, it, we, they. After words like to, with, for use <b>me, him, her, us, them</b>. They keep writing smooth: "Ali is six. He likes cars." not "Ali is six. Ali likes cars."`, `<b>Me and Ali.</b> Say "Ali and I went", not "Me and Ali went". Test by removing the other person: "I went" is right, so "Ali and I went" is right.`],
- [`Which is correct: "Me and Ali went home" or "Ali and I went home"?`, `Remove Ali: "Me went home" sounds wrong.`, `"I went home" sounds right.`, `So use I: Ali and I went home.`, `Say it aloud to hear the difference.`],
+ [`Which is correct: "Me and Ali went home" or "Ali and I went home"?`, `Take away Ali: "Me went home" sounds wrong.`, `"I went home" sounds right.`, `So use I: Ali and I went home.`, `Say it aloud to hear the difference.`],
  [`Using "me" as the doer of the action.`, `Mixing he and she.`],
  [`Which pronoun replaces "Mei and Ali"?`, `Can you tell a story about a friend without using their name?`, `Say "The cat sat on the mat. It was soft." What does "it" mean?`],
  [[`pronoun`, `a word used instead of a noun`], [`replace`, `use one thing in place of another`]]);
@@ -48,7 +48,7 @@ D('e27',
  [[`infer`, `work out something from clues`], [`predict`, `say what might happen next`], [`clue`, `a hint`]]);
 D('e28',
  [`<b>Main idea.</b> The main idea is what a whole text is mostly about. The details support it. For a passage about ants being small but strong and working together, a good main idea is "ants are strong workers" and a good title is "Strong Little Ants".`, `<b>Too big, too small.</b> A good title covers all the details. "Nests" is too small because it leaves out strength. "Animals" is too big. Teach children to check the title against every sentence.`],
- [`Which title fits best for a passage about how rain helps rivers and plants and gives us water?`, `List the details: rivers, plants, drinking water.`, `What do they have in common? They are why rain matters.`, `Choose "Why Rain is Important".`, `Check: it covers all three sentences.`],
+ [`Which title fits best for a text about how rain helps rivers and plants and gives us water?`, `List the details: rivers, plants, drinking water.`, `What do they have in common? They are why rain matters.`, `Choose "Why Rain is Important".`, `Check: it covers all three sentences.`],
  [`Choosing a title that only covers one detail.`, `Picking the first sentence just because it is first.`],
  [`What is this text mostly about?`, `Which sentence gives a detail rather than the main idea?`, `Can you make up a title for your favourite story?`],
  [[`main idea`, `what the whole text is mostly about`], [`detail`, `a small fact that supports the main idea`], [`title`, `the name of a text`]]);
@@ -107,11 +107,11 @@ D('e37',
  [`What does "hit the sack" mean?`, `Can you draw the funny literal meaning and the real meaning?`, `Which idiom do you like best?`],
  [[`idiom`, `a phrase that means something different from its words`], [`literal`, `exactly what the words say`]]);
 D('e38',
- [`<b>Similes.</b> A simile compares two things using <b>as</b> or <b>like</b>: as brave as a lion, as light as a feather, runs like the wind. A metaphor says one thing <i>is</i> another ("The moon is a silver coin"). Similes help readers picture things.`, `<b>Poems.</b> Poems use rhythm, rhyme and pictures in words. Reading poems aloud with feeling helps children hear sounds and enjoy language.`],
+ [`<b>Similes.</b> A simile compares two things using <b>as</b> or <b>like</b>: as brave as a lion, as light as a feather, runs like the wind. Similes help readers picture things.`, `<b>Poems.</b> Poems use rhythm, rhyme and pictures in words. Reading poems aloud with feeling helps children hear sounds and enjoy language.`],
  [`Finish: as quiet as a ___`, `Think of something very quiet.`, `A mouse.`, `Write: as quiet as a mouse.`, `Use it in a sentence: The kitten was as quiet as a mouse.`],
  [`Making a simile without as or like.`, `Using a simile that does not make sense.`],
  [`What does "as brave as a lion" tell us?`, `Can you make up a simile about the sun?`, `How is a simile different from a plain sentence?`],
- [[`simile`, `a comparison using as or like`], [`metaphor`, `saying one thing is another`], [`poem`, `writing with rhythm and pictures in words`]]);
+ [[`simile`, `a comparison using as or like`], [`poem`, `writing with rhythm and pictures in words`]]);
 D('e39',
  [`<b>Bringing it together.</b> This week mixes everything: sounds, words, sentences, grammar, reading and word puzzles. Before each question ask: can I read it aloud? Which rule applies? Does it make sense?`, `<b>Reading every day.</b> Ten minutes of shared reading each evening is the best habit for English. Talk about the story, ask questions and let your child read to you.`],
  [`Work through a mixed question`, `Read the whole question aloud.`, `Decide which topic it belongs to (plural, past tense, analogy).`, `Recall the rule.`, `Answer, then read the sentence again to check it makes sense.`],

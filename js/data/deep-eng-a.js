@@ -9,7 +9,7 @@ D('e1',
  [`Read "stop"`, `Say the sounds: s-t-o-p (4 sounds).`, `Notice that s and t are a blend and you hear both.`, `Blend: /st/ then /o/ then /p/: stop.`, `Add a letter to make a new word: top becomes stop.`],
  [`Dropping one of the blend letters when writing (writing "sop" for "stop").`, `Treating the blend as a new single sound. You should still hear both.`],
  [`Can you say "frog" slowly and tell me how many sounds you hear?`, `Which blend begins "spider"? Which begins "train"?`, `Can you think of a word that ends in a blend?`],
- [[`blend`, `two consonant sounds that keep their own sounds`], [`segment`, `break a word into its sounds`]]);
+ [[`blend`, `two sounds stuck together that you can still hear`], [`segment`, `break a word into its sounds`]]);
 D('e2',
  [`<b>One sound, two letters.</b> A digraph is two letters that together make one new sound: <b>sh</b> in ship, <b>ch</b> in chair, <b>th</b> in thick, <b>wh</b> in whale. Unlike blends, you cannot hear the two letters separately. In first-grade phonics the most common digraphs are ch, sh, th, wh and ck.`, `<b>Feel the sound.</b> Make sh like telling someone to be quiet. Make th with your tongue between your teeth. Children remember these better when their mouth and hands take part (a "multi-sensory" approach).`],
  [`Read "chip"`, `Look for the digraph: c and h together say /ch/.`, `Then the vowel /i/ and the last sound /p/.`, `Blend the three sounds: ch-i-p.`, `Say the word: chip. There are 3 sounds but 4 letters.`],
@@ -48,7 +48,7 @@ D('e7',
  [[`compound word`, `a word made of two smaller words`], [`part`, `one piece of a word`]]);
 D('e8',
  [`<b>Plurals.</b> Most nouns just add <b>s</b> (dogs). Nouns ending in s, x, sh, ch add <b>es</b> (boxes, dishes, watches). If a word ends in a consonant and y, change the y to i and add es (baby, babies). Some words with f change to ves (leaf, leaves).`, `<b>Irregular plurals.</b> A few common words change completely: child, children; man, men; foot, feet; mouse, mice; tooth, teeth. Sheep stays sheep. These must be learned, so practise a few each week.`],
- [`Make the plural of "baby"`, `Look at the ending: consonant + y.`, `Change the y to i: babi.`, `Add es: babies.`, `Read it aloud: babies.`],
+ [`Make the plural of "baby"`, `Look at the end of the word: a letter that is not a vowel, then y.`, `Change the y to i: babi.`, `Add es: babies.`, `Read it aloud: babies.`],
  [`Adding s to every word (childs, mouses).`, `Keeping the y (babys).`],
  [`Is it one or more than one? How can you tell?`, `What is the plural of "box"? Why es?`, `Which plurals are tricky?`],
  [[`plural`, `more than one`], [`singular`, `just one`], [`irregular`, `does not follow the usual rule`]]);
@@ -102,7 +102,7 @@ D('e16',
  [[`present`, `happening now`], [`past`, `happened before`], [`subject`, `who or what the sentence is about`]]);
 D('e17',
  [`<b>Adjectives describe nouns.</b> They tell what something is like: size (huge), colour (red), feeling (happy), touch (soft), taste (sweet). They usually come before the noun: a big brown dog. Adjectives do not change for plural: three black cats.`, `<b>Good descriptions.</b> Great writers use adjectives to help readers see, hear, feel and taste. Try to choose exact words: not "nice" but "cosy", "sweet" or "kind".`],
- [`Improve "The dog barked."`, `Ask: what kind of dog? Big, brown, noisy.`, `Put the adjectives before dog: The big brown dog barked.`, `Ask: how did it bark? Loudly. (That is an adverb, a later topic.)`, `Read it aloud and enjoy the picture in your mind.`],
+ [`Improve "The dog barked."`, `Ask: what kind of dog? Big, brown, noisy.`, `Put the adjectives before dog: The big brown dog barked.`, `Ask: how did it bark? Loudly. (You will learn about words like loudly later.)`, `Read it aloud and enjoy the picture in your mind.`],
  [`Putting adjectives after the noun.`, `Adding an s to adjectives (blacks cats).`],
  [`Can you describe an apple using 3 adjectives?`, `Which adjectives tell size? Colour?`, `How does "the big brown dog" differ from "the dog"?`],
  [[`adjective`, `a describing word`], [`describe`, `tell what something is like`]]);
