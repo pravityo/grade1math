@@ -81,6 +81,9 @@
   /* "Already learned elsewhere": mark lessons done without any answers. Stars and streak are not affected, and real results are never overwritten. */
   const markKnown = L => { if (S.done[L.id]) return false; S.done[L.id] = { correct: 0, total: L.q.length, when: todayStr(), skipped: true }; return true; };
   const unmarkKnown = L => { if (S.done[L.id] && S.done[L.id].skipped) { delete S.done[L.id]; return true; } return false; };
+  /* "Unlearn": undo a completion (real or marked known). Stars for solved questions stay unless the lesson is started over. */
+  const unmarkDone = L => { if (S.done[L.id]) { delete S.done[L.id]; return true; } return false; };
+  const startOver = L => { unmarkDone(L); delete S.right[L.id]; };
   const lessonsUpTo = (sb, week) => sb.lessons.filter(l => l.week <= week);
   const norm = s => String(s).trim().toLowerCase().replace(/\s+/g, '').replace(/[.!]+$/, '');
   function isCorrect(q, given) {
@@ -170,7 +173,7 @@
   const pillOf = L => `${SUBJ[L.subj].icon} ${SUBJ[L.subj].name} · Week ${L.week} · ${DAYS[L.day - 1]} · ${L.theme}`;
   let pick = null; // Set of lesson ids while choosing lessons to mark as known on the map
   function tile(L) {
-    const done = S.done[L.id], nx = nextIdx(SUBJ[L.subj]) === L.n, choosing = pick && !done;
+    const done = S.done[L.id], nx = nextIdx(SUBJ[L.subj]) === L.n, choosing = !!pick;
     const a = h('a', { class: 'tile ' + (done ? 'done ' : '') + (nx ? 'next ' : '') + (choosing ? 'pickable ' : '') + (choosing && pick.has(L.id) ? 'picked' : ''), href: '#/lesson/' + L.id },
       h('small', {}, `Week ${L.week} · ${DAYS[L.day - 1]}`), h('b', {}, (done ? '✅ ' : nx && !pick ? '▶ ' : '') + L.t),
       done ? h('small', {}, scoreText(done)) : '',
@@ -251,10 +254,14 @@
     const sb = SUBJ[key] || SUBJECTS[0];
     if (pick && pick.subj !== sb.key) pick = null;
     const frag = h('div', {}, h('h1', {}, 'Adventure Map'), subjTabs('map', sb.key), h('p', { class: 'muted' }, `${sb.blurb} 8 weeks, 5 lessons a week. Tap any lesson to open it.`));
-    if (!pick) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Already learned some of these before?'), h('button', { class: 'btn', onclick: () => { pick = new Set(); pick.subj = sb.key; route(); } }, 'Choose the ones I know')));
-    else frag.append(h('div', { class: 'pickbar' }, h('b', {}, pick.size ? `${pick.size} chosen` : 'Tap the lessons you already know'),
-      h('button', Object.assign({ class: 'btn', onclick: () => { if (!pick.size) return; if (confirm(`Mark ${pick.size} lesson${pick.size > 1 ? 's' : ''} as already known? They will count as done without any questions. You can undo this.`)) { [...pick].forEach(id => markKnown(BYID[id])); pick = null; save(); route(); } } }, pick.size ? {} : { disabled: 'disabled' }), 'Mark as known'),
-      h('button', { class: 'btn alt', onclick: () => { pick = null; route(); } }, 'Cancel')));
+    if (!pick) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Learned some already, or pressed done by mistake?'), h('button', { class: 'btn', onclick: () => { pick = new Set(); pick.subj = sb.key; route(); } }, 'Choose lessons to change')));
+    else {
+      const ids = [...pick], toKnow = ids.filter(id => !S.done[id]), toReset = ids.filter(id => S.done[id]);
+      frag.append(h('div', { class: 'pickbar' }, h('b', {}, ids.length ? `${ids.length} chosen` : 'Tap the lessons to change'),
+        h('button', Object.assign({ class: 'btn', onclick: () => { if (confirm(`Mark ${toKnow.length} lesson${toKnow.length > 1 ? 's' : ''} as already known? They will count as done without any questions. You can undo this.`)) { toKnow.forEach(id => markKnown(BYID[id])); pick = null; save(); route(); } } }, toKnow.length ? {} : { disabled: 'disabled' }), `Mark as known${toKnow.length ? ' (' + toKnow.length + ')' : ''}`),
+        h('button', Object.assign({ class: 'btn alt', onclick: () => { if (confirm(`Mark ${toReset.length} lesson${toReset.length > 1 ? 's' : ''} as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { toReset.forEach(id => unmarkDone(BYID[id])); pick = null; save(); route(); } } }, toReset.length ? {} : { disabled: 'disabled' }), `↩ Mark as not done${toReset.length ? ' (' + toReset.length + ')' : ''}`),
+        h('button', { class: 'btn alt', onclick: () => { pick = null; route(); } }, 'Cancel')));
+    }
     sb.weeks.forEach(w => {
       const wl = sb.lessons.filter(l => l.week === w.week), wd = wl.filter(l => S.done[l.id]);
       const last = wd.map(l => S.done[l.id].when).sort().pop();
@@ -263,7 +270,8 @@
         h('span', { class: 'wk' + (wd.length === wl.length ? ' ok' : '') }, wd.length === wl.length ? `✅ Week complete ${fmtDate(last)}` : `${wd.length}/${wl.length} done`)), h('p', { class: 'muted' }, w.blurb),
         h('div', { class: 'known-row' },
           todo.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark the ${todo.length} unfinished lesson${todo.length > 1 ? 's' : ''} in Week ${w.week} as already known? They will count as done without questions. You can undo this.`)) { todo.forEach(markKnown); save(); route(); } } }, `✔ Already know all of Week ${w.week}`) : '',
-          known.length ? h('button', { class: 'btn alt small', onclick: () => { known.forEach(unmarkKnown); save(); route(); } }, `↩ Undo ${known.length} marked as known`) : ''));
+          known.length ? h('button', { class: 'btn alt small', onclick: () => { known.forEach(unmarkKnown); save(); route(); } }, `↩ Undo ${known.length} marked as known`) : '',
+          wd.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark all ${wd.length} finished lesson${wd.length > 1 ? 's' : ''} in Week ${w.week} as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { wd.forEach(unmarkDone); save(); route(); } } }, `↩ Mark Week ${w.week} as not done`) : ''));
       frag.append(h('div', { class: 'grid' }, wl.map(tile)));
     });
     app(frag);
@@ -302,7 +310,9 @@
       wrap.append(h('span', { class: 'pill dark ' + L.subj }, pillOf(L)), h('h1', {}, L.t));
       if (S.done[id]) {
         wrap.append(h('div', { class: 'badge-done' }, `✅ ${doneLine(S.done[id])}${S.done[id].skipped ? '' : ' · ' + scoreText(S.done[id])}`));
-        if (S.done[id].skipped) wrap.append(' ', h('button', { class: 'btn alt small', onclick: () => { unmarkKnown(L); save(); draw(); } }, 'Undo'), h('p', { class: 'muted small' }, 'You can still work through this lesson and finish it to record real results.'));
+        wrap.append(h('div', { class: 'known-row' },
+          h('button', { class: 'btn alt small', onclick: () => { if (confirm('Mark this lesson as not done? The score and date are removed. Stars for solved questions are kept.')) { unmarkDone(L); save(); draw(); } } }, '↩ Mark as not done'),
+          Object.keys(S.right[id] || {}).length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm('Start this lesson over? The score, date and all stars for this lesson are removed.')) { startOver(L); Object.keys(right).forEach(k => delete right[k]); save(); draw(); } } }, '🔄 Start this lesson over') : ''));
       } else {
         wrap.append(h('div', { class: 'known-card' }, h('span', {}, 'Learned this before, somewhere else?'), h('button', { class: 'btn', onclick: () => { if (confirm('Mark this lesson as already known? It will count as done without any questions. You can undo this.')) { markKnown(L); S.pos = { id: (sb.lessons[L.n + 1] || L).id, step: 0 }; save(); go('#/map/' + L.subj); } } }, '✔ I already know this')));
       }
@@ -446,13 +456,17 @@
     frag.append(passwordCard());
     const skipSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
     const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Weeks 1 to ${n}`)));
-    frag.append(h('section', { class: 'card' }, h('h2', {}, 'Already learned some of this?'),
+    frag.append(h('section', { class: 'card' }, h('h2', {}, 'Already learned some of this, or marked by mistake?'),
       h('p', { class: 'muted' }, 'Mark lessons as done without questions when your child has already learned them elsewhere. Lessons already completed here keep their real scores. Marked lessons still appear in Look Back so old ideas are refreshed, and you can undo any time from the map.'),
       h('div', { class: 'ans' }, skipSel, weekSel, h('button', { class: 'btn', onclick: () => {
         const sb = SUBJ[skipSel.value], list = lessonsUpTo(sb, +weekSel.value).filter(l => !S.done[l.id]);
         if (!list.length) return alert('Everything in that range is already done.');
         if (confirm(`Mark ${list.length} ${sb.name} lesson${list.length > 1 ? 's' : ''} (weeks 1 to ${weekSel.value}) as already known?`)) { list.forEach(markKnown); const nx = sb.lessons.find(l => !S.done[l.id]); if (nx) S.pos = { id: nx.id, step: 0 }; save(); alert(`Done. ${list.length} lesson${list.length > 1 ? 's' : ''} marked.`); route(); }
-      } }, 'Mark as known'))));
+      } }, 'Mark as known'), h('button', { class: 'btn alt', onclick: () => {
+        const sb = SUBJ[skipSel.value], list = lessonsUpTo(sb, +weekSel.value).filter(l => S.done[l.id]);
+        if (!list.length) return alert('Nothing in that range is marked done.');
+        if (confirm(`Mark ${list.length} ${sb.name} lesson${list.length > 1 ? 's' : ''} (weeks 1 to ${weekSel.value}) as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { list.forEach(unmarkDone); save(); alert(`Done. ${list.length} lesson${list.length > 1 ? 's' : ''} reset.`); route(); }
+      } }, '↩ Mark as not done'))));
     SUBJECTS.forEach(sb => {
       const t = h('table', {}, h('tr', {}, h('th', {}, 'Lesson'), h('th', {}, 'Score'), h('th', {}, 'Completed'), h('th', {}, 'Answers')));
       sb.lessons.forEach(L => t.append(h('tr', {}, h('td', {}, `W${L.week}·${DAYS[L.day - 1]} ${L.t}`), h('td', {}, S.done[L.id] ? scoreShort(S.done[L.id]) : '-'), h('td', {}, S.done[L.id] ? fmtDate(S.done[L.id].when) : '-'), h('td', {}, h('a', { href: '#/key/' + L.id }, 'Key')))));
