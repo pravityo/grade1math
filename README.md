@@ -99,7 +99,7 @@ finished lesson, and quest wording. Child-facing lesson text in all three subjec
 short sentences, "you", no jargon without an explanation. Adult-facing text (parent notes, Explain it more) stays adult.
 
 ## Monsters and bosses (`js/monsters.js`)
-Ten monsters are drawn from parts (body shape, eyes, horns or antennae, mouth, spots) and cycle through the lessons. The
+Twenty monsters, each with its own body plan (ghost, flame, dino, octopus, robot, alien, mushroom, jellyfish, rock golem, fuzzball, caterpillar, bat, snail, pumpkin, cloud, cactus and more), cycle through the lessons. The
 last lesson of every level (week) is a Big Boss with a crown. Each lesson opens with a battle scene: the knight against the
 lesson's monster, whose "calm" bar fills as puzzles are solved until it becomes a friend in the monster book. The map,
 subject cards, questions, rank (Page, Squire, Knight, Champion, Dragon Knight) and the skyline at the bottom of each page

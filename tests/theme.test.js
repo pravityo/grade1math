@@ -3,14 +3,14 @@ globalThis.window = globalThis; const fs = require('fs'), path = require('path')
 eval(fs.readFileSync(path.join(__dirname, '..', 'js', 'monsters.js'), 'utf8'));
 let bad = 0; const eq = (name, got, want) => { if (JSON.stringify(got) !== JSON.stringify(want)) { bad++; console.log('FAIL', name, 'got', JSON.stringify(got), 'want', JSON.stringify(want)); } };
 const M = Monsters;
-eq('ten monsters', M.LIST.length, 10); eq('unique names', new Set(M.LIST.map(m => m.name)).size, 10); eq('unique looks', new Set(M.LIST.map(m => [m.c, m.shape, m.eyes, m.top, m.mouth].join())).size, 10);
-for (let i = 0; i < 10; i++) { const s = M.svg(i); eq('svg ' + i + ' is one svg', (s.match(/<svg/g) || []).length, 1); eq('svg ' + i + ' closes', /<\/svg>$/.test(s), true); eq('boss has crown', M.svg(i, { boss: true }).includes('#ffd84d'), true); eq('tamed has hearts', M.svg(i, { tamed: true }).includes('#ff7a90'), true); }
-eq('sprite has every symbol', (M.sprite().match(/<symbol/g) || []).length, 20);
-eq('use references the sprite', M.use(3, true).includes('#monb-3'), true); eq('use wraps around', M.use(13).includes('#mon-3'), true);
+eq('twenty monsters', M.LIST.length, 20); eq('unique names', new Set(M.LIST.map(m => m.name)).size, 20); eq('unique drawings', new Set(M.LIST.map(m => m.draw())).size, 20);
+for (let i = 0; i < 20; i++) { const s = M.svg(i); eq('svg ' + i + ' is one svg', (s.match(/<svg/g) || []).length, 1); eq('svg ' + i + ' has blinking eyes', s.includes('class="pupil"'), true); eq('svg ' + i + ' has no NaN', /NaN|undefined/.test(s), false); eq('svg ' + i + ' closes', /<\/svg>$/.test(s), true); eq('boss has crown', M.svg(i, { boss: true }).includes('#ffd84d'), true); eq('tamed has hearts', M.svg(i, { tamed: true }).includes('#ff7a90'), true); }
+eq('sprite has every symbol', (M.sprite().match(/<symbol/g) || []).length, 40);
+eq('use references the sprite', M.use(3, true).includes('#monb-3'), true); eq('use wraps around', M.use(23).includes('#mon-3'), true);
 // lessons cycle through all ten monsters and day 5 is a boss
 const seen = { math: new Set(), eng: new Set(), sci: new Set() };
 for (const subj of ['math', 'eng', 'sci']) for (let n = 0; n < 40; n++) { const L = { subj, n, day: (n % 5) + 1 }, f = M.forLesson(L); seen[subj].add(f.i); eq(`${subj}${n} boss only on day 5`, f.boss, L.day === 5); eq('boss name prefix', f.name.startsWith('Boss '), f.boss); }
-eq('math uses all ten', seen.math.size, 10); eq('english uses all ten', seen.eng.size, 10); eq('science uses all ten', seen.sci.size, 10);
+eq('math uses all twenty', seen.math.size, 20); eq('english uses all twenty', seen.eng.size, 20); eq('science uses all twenty', seen.sci.size, 20);
 eq('neighbouring lessons differ', M.forLesson({ subj: 'math', n: 0, day: 1 }).i !== M.forLesson({ subj: 'math', n: 1, day: 2 }).i, true);
 eq('same lesson number differs by subject', new Set(['math', 'eng', 'sci'].map(s => M.forLesson({ subj: s, n: 4, day: 5 }).i)).size, 3);
 // ranks
