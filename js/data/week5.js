@@ -27,7 +27,7 @@
   key: `Cube: 6 faces, 12 edges, 8 corners. Opposite faces of a dice add to 7.`,
   learn: [
     `<b>3D shapes</b> are solid. A <b>face</b> is a flat side. An <b>edge</b> is where 2 faces meet. A <b>corner</b> is where edges meet.`,
-    `<b>Cube:</b> 6 faces, 12 edges, 8 corners. <b>Ball (sphere):</b> rolls, no flat faces. <b>Cylinder:</b> 2 flat circles and 1 curved surface.`,
+    `<b>Cube:</b> 6 faces, 12 edges, 8 corners. <b>Ball (sphere):</b> rolls, no flat faces. <b>Cylinder:</b> 2 flat circles and 1 curved surface. Look at the picture below to spot each solid.`,
     `<b>Dice:</b> opposite faces add to 7. (1 opposite 6, 2 opposite 5, 3 opposite 4.) Total on all 6 faces = 21.`
   ],
   do: `<b>Hands-on:</b> Find boxes, cans, and balls at home. Sort into "rolls" and "stacks". Look at a real dice: check that opposite faces add to 7.`,

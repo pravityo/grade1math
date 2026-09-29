@@ -4,7 +4,7 @@
   lessons: [
 LS(`Short Vowels: Blend It!`, `Phonics (CVC words)`, `Blend three sounds into a word and change one sound to make a new word.`,
   `Say each sound, then blend them: c-a-t = cat. Change one sound and you get a new word.`,
-  [`Every word is made of <b>sounds</b>. To read <b>cat</b>, say each sound then push them together.`,
+  [`Every word is made of <b>sounds</b>. To read <b>cat</b>, say each sound then push them together. The picture below shows the sounds of one word.`,
    `[[blend:c,a,t]]`,
    `The five short vowels say: <b>a</b> as in cat, <b>e</b> as in pen, <b>i</b> as in pig, <b>o</b> as in dog, <b>u</b> as in sun.`,
    `<b>Word changing:</b> change one sound and you make a new word. cat, then cot, then cut. Each word changed only ONE letter.`],
@@ -65,7 +65,7 @@ LS(`Magic e`, `Long vowel sounds`, `Use a silent e to turn a short vowel into a 
 LS(`Rhyming & Word Families`, `Rhyme and word patterns`, `Hear rhymes and group words that end with the same pattern.`,
   `Words that end with the same sounds rhyme: cat, hat, mat. Word families share an ending.`,
   [`Words <b>rhyme</b> when their ending sounds are the same: cat, hat, mat, sat.`,
-   `Words with the same ending letters make a <b>word family</b>: the <b>-at</b> family is cat, hat, bat. The <b>-ight</b> family is light, night, fight.`,
+   `Words with the same ending letters make a <b>word family</b>: the <b>-at</b> family is cat, hat, bat. The <b>-ight</b> family is light, night, fight. The picture below shows the -at family.`,
    `[[cards:🐱 cat,🎩 hat,🦇 bat,🐀 rat]]`,
    `Careful: rhymes are about <b>sound</b>, not spelling. <b>kite</b> and <b>light</b> rhyme even though they are spelled differently.`],
   `<b>Hands-on:</b> Make up a silly rhyme with 4 lines. Which words rhyme? Can you find one that rhymes by sound but not spelling?`,

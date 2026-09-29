@@ -19,7 +19,7 @@ LS(`Materials & Properties`, `Choosing materials`, `Describe materials and say w
    MC(`o`, `Which is the BEST material for a mop to soak up water?`, [`sponge or cloth`, `plastic`, `glass`], `sponge or cloth`, `Which soaks in water?`, `Absorbent materials soak up water.`)]),
 LS(`Solid, Liquid, Gas`, `States of matter`, `Tell the three states of matter apart.`,
   `Solids keep their shape. Liquids take the shape of the container. Gases fill all the space.`,
-  [`Everything is made of <b>matter</b>, and matter comes in three <b>states</b>.`,
+  [`Everything is made of <b>matter</b>, and matter comes in three <b>states</b>. The picture below shows all three.`,
    `[[states:]]`,
    `<b>Solid:</b> has its own shape (rock, ice). <b>Liquid:</b> flows and takes the shape of its container (water, milk). <b>Gas:</b> spreads out to fill any space (air, steam).`,
    `You can pour a liquid but not a solid. You cannot see most gases, but you can feel wind, and a balloon shows air takes up space.`],

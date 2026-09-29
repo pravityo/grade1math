@@ -1,0 +1,35 @@
+name: Check outside links
+on:
+  workflow_dispatch:
+    inputs:
+      prune:
+        description: 'Remove links that do not return HTTP 200 and commit the result'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '0 3 * * 1'
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check every link returns 200
+        id: check
+        continue-on-error: true
+        run: node tests/links.check.js ${{ inputs.prune && '--prune' || '' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: links-report
+          path: tests/links.report.json
+      - name: Commit pruned list
+        if: ${{ inputs.prune }}
+        run: |
+          git config user.name "links-bot"
+          git config user.email "links-bot@users.noreply.github.com"
+          git add js/data/links.js
+          git diff --cached --quiet || (git commit -m "Remove outside links that no longer return 200" && git push)
+      - name: Fail if any link is dead
+        if: steps.check.outcome == 'failure' && !inputs.prune
+        run: exit 1

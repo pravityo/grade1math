@@ -34,7 +34,7 @@ LS(`Past Tense: Tricky Verbs`, `Irregular past tense`, `Use the special past for
    MC(`o`, `What is the past of catch?`, [`catched`, `caught`, `cought`], `caught`, `It is a tricky one.`, `caught.`)]),
 LS(`Pronouns`, `Words that replace nouns`, `Use he, she, it, they, we and I instead of repeating names.`,
   `Pronouns replace nouns: Ali is six. He is my brother.`,
-  [`A <b>pronoun</b> takes the place of a noun so we do not repeat it: Ali is six. <b>He</b> likes cars.`,
+  [`A <b>pronoun</b> takes the place of a noun so we do not repeat it: Ali is six. <b>He</b> likes cars. The table below shows which pronoun to use for whom.`,
    `[[table:Who,Use|one boy,he|one girl,she|one thing,it|many,they|me and others,we|me,I]]`,
    `After words like <b>to, for, with</b> use <b>me, him, her, us, them</b>: Give it to <b>her</b>. Play with <b>us</b>.`,
    `When you talk about yourself and a friend: <b>Ali and I</b> went. (Not "Me and Ali".)`],

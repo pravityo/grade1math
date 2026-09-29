@@ -52,7 +52,7 @@ LS(`Plurals`, `More than one`, `Make plurals: s, es, ies, ves, and the tricky on
   [`<b>Plural</b> means more than one. Most words just add <b>s</b>: dog, dogs.`,
    `After s, x, sh, ch add <b>es</b>: box, boxes. bus, buses. dish, dishes. watch, watches.`,
    `If a word ends in consonant + y, change y to <b>ies</b>: baby, babies. If it ends in f, change to <b>ves</b>: leaf, leaves.`,
-   `Irregular plurals do not follow rules. Just learn them, like these:`,
+   `Irregular plurals do not follow rules. Just learn them, like these: The table below lists four.`,
    `[[table:One,Many|child,children|foot,feet|mouse,mice|sheep,sheep]]`],
   `<b>Hands-on:</b> Collect 1 leaf, 2 leaves. Draw 1 baby, 2 babies. Say the plural out loud.`,
   `<b>Olympiad tip:</b> Ask: is this an irregular one? (foot, child, mouse, man, tooth, sheep). If it is, the rule does not apply.`,

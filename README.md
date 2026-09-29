@@ -71,3 +71,24 @@ data, not a login, so nothing is stored on a server. `node tests/password.test.j
 
 The Grown-ups tab and the answer keys open only after typing an "-ology" word for a hint shown in a pop-up (`js/gate.js`, 38 words).
 It unlocks for 10 minutes after the last use. It keeps a young child out; it is not real security because the words are in the source.
+
+## Adaptive learning (`js/adapt.js`)
+Every answered question updates a review box for that lesson's skill (`S.skills`). A miss drops the box two levels and
+remembers the question; a first-try correct answer moves it up. Boxes come due after 1, 2, 4, 7, 14 and 30 days, and
+Look Back and the Quiz page ("Skills to practise") bring tricky or due skills back first. After two wrong tries a
+question offers an easier one from the same lesson. Challenge stays locked until 60% of Practice is solved. Each subject
+has a quick placement check (`#/placement/<subject>`, 2 questions from every 5th lesson, stops at the first miss) that
+can mark earlier lessons as already known.
+
+## Streaks, weekly goal and owl accessories (`js/owlwear.js`)
+The home page shows the streak (weekends never break it, one missed weekday in five is forgiven) and progress towards
+the weekly goal (parent-set, 1 to 5 evenings). The owl earns one of 12 accessories for every 3 study days (days with a
+solved question or finished lesson) and wears it straight away; the child can change outfits under "Dress my owl".
+Study days live on the device, so accessories are not part of the progress password.
+`node tests/adapt.test.js` covers all of this.
+
+## Content checks
+`node tests/coherence.test.js` checks that every picture has a text paragraph around it that points at it, that there is
+no parent-directed wording in child text and no copied paragraphs or worked examples. `node tests/links.check.js` checks
+that every outside link returns HTTP 200 (needs internet; use the "Check outside links" GitHub Action, optionally with
+"prune" to remove dead ones).

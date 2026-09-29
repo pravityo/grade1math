@@ -34,7 +34,7 @@ LS(`Plant Life Cycle`, `Growing from seed`, `Order the stages from seed to new s
    MC(`o`, `Why do plants spread their seeds far away?`, [`So they do not crowd the parent plant`, `To make the seeds bigger`, `To hide from the sun`], `So they do not crowd the parent plant`, `Think about space and light.`, `Seedlings need space, water and light.`)]),
 LS(`Habitats`, `Where living things live`, `Match animals and plants to habitats and explain how they are suited.`,
   `A habitat is where a plant or animal lives and finds what it needs.`,
-  [`A <b>habitat</b> is a place where living things find food, water, shelter and space.`,
+  [`A <b>habitat</b> is a place where living things find food, water, shelter and space. The pictures below show four habitats.`,
    `[[cards:🌲 forest,🌊 ocean,🏜️ desert,🐸 pond]]`,
    `Animals have features that fit their habitat. A <b>camel</b> has wide feet for sand and can go without water for days. A <b>polar bear</b> has thick fur and fat to stay warm in the cold. A <b>fish</b> has gills and fins for water.`,
    `In Singapore, <b>mangroves</b> grow by the sea. Their roots grow above the mud and are home to crabs, fish and mudskippers.`],

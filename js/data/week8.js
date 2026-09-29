@@ -68,7 +68,7 @@
   goal: `Count outfit-type combinations systematically.`,
   key: `Choices multiply: 2 shirts x 3 shorts = 6 outfits.`,
   learn: [
-    `<b>2 shirts and 3 shorts:</b> each shirt goes with 3 shorts. 3 + 3 = 6 outfits (2 x 3).`,
+    `<b>2 shirts and 3 shorts:</b> each shirt goes with 3 shorts. 3 + 3 = 6 outfits (2 x 3). The picture below lists every outfit.`,
     `<b>Menu:</b> 2 mains and 3 drinks = 6 meals.`,
     `<b>Arranging:</b> A and B in a line: AB, BA = 2 ways. A, B, C: ABC, ACB, BAC, BCA, CAB, CBA = 6 ways.`,
     `<b>Digits:</b> using 1 and 2 (repeats allowed): 11, 12, 21, 22 = 4 numbers.`,

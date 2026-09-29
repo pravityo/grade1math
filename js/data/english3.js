@@ -4,7 +4,7 @@
   lessons: [
 LS(`What Makes a Sentence?`, `Sentence basics`, `Write complete sentences with a capital letter and a full stop.`,
   `A sentence starts with a capital letter, tells a whole idea, and ends with a full stop.`,
-  [`A <b>sentence</b> tells a complete idea. It must have <b>who or what</b> and <b>what happens</b>.`,
+  [`A <b>sentence</b> tells a complete idea. It must have <b>who or what</b> and <b>what happens</b>. The picture below shows one sentence, with its capital letter and full stop.`,
    `[[sentence:The,dog,ran|.]]`,
    `Start with a <b>capital letter</b>. End with a <b>full stop</b> (.). Names always start with capitals too: Mei, Ali.`,
    `Not every group of words is a sentence. <b>The dog</b> is only half an idea. <b>Under the table</b> is only half an idea. They need more to be sentences, like <b>The dog sat under the table.</b>`],
