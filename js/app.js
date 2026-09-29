@@ -538,7 +538,7 @@
     const draw = () => {
       const c = Cloud.status(), kids = [h('h2', {}, '👨‍👩‍👧 Parents and cloud save')];
       kids.push(h('p', {}, 'Signed in as ', h('b', {}, c.email || '...'), '. Progress is saved to the family and follows your child to any device.'),
-        h('p', { class: 'muted' }, c.state === 'syncing' ? 'Saving...' : c.state === 'denied' || c.state === 'error' ? '⚠️ ' + c.message : c.at ? `✅ Saved at ${when(c.at)}. It saves by itself after each lesson.` : ''));
+        h('p', { class: 'muted' }, c.state === 'syncing' ? 'Saving...' : c.state === 'denied' || c.state === 'error' ? '⚠️ ' + c.message : c.at ? `✅ Saved at ${when(c.at)}. It saves by itself after every change and every couple of minutes.` : ''));
       if (c.family) {
         kids.push(h('h3', {}, 'Parents with access'), h('ul', { class: 'plain' }, c.family.members.map(m => h('li', { class: 'parent-row' }, h('span', {}, m.email, m.you ? ' (you)' : '', m.owner ? ' · started the family' : ''),
           m.you ? '' : h('button', { class: 'btn alt small', onclick: async () => { if (confirm(`Remove ${m.email}? They will no longer see this progress.`)) { const r = await Cloud.removeParent(m.uid); say(r.ok ? `${m.email} was removed.` : r.reason); } } }, 'Remove')))));
@@ -547,7 +547,7 @@
           h('div', { class: 'ans' }, email, h('button', { class: 'btn', onclick: async () => { const r = await Cloud.invite(email.value); if (r.ok) { email.value = ''; say(`Invited ${r.invite}. Ask them to open this app and tap Grown-ups.`); } else say(r.reason); } }, 'Invite')));
       }
       if (note) kids.push(h('p', { class: 'note' }, note));
-      kids.push(h('div', { class: 'ans', style: 'margin-top:14px' }, h('button', { class: 'btn', onclick: () => Cloud.syncNow() }, 'Save now'), h('button', { class: 'btn alt', onclick: async () => { if (confirm('Sign out on this device? Progress stays here and in the cloud. The Grown-ups area locks.')) { await Cloud.signOut(); go('#/'); } } }, 'Sign out')));
+      kids.push(h('div', { class: 'ans', style: 'margin-top:14px' }, h('button', { class: 'btn alt', onclick: () => Cloud.syncNow() }, 'Save now (optional)'), h('button', { class: 'btn alt', onclick: async () => { if (confirm('Sign out on this device? Progress stays here and in the cloud. The Grown-ups area locks.')) { await Cloud.signOut(); go('#/'); } } }, 'Sign out')));
       box.replaceChildren(...kids);
     };
     let shown = false;

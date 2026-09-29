@@ -136,6 +136,13 @@
     status: () => Object.assign({ email: user ? user.email : '', signedIn: !!user, uid: user ? user.uid : '', family: fam ? { members: Family.list(fam, user && user.uid), pending: fam.pending || [] } : null }, st),
     onChange(f) { listeners.push(f); }, offChange(f) { const i = listeners.indexOf(f); if (i >= 0) listeners.splice(i, 1); }
   };
+  // Automatic saving: 4 seconds after any change (pushSoon), every 2 minutes while the app is open (this also picks up the other
+  // parent's devices), when the app comes back or the connection returns, and once more as the app is put away.
   window.addEventListener('online', () => { if (user) syncNow(); });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && user) syncNow(); });
+  document.addEventListener('visibilitychange', () => {
+    if (!user) return;
+    if (document.visibilityState === 'visible') syncNow(); else { clearTimeout(timer); syncNow(); }
+  });
+  window.addEventListener('pagehide', () => { if (user) { clearTimeout(timer); syncNow(); } });
+  setInterval(() => { if (user && document.visibilityState === 'visible' && !busy) syncNow(); }, 120000);
 })();
