@@ -60,3 +60,9 @@ Each lesson's Learn tab also shows: an "Explain it more" section, a worked examp
 (`js/data/deep-*.js`, keyed by lesson id) and free outside resources (`js/data/links.js`, found by web search). Lesson ids are
 `0`-`39` (maths), `e0`-`e39` (English) and `s0`-`s39` (science). `node tests/data.test.js` checks every lesson has both.
 Outside links are not verified by the tests and can change, so re-check them occasionally.
+
+## Progress passwords
+
+The Parent tab can create an SNES-style password (`js/password.js`) that holds progress: which lessons are done or marked known, the
+first name, the daily plan and, in the full version, scores and completion dates. Enter it on any device or browser to carry on. It is
+data, not a login, so nothing is stored on a server. `node tests/password.test.js` checks round trips and typo detection.

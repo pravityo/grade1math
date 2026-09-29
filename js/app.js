@@ -75,8 +75,9 @@
   };
   const vis = html => Visuals.expand(html);
   const fmtDate = iso => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? new Date(+m[1], m[2] - 1, +m[3]).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : ''; };
-  const doneLine = r => r.skipped ? `Marked as already known ${fmtDate(r.when)}` : `Completed ${fmtDate(r.when)}`;
-  const scoreText = r => r.skipped ? 'already known' : `${r.correct}/${r.total} correct`;
+  const doneLine = r => (r.skipped ? 'Marked as already known' : 'Completed') + (r.when ? ' ' + fmtDate(r.when) : '');
+  const scoreText = r => r.skipped ? 'already known' : r.noscore ? 'done (score not saved)' : `${r.correct}/${r.total} correct`;
+  const scoreShort = r => r.skipped ? 'known' : r.noscore ? 'done' : `${r.correct}/${r.total}`;
   /* "Already learned elsewhere": mark lessons done without any answers. Stars and streak are not affected, and real results are never overwritten. */
   const markKnown = L => { if (S.done[L.id]) return false; S.done[L.id] = { correct: 0, total: L.q.length, when: todayStr(), skipped: true }; return true; };
   const unmarkKnown = L => { if (S.done[L.id] && S.done[L.id].skipped) { delete S.done[L.id]; return true; } return false; };
@@ -224,7 +225,7 @@
     frag.append(rc);
     const recent = ALL.filter(l => S.done[l.id]).sort((a, b) => (S.done[b.id].when || '').localeCompare(S.done[a.id].when || '') || b.n - a.n).slice(0, 6);
     if (recent.length) frag.append(h('section', { class: 'card' }, h('h2', {}, '✅ Completed lessons'),
-      h('ul', { class: 'recent', style: 'list-style:none;padding:0' }, recent.map(l => h('li', {}, h('a', { href: '#/lesson/' + l.id }, `${SUBJ[l.subj].icon} ${l.t}`), h('span', { class: 'muted' }, `${fmtDate(S.done[l.id].when)} · ${S.done[l.id].skipped ? 'already known' : S.done[l.id].correct + '/' + S.done[l.id].total}`))))));
+      h('ul', { class: 'recent', style: 'list-style:none;padding:0' }, recent.map(l => h('li', {}, h('a', { href: '#/lesson/' + l.id }, `${SUBJ[l.subj].icon} ${l.t}`), h('span', { class: 'muted' }, `${S.done[l.id].when ? fmtDate(S.done[l.id].when) + ' · ' : ''}${scoreText(S.done[l.id])}`))))));
     frag.append(h('section', { class: 'card' }, h('h2', {}, '🕰️ Evening routine (about 25 minutes per subject)'),
       h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
         h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong is fine. Thinking is the point!'))));
@@ -341,7 +342,7 @@
     const L = BYID[id]; if (!L) return go('#/');
     const nx = SUBJ[L.subj].lessons[L.n + 1], r = S.done[id];
     app(h('section', { class: 'card hero ' + L.subj }, h('h1', {}, '🎉 Lesson complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? scoreText(r) : ''}`),
-      nx ? h('p', {}, 'Next time: ' + nx.t) : h('p', {}, `🎓 That was the last ${SUBJ[L.subj].name} lesson!`), h('a', { class: 'btn light', href: '#/' }, 'Back home')));
+      nx ? h('p', {}, 'Next time: ' + nx.t) : h('p', {}, `🎓 That was the last ${SUBJ[L.subj].name} lesson!`), h('a', { class: 'btn light', href: '#/' }, 'Back home'), h('p', { class: 'small', style: 'margin-top:20px' }, 'Playing on another device? ', h('a', { href: '#/parent', style: 'color:#fff;text-decoration:underline' }, 'Get your progress password'))));
   }
 
   function viewReview(key) {
@@ -357,6 +358,51 @@
     frag.append(h('section', { class: 'card' }, h('h2', {}, '📚 Recap cards'),
       doneList.length ? doneList.map(L => h('div', { class: 'recap', style: 'margin:8px 0' }, h('span', {}, h('b', {}, `${SUBJ[L.subj].icon} ${L.t}: `), L.key, h('br'), h('small', { class: 'muted' }, '✔ ' + doneLine(S.done[L.id]))), h('a', { class: 'btn alt small', href: '#/lesson/' + L.id }, 'Redo'))) : h('p', { class: 'muted' }, 'Finish a lesson and its recap card appears here.')));
     app(frag);
+  }
+
+  /* ---- progress passwords (js/password.js) ---- */
+  const pwState = () => ({ name: S.name, plan: S.plan, lessons: ALL.map(L => { const r = S.done[L.id]; return r ? { status: r.skipped ? 2 : 1, correct: r.correct | 0, when: r.when } : { status: 0, correct: 0, when: null }; }) });
+  function applyPassword(dec, merge) {
+    const today = todayStr();
+    ALL.forEach((L, i) => {
+      const p = dec.lessons[i], cur = S.done[L.id];
+      if (!merge) { delete S.done[L.id]; delete S.right[L.id]; }
+      if (!p.status) return;
+      if (merge && cur) { // keep real results over "known", the better score, and the earlier date
+        if (cur.skipped && p.status === 1) delete S.done[L.id]; else { if (!cur.skipped && p.status === 1 && dec.detail && p.correct > cur.correct) { cur.correct = p.correct; S.right[L.id] = Object.fromEntries([...Array(p.correct).keys()].map(k => [k, true])); } if (p.when && (!cur.when || p.when < cur.when)) cur.when = p.when; return; }
+      }
+      const rec = { correct: dec.detail ? p.correct : 0, total: L.q.length, when: p.when || (dec.detail ? today : '') };
+      if (p.status === 2) rec.skipped = true; else if (!dec.detail) rec.noscore = true;
+      S.done[L.id] = rec;
+      if (p.status === 1 && dec.detail) S.right[L.id] = Object.fromEntries([...Array(Math.min(p.correct, L.q.length)).keys()].map(k => [k, true]));
+    });
+    if (dec.name && (!merge || !S.name)) S.name = dec.name;
+    if (!merge) S.plan = dec.plan;
+    const firstOpen = SUBJECTS[0].lessons.find(l => !S.done[l.id]); S.pos = firstOpen ? { id: firstOpen.id, step: 0 } : null;
+    save();
+  }
+  function passwordCard() {
+    const out = h('textarea', { readonly: 'readonly', rows: 3, class: 'pw-box', 'aria-label': 'Your progress password', placeholder: 'Your password appears here' });
+    const note = h('p', { class: 'muted small' });
+    const show = detail => { out.value = PW.encode(pwState(), detail); note.textContent = `${out.value.replace(/-/g, '').length} characters. Write it down or copy it. Anyone with this password can load this progress, and it never expires.`; };
+    const copy = h('button', { class: 'btn alt', onclick: () => { if (!out.value) return; out.select(); try { navigator.clipboard.writeText(out.value); } catch (e) { document.execCommand && document.execCommand('copy'); } note.textContent = 'Copied.'; } }, 'Copy');
+    const inp = h('textarea', { rows: 3, class: 'pw-box', 'aria-label': 'Enter a password', placeholder: 'Type or paste a password (spaces, dashes and capitals do not matter)' });
+    const msg = h('p', { class: 'fb' });
+    const load = merge => {
+      const dec = PW.decode(inp.value, ALL.length);
+      if (dec.error) { msg.className = 'fb no'; msg.textContent = dec.error; return; }
+      const done = dec.lessons.filter(l => l.status === 1).length, known = dec.lessons.filter(l => l.status === 2).length;
+      const who = dec.name ? ` for ${dec.name}` : '';
+      if (!confirm(`This password${who} has ${done} finished and ${known} marked-as-known lessons${dec.detail ? ', with scores and dates' : ' (no scores or dates)'}.\n\n${merge ? 'Merge it with the progress on this device?' : 'Replace the progress on this device with it?'}`)) return;
+      applyPassword(dec, merge); alert('Progress loaded. Open Today or the Map to see it.'); route();
+    };
+    return h('section', { class: 'card' }, h('h2', {}, '🔑 Progress password'),
+      h('p', { class: 'muted' }, 'Like an old video game: the password holds your progress. Get one here, then type it on another device or browser to carry on where you left off. No account or internet is needed.'),
+      h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => show(false) }, 'Short password (progress only)'), h('button', { class: 'btn', onclick: () => show(true) }, 'Full password (with scores and dates)')),
+      out, h('div', { class: 'ans' }, copy), note,
+      h('h3', { style: 'margin-top:28px' }, 'Load a password'), inp,
+      h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => load(false) }, 'Load (replace this device)'), h('button', { class: 'btn alt', onclick: () => load(true) }, 'Merge with this device')), msg,
+      h('p', { class: 'muted small' }, 'A password carries which lessons are done or marked known, the child\'s first name (letters only, up to 8), the daily plan, and, in the full version, scores and completion dates. It does not carry the streak or half-finished lessons. Save it after each week.'));
   }
 
   function viewParent() {
@@ -375,6 +421,7 @@
         h('li', {}, h('b', {}, 'Rhythm: '), 'About 25 minutes per subject. Progress is lesson-based, so missed days do not skip content.'),
         h('li', {}, h('b', {}, 'Coach tips: '), 'Ask "How do you know?", let them draw, praise effort, and read questions aloud together for English and Science.'),
         h('li', {}, h('b', {}, 'Levels: '), '🌱 Warm-up, ⭐ Core, 🚀 Stretch, 🏆 Olympiad.'))));
+    frag.append(passwordCard());
     const skipSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
     const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Weeks 1 to ${n}`)));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Already learned some of this?'),
@@ -386,7 +433,7 @@
       } }, 'Mark as known'))));
     SUBJECTS.forEach(sb => {
       const t = h('table', {}, h('tr', {}, h('th', {}, 'Lesson'), h('th', {}, 'Score'), h('th', {}, 'Completed'), h('th', {}, 'Answers')));
-      sb.lessons.forEach(L => t.append(h('tr', {}, h('td', {}, `W${L.week}·${DAYS[L.day - 1]} ${L.t}`), h('td', {}, S.done[L.id] ? (S.done[L.id].skipped ? 'known' : `${S.done[L.id].correct}/${S.done[L.id].total}`) : '-'), h('td', {}, S.done[L.id] ? fmtDate(S.done[L.id].when) : '-'), h('td', {}, h('a', { href: '#/key/' + L.id }, 'Key')))));
+      sb.lessons.forEach(L => t.append(h('tr', {}, h('td', {}, `W${L.week}·${DAYS[L.day - 1]} ${L.t}`), h('td', {}, S.done[L.id] ? scoreShort(S.done[L.id]) : '-'), h('td', {}, S.done[L.id] ? fmtDate(S.done[L.id].when) : '-'), h('td', {}, h('a', { href: '#/key/' + L.id }, 'Key')))));
       frag.append(h('section', { class: 'card' }, h('h2', {}, `${sb.icon} ${sb.name}: progress and answer keys`), t));
     });
     const io = h('textarea', { rows: 3, style: 'width:100%', placeholder: 'Paste saved progress here to restore' });

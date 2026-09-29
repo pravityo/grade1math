@@ -216,3 +216,5 @@ figure.ill.seq .arr,.cyc .arr{color:var(--pri);font-size:1.6rem;font-weight:800}
 
 .known-row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 18px}
 .tile.done .stamp{color:var(--ok)}
+
+.pw-box{width:100%;font:1.05rem/1.6 ui-monospace,Menlo,Consolas,monospace;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);margin:14px 0;letter-spacing:.06em;word-break:break-all}
