@@ -38,6 +38,7 @@
   }
   const kinds = { bar, cmp, bond, frame };
   window.Visuals = {
+    kinds,
     expand: html => html.replace(/\[\[(\w+):([^\]]*)\]\]/g, (m, k, a) => (kinds[k] ? kinds[k](a) : ''))
   };
 })();

@@ -54,6 +54,8 @@
     return e;
   };
   const vis = html => Visuals.expand(html);
+  const fmtDate = iso => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? new Date(+m[1], m[2] - 1, +m[3]).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : ''; };
+  const doneLine = r => `Completed ${fmtDate(r.when)}`;
   const norm = s => String(s).trim().toLowerCase().replace(/\s+/g, '').replace(/[.!]+$/, '');
   function isCorrect(q, given) {
     const g = norm(given); if (!g) return false;
@@ -93,6 +95,8 @@
     box.append(h('span', { class: 'lv ' + q.l }, lv[1] + ' ' + lv[0]));
     if (opts.tag) box.append(' ', h('span', { class: 'muted small' }, opts.tag));
     box.append(h('div', { class: 'text' }, q.q));
+    const qp = (window.QPICS || {})[(item.n != null ? item.n : item.L && item.L.n) + ':' + item.qi];
+    if (qp) box.append(h('div', { class: 'qpic', html: vis(qp) }));
 
     function showSol() { if (q.s) extra.append(h('div', { class: 'sol' }, '💡 ' + q.s)); }
     function win() {
@@ -139,7 +143,8 @@
     const done = S.done[L.n], nx = nextIdx() === L.n;
     return h('a', { class: 'tile ' + (done ? 'done ' : '') + (nx ? 'next' : ''), href: '#/lesson/' + L.n },
       h('small', {}, `Week ${L.week} · ${DAYS[L.day - 1]}`), h('b', {}, (done ? '✅ ' : nx ? '▶ ' : '') + L.t),
-      done ? h('small', {}, `${done.correct}/${done.total} correct`) : '');
+      done ? h('small', {}, `${done.correct}/${done.total} correct`) : '',
+      done && done.when ? h('span', { class: 'stamp' }, '✔ ' + doneLine(done)) : '');
   }
 
   function viewHome() {
@@ -170,6 +175,9 @@
       rc.append(h('p', {}, h('a', { class: 'btn', href: '#/review' }, 'Try a mixed review quiz')));
     }
     frag.append(rc);
+    const recent = LESSONS.filter(l => S.done[l.n]).sort((a, b) => (S.done[b.n].when || '').localeCompare(S.done[a.n].when || '') || b.n - a.n).slice(0, 5);
+    if (recent.length) frag.append(h('section', { class: 'card' }, h('h2', {}, '✅ Completed lessons'),
+      h('ul', { class: 'recent', style: 'list-style:none;padding:0' }, recent.map(l => h('li', {}, h('a', { href: '#/lesson/' + l.n }, l.t), h('span', { class: 'muted' }, `${fmtDate(S.done[l.n].when)} · ${S.done[l.n].correct}/${S.done[l.n].total}`))))));
     frag.append(h('section', { class: 'card' }, h('h2', {}, '🕰️ Evening routine (about 30 minutes)'),
       h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
         h('li', {}, '12 min: Practice (warm-up and core questions)'), h('li', {}, '5 min: Challenge (stretch and olympiad puzzles). Wrong is fine. Thinking is the point!'))));
@@ -180,7 +188,10 @@
     setNav('map');
     const frag = h('div', {}, h('h1', {}, '🗺️ Learning Map'), h('p', { class: 'muted' }, '8 weeks, 5 evenings a week. Tap any lesson to open it.'));
     WEEKS.forEach(w => {
-      frag.append(h('div', { class: 'weekh' }, h('h2', {}, `Week ${w.week}: ${w.theme}`)), h('p', { class: 'muted' }, w.blurb));
+      const wl = LESSONS.filter(l => l.week === w.week), wd = wl.filter(l => S.done[l.n]);
+      const last = wd.map(l => S.done[l.n].when).sort().pop();
+      frag.append(h('div', { class: 'weekh' }, h('h2', {}, `Week ${w.week}: ${w.theme}`),
+        h('span', { class: 'wk' + (wd.length === wl.length ? ' ok' : '') }, wd.length === wl.length ? `✅ Week complete ${fmtDate(last)}` : `${wd.length}/${wl.length} done`)), h('p', { class: 'muted' }, w.blurb));
       frag.append(h('div', { class: 'grid' }, LESSONS.filter(l => l.week === w.week).map(tile)));
     });
     app(frag);
@@ -197,6 +208,7 @@
     function draw() {
       wrap.replaceChildren();
       wrap.append(h('span', { class: 'pill dark' }, `Week ${L.week} · ${DAYS[L.day - 1]} · ${L.theme}`), h('h1', {}, L.t));
+      if (S.done[n]) wrap.append(h('div', { class: 'badge-done' }, `✅ ${doneLine(S.done[n])} · ${S.done[n].correct}/${S.done[n].total} correct`));
       wrap.append(h('div', { class: 'steps' }, steps.map((s, i) => h('button', { class: (i === cur ? 'on ' : '') + (seen.has(i) && i !== cur ? 'done' : ''), onclick: () => { cur = i; draw(); window.scrollTo(0, 0); } }, s[0]))));
       seen.add(cur); S.pos = { n, step: cur }; save();
       const body = h('section', { class: 'card' });
@@ -211,7 +223,11 @@
         }
       } else if (kind === 'learn') {
         body.append(h('h2', {}, '📖 Today we learn: ' + L.sk), h('div', { class: 'key' }, '🎯 Goal: ' + L.goal));
-        L.learn.forEach(p => body.append(h('div', { html: '<p>' + vis(p) + '</p>' })));
+        const pics = (window.PICS || {})[n] || [];
+        L.learn.forEach((p, i) => {
+          body.append(h('div', { class: 'learn-p', html: vis(p) }));
+          pics.filter(x => x[0] === i).forEach(x => body.append(h('div', { html: vis(x[1]) })));
+        });
         body.append(h('div', { class: 'key' }, '🔑 Remember: ' + L.key), h('div', { class: 'callout do', html: L.do }), h('div', { class: 'callout oly', html: L.tip }),
           h('div', { class: 'callout small', html: '<b>Parent note:</b> ' + L.parent }));
       } else if (kind === 'prac' || kind === 'chal') {
@@ -219,7 +235,7 @@
         body.append(h('h2', {}, kind === 'prac' ? '✏️ Practice' : '🚀 Challenge time'),
           h('p', { class: 'muted' }, kind === 'prac' ? 'Draw a picture if you get stuck.' : 'These are harder. Think, draw, try. Use hints if you need them.'));
         set.forEach(x => {
-          const el = questionEl({ q: x.q, qi: x.qi }, { onRight: () => { right[x.qi] = true; markDay(); save(); } });
+          const el = questionEl({ q: x.q, qi: x.qi, n }, { onRight: () => { right[x.qi] = true; markDay(); save(); } });
           if (right[x.qi]) el.append(h('div', { class: 'muted small' }, '⭐ You solved this one before.'));
           body.append(el);
         });
@@ -230,7 +246,7 @@
           h('p', {}, `You solved ${got} of ${total} questions in this lesson.`),
           h('div', { class: 'key' }, '🔑 ' + L.key), h('p', {}, 'Tell a grown-up in your own words what you learned today.'),
           got < total ? h('p', { class: 'muted' }, 'Go back to Practice or Challenge to try the unsolved ones. You can also finish now and revisit them later on the Look Back page.') : '');
-        body.append(h('button', { class: 'btn', onclick: () => { S.done[n] = { correct: counts(), total, when: todayStr() }; S.pos = { n: n + 1, step: 0 }; markDay(); save(); go(n + 1 < LESSONS.length ? '#/done/' + n : '#/'); } }, S.done[n] ? 'Save again' : '✅ Finish lesson'));
+        body.append(h('button', { class: 'btn', onclick: () => { S.done[n] = { correct: counts(), total, when: (S.done[n] && S.done[n].when) || todayStr(), last: todayStr() }; S.pos = { n: n + 1, step: 0 }; markDay(); save(); go(n + 1 < LESSONS.length ? '#/done/' + n : '#/'); } }, S.done[n] ? 'Save again' : '✅ Finish lesson'));
       }
       wrap.append(body);
       const nav = h('div', { class: 'ans' });
@@ -258,7 +274,7 @@
     quiz.append(h('button', { class: 'btn', onclick: () => { qbox.replaceChildren(...mixedQs(upTo, 6).map(x => questionEl(x, { tag: 'from: ' + x.L.t }))); } }, 'Start quiz'), qbox);
     frag.append(quiz);
     frag.append(h('section', { class: 'card' }, h('h2', {}, '📚 Recap cards'),
-      doneList.length ? doneList.map(L => h('div', { class: 'recap', style: 'margin:8px 0' }, h('span', {}, h('b', {}, `${L.t}: `), L.key), h('a', { class: 'btn alt small', href: '#/lesson/' + L.n }, 'Redo'))) : h('p', { class: 'muted' }, 'Finish a lesson and its recap card appears here.')));
+      doneList.length ? doneList.map(L => h('div', { class: 'recap', style: 'margin:8px 0' }, h('span', {}, h('b', {}, `${L.t}: `), L.key, h('br'), h('small', { class: 'muted' }, '✔ ' + doneLine(S.done[L.n]))), h('a', { class: 'btn alt small', href: '#/lesson/' + L.n }, 'Redo'))) : h('p', { class: 'muted' }, 'Finish a lesson and its recap card appears here.')));
     app(frag);
   }
 
@@ -274,8 +290,8 @@
         h('li', {}, h('b', {}, 'Rhythm: '), 'Mon to Fri, 25-30 minutes. Progress is lesson-based, so missed days do not skip content.'),
         h('li', {}, h('b', {}, 'Coach tips: '), 'Ask "How do you know?", let them draw, praise effort, and never rush the ten-frame or bar model.'),
         h('li', {}, h('b', {}, 'Levels: '), '🌱 Warm-up, ⭐ Core, 🚀 Stretch, 🏆 Olympiad.'))));
-    const t = h('table', {}, h('tr', {}, h('th', {}, 'Lesson'), h('th', {}, 'Score'), h('th', {}, 'Answers')));
-    LESSONS.forEach(L => t.append(h('tr', {}, h('td', {}, `W${L.week}·${DAYS[L.day - 1]} ${L.t}`), h('td', {}, S.done[L.n] ? `${S.done[L.n].correct}/${S.done[L.n].total}` : '-'), h('td', {}, h('a', { href: '#/key/' + L.n }, 'Key')))));
+    const t = h('table', {}, h('tr', {}, h('th', {}, 'Lesson'), h('th', {}, 'Score'), h('th', {}, 'Completed'), h('th', {}, 'Answers')));
+    LESSONS.forEach(L => t.append(h('tr', {}, h('td', {}, `W${L.week}·${DAYS[L.day - 1]} ${L.t}`), h('td', {}, S.done[L.n] ? `${S.done[L.n].correct}/${S.done[L.n].total}` : '-'), h('td', {}, S.done[L.n] ? fmtDate(S.done[L.n].when) : '-'), h('td', {}, h('a', { href: '#/key/' + L.n }, 'Key')))));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Progress and answer keys'), t));
     const io = h('textarea', { rows: 3, style: 'width:100%', placeholder: 'Paste saved progress here to restore' });
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Backup / new device'),
