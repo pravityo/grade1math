@@ -33,3 +33,8 @@ Progress is saved in the browser's localStorage (no accounts, no network).
 Append to `window.CURRICULUM` in a new `js/data/weekN.js` and include it in `index.html`.
 Question fields: `l` level (b/c/s/o), `q`, `a` (string or array), optional `o` options, `h` hint, `s` solution, `u` unit.
 Visual tokens in `learn`: `[[bond:10|3,7]]`, `[[bar:6,?|10]]`, `[[cmp:8,3|Amy,Ben]]`, `[[frame:13]]`.
+
+## Deploy
+
+GitHub Pages via `.github/workflows/pages.yml` (repo Settings > Pages > Source: GitHub Actions).
+Live at https://pravityo.github.io/grade1math/ . On iPad/iPhone Safari use Share > Add to Home Screen so progress is not evicted.
