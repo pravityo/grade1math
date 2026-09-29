@@ -414,3 +414,8 @@ h1{letter-spacing:-.01em}
 .newmon-face .mon{width:84px}
 .hero .newmon{overflow:hidden}
 .grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+
+/* parents list */
+ul.plain{list-style:none;padding:0;margin:8px 0}
+.parent-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:6px 0;border-bottom:1px dashed var(--line);word-break:break-all}
+.cloud .note{font-weight:700;color:var(--pri)}

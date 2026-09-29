@@ -61,16 +61,9 @@ Each lesson's Learn tab also shows: an "Explain it more" section, a worked examp
 `0`-`39` (maths), `e0`-`e39` (English) and `s0`-`s39` (science). `node tests/data.test.js` checks every lesson has both.
 Outside links are not verified by the tests and can change, so re-check them occasionally.
 
-## Progress passwords
-
-The Parent tab can create an SNES-style password (`js/password.js`) that holds progress: which lessons are done or marked known, the
-first name, the daily plan and, in the full version, scores and completion dates. Enter it on any device or browser to carry on. It is
-data, not a login, so nothing is stored on a server. `node tests/password.test.js` checks round trips and typo detection.
-
 ## Grown-ups gate
 
-The Grown-ups tab and the answer keys open only after typing an "-ology" word for a hint shown in a pop-up (`js/gate.js`, 38 words).
-It unlocks for 10 minutes after the last use. It keeps a young child out; it is not real security because the words are in the source.
+The Grown-ups tab and the answer keys open only after a parent signs in with Google (see below). They stay open for 10 minutes after the last use, then lock again.
 
 ## Adaptive learning (`js/adapt.js`)
 Every answered question updates a review box for that lesson's skill (`S.skills`). A miss drops the box two levels and
@@ -84,7 +77,7 @@ can mark earlier lessons as already known.
 The home page shows the streak (weekends never break it, one missed weekday in five is forgiven) and progress towards
 the weekly goal (parent-set, 1 to 5 evenings). The little knight earns one of 12 pieces of armour for every 3 study days (days with a
 solved question or finished lesson) and wears it straight away; the child can change outfits under "Open the armoury".
-Study days live on the device, so accessories are not part of the progress password.
+Study days and armour are saved with the rest of the progress when a parent is signed in.
 `node tests/adapt.test.js` covers all of this.
 
 ## Content checks
@@ -105,10 +98,15 @@ lesson's monster, whose "calm" bar fills as puzzles are solved until it becomes 
 subject cards, questions, rank (Page, Squire, Knight, Champion, Dragon Knight) and the skyline at the bottom of each page
 change with the realm (Number Keep, Story Forest, Dragon Lab). `node tests/theme.test.js` checks all of it.
 
-## Google sign-in and cloud save (optional)
-Grown-ups can sign in with Google in the Parent corner. Progress is then merged with, and saved to, a Firestore document
-`users/<uid>` (Firebase project `grade-1-training-grounds`; config in `js/firebase-config.js`, logic in `js/cloud.js`).
-`js/merge.js` combines two copies: nothing earned is lost, except that a lesson marked "not done" on purpose stays not done
-(tombstones in `S.removed`). The local copy stays the source of truth, so the app works offline and signed out.
-Firestore rules must be: `match /users/{uid}/{document=**} { allow read, write: if request.auth != null && request.auth.uid == uid; }`.
-`pravityo.github.io` must be in Authentication, Settings, Authorized domains. `node tests/merge.test.js` checks the merging.
+## Google sign-in, parents and cloud save
+There are no passwords. Every parent signs in with their own Google account (`js/cloud.js`), which unlocks the Grown-ups
+area for 10 minutes (`js/gate.js`) and keeps progress in a shared family record in Firestore (Firebase project
+`grade-1-training-grounds`, config in `js/firebase-config.js`).
+- A family record holds the parents' Google IDs, invited emails and the progress (`js/family.js`). The first parent to sign in creates it.
+- A parent invites another by Gmail address; only that account can accept (an `invites/<email>` document points at the family).
+- A device belongs to one family. An account that is not a parent of that family cannot open the Grown-ups area on it.
+- `js/merge.js` combines two copies of progress: nothing earned is lost, except that a lesson marked "not done" on purpose stays not done.
+- Progress stays in localStorage first, so the app works offline and for children without any sign-in.
+- Publish the rules in `firestore.rules` in the Firebase console (Firestore Database, Rules). `pravityo.github.io` must be under
+  Authentication, Settings, Authorized domains.
+- Tests: `node tests/merge.test.js`, `node tests/family.test.js`. The Firestore rules themselves are not covered by the offline tests.

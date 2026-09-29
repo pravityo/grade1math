@@ -1,0 +1,24 @@
+/* Run: node tests/family.test.js  (shared family records: invites, joining, removing) */
+globalThis.window = globalThis; const fs = require('fs'), path = require('path');
+eval(fs.readFileSync(path.join(__dirname, '..', 'js', 'family.js'), 'utf8'));
+let bad = 0; const eq = (name, got, want) => { if (JSON.stringify(got) !== JSON.stringify(want)) { bad++; console.log('FAIL', name, '\n  got ', JSON.stringify(got), '\n  want', JSON.stringify(want)); } };
+const F = Family;
+eq('email is lower-cased and trimmed', F.normEmail('  Mum@Gmail.COM '), 'mum@gmail.com');
+['a@b.co', 'mum@gmail.com', 'first.last+tag@example.org'].forEach(e => eq('valid ' + e, F.validEmail(e), true));
+['', 'mum', 'mum@', '@gmail.com', 'a b@c.com', 'a@b', 'a@b.c', 'a@b.com,c@d.com', null].forEach(e => eq('invalid ' + e, F.validEmail(e), false));
+const ids = new Set(Array.from({ length: 200 }, () => F.newId())); eq('ids are unique', ids.size, 200); eq('id length', [...ids][0].length, 15); eq('id characters are safe', [...ids].every(i => /^[a-z2-9]+$/.test(i)), true);
+let fam = F.newFamily('u1', 'Mum@Gmail.com', '{"a":1}');
+eq('new family', [fam.members, fam.emails, fam.pending, fam.owner, fam.v], [['u1'], { u1: 'mum@gmail.com' }, [], 'u1', 2]);
+let r = F.invite(fam, ' Dad@Gmail.com '); eq('invite ok', [r.ok, r.fam.pending, r.email], [true, ['dad@gmail.com'], 'dad@gmail.com']); eq('invite does not change the original', fam.pending, []);
+fam = r.fam;
+eq('duplicate invite refused', F.invite(fam, 'DAD@gmail.com').ok, false); eq('inviting a member refused', F.invite(fam, 'mum@gmail.com').ok, false); eq('bad email refused', F.invite(fam, 'nope').ok, false);
+let f2 = fam; for (let i = 0; i < 4; i++) f2 = F.invite(f2, `p${i}@x.com`).fam; eq('open invite limit', F.invite(f2, 'z@x.com').ok, false);
+const joined = F.accept(fam, 'u2', 'DAD@gmail.com'); eq('accept adds the parent', joined.members, ['u1', 'u2']); eq('accept records the email', joined.emails.u2, 'dad@gmail.com'); eq('accept clears the invite', joined.pending, []);
+eq('accepting twice adds once', F.accept(joined, 'u2', 'dad@gmail.com').members, ['u1', 'u2']); eq('membership', [F.isMember(joined, 'u2'), F.isMember(joined, 'u9'), F.isMember(null, 'u1')], [true, false, false]);
+eq('list marks you and the owner', F.list(joined, 'u2'), [{ uid: 'u1', email: 'mum@gmail.com', you: false, owner: true }, { uid: 'u2', email: 'dad@gmail.com', you: true, owner: false }]);
+eq('revoke an invite', F.revoke(fam, 'Dad@gmail.com').pending, []);
+let rm = F.removeMember(joined, 'u1', 'u2'); eq('a parent can remove another', [rm.ok, rm.fam.members, rm.fam.emails], [true, ['u2'], { u2: 'dad@gmail.com' }]); eq('ownership passes on', rm.fam.owner, 'u2');
+eq('cannot remove yourself', F.removeMember(joined, 'u2', 'u2').ok, false); eq('outsider cannot remove', F.removeMember(joined, 'u1', 'u9').ok, false); eq('cannot remove a stranger', F.removeMember(joined, 'u9', 'u1').ok, false);
+eq('cannot remove the last parent', F.removeMember(fam, 'u1', 'u1').ok, false);
+let big = fam; for (let i = 0; i < 6; i++) big = F.accept(big, 'x' + i, `x${i}@x.com`); eq('family size limit', F.invite(big, 'new@x.com').ok, false);
+console.log(bad ? bad + ' failures' : 'family tests OK'); process.exit(bad ? 1 : 0);

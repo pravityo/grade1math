@@ -471,7 +471,7 @@
     app(h('div', {}, news || '', h('section', { class: 'card hero ' + L.subj }, h('h1', {}, mon.boss ? '👑 Big Boss tamed!' : '🏰 Quest complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? scoreText(r) : ''}`),
       r && !r.skipped ? h('div', { class: 'newmon' }, h('span', { class: 'newmon-face', html: Monsters.svg(mon.i, { boss: mon.boss, tamed: true }) }), h('span', {}, h('b', {}, mon.boss ? `You tamed ${mon.name}, the Big Boss!` : `You tamed ${mon.name}, a new monster friend!`), h('br'), 'Find it in your monster book on the home page.')) : '',
       h('div', { class: 'sparkles', 'aria-hidden': 'true' }, ['✨', '⭐', '🎉', '✨', '⭐', '🎉', '✨', '⭐'].map((e, k) => h('span', { style: `left:${8 + k * 12}%;animation-delay:${(k % 4) * 0.25}s` }, e))),
-      nx ? h('p', {}, 'Next time: ' + nx.t) : h('p', {}, `🎓 That was the last ${SUBJ[L.subj].name} quest!`), h('a', { class: 'btn light', href: '#/' }, 'Back home'), h('p', { class: 'small', style: 'margin-top:20px' }, 'Playing on another device? ', h('a', { href: '#/parent', style: 'color:#fff;text-decoration:underline' }, 'Get your progress password')))));
+      nx ? h('p', {}, 'Next time: ' + nx.t) : h('p', {}, `🎓 That was the last ${SUBJ[L.subj].name} quest!`), h('a', { class: 'btn light', href: '#/' }, 'Back home'))));
   }
 
   /* ---- quick placement check: 2 questions from every 5th lesson, stops at the first miss ---- */
@@ -527,75 +527,34 @@
     app(frag);
   }
 
-  /* ---- progress passwords (js/password.js) ---- */
-  const pwState = () => ({ name: S.name, plan: S.plan, lessons: ALL.map(L => { const r = S.done[L.id]; return r ? { status: r.skipped ? 2 : 1, correct: r.correct | 0, when: r.when } : { status: 0, correct: 0, when: null }; }) });
-  function applyPassword(dec, merge) {
-    const today = todayStr();
-    ALL.forEach((L, i) => {
-      const p = dec.lessons[i], cur = S.done[L.id];
-      if (!merge) { delete S.done[L.id]; delete S.right[L.id]; }
-      if (!p.status) return;
-      if (merge && cur) { // keep real results over "known", the better score, and the earlier date
-        if (cur.skipped && p.status === 1) delete S.done[L.id]; else { if (!cur.skipped && p.status === 1 && dec.detail && p.correct > cur.correct) { cur.correct = p.correct; S.right[L.id] = Object.fromEntries([...Array(p.correct).keys()].map(k => [k, true])); } if (p.when && (!cur.when || p.when < cur.when)) cur.when = p.when; return; }
-      }
-      const rec = { correct: dec.detail ? p.correct : 0, total: L.q.length, when: p.when || (dec.detail ? today : '') };
-      if (p.status === 2) rec.skipped = true; else if (!dec.detail) rec.noscore = true;
-      S.done[L.id] = rec;
-      if (p.status === 1 && dec.detail) S.right[L.id] = Object.fromEntries([...Array(Math.min(p.correct, L.q.length)).keys()].map(k => [k, true]));
-    });
-    if (dec.name && (!merge || !S.name)) S.name = dec.name;
-    if (!merge) S.plan = dec.plan;
-    const firstOpen = SUBJECTS[0].lessons.find(l => !S.done[l.id]); S.pos = firstOpen ? { id: firstOpen.id, step: 0 } : null;
-    save();
-  }
-  /* Optional Google sign-in: keep progress in the cloud and carry it to other devices without a password (js/cloud.js). */
-  function cloudCard() {
+  /* Parents: who has access (each with their own Google account), invites, and cloud-save status (js/cloud.js, js/family.js). */
+  function familyCard() {
+    if (!window.Cloud) return h('span');
     const box = h('section', { class: 'card cloud' });
     const when = t => t ? new Date(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
+    const email = h('input', { type: 'email', inputmode: 'email', autocomplete: 'off', placeholder: 'Other parent\'s Gmail address', 'aria-label': 'Email address to invite', style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);min-width:0;flex:1 1 220px' });
+    let note = '';
+    const say = t => { note = t; draw(); };
     const draw = () => {
-      const c = Cloud.status(), kids = [h('h2', {}, '☁️ Save progress with Google')];
-      if (c.signedIn) {
-        kids.push(h('p', {}, `Signed in as `, h('b', {}, c.email), '. Progress is saved to your Google account and follows your child to any device where you sign in.'),
-          h('p', { class: 'muted' }, c.state === 'syncing' ? 'Saving...' : c.state === 'error' ? '⚠️ ' + c.message : c.at ? `✅ Saved at ${when(c.at)}. It saves by itself after each lesson.` : ''),
-          h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => Cloud.syncNow() }, 'Save now'), h('button', { class: 'btn alt', onclick: () => { if (confirm('Sign out on this device? Progress stays on this device and in the cloud.')) Cloud.signOut(); } }, 'Sign out')));
-      } else {
-        kids.push(h('p', {}, 'Sign in with a grown-up\'s Google account to keep your child\'s progress safe and use it on other devices. No password to remember. Only progress is saved: lessons done, scores, study days and the knight\'s armour.'),
-          h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => Cloud.signIn() }, 'Sign in with Google')),
-          c.message ? h('p', { class: 'muted' }, '⚠️ ' + c.message) : (c.state === 'signing' || c.state === 'loading') ? h('p', { class: 'muted' }, c.message) : '',
-          h('p', { class: 'muted small' }, 'You can still use the progress password below. Signing in with Google is optional.'));
+      const c = Cloud.status(), kids = [h('h2', {}, '👨‍👩‍👧 Parents and cloud save')];
+      kids.push(h('p', {}, 'Signed in as ', h('b', {}, c.email || '...'), '. Progress is saved to the family and follows your child to any device.'),
+        h('p', { class: 'muted' }, c.state === 'syncing' ? 'Saving...' : c.state === 'denied' || c.state === 'error' ? '⚠️ ' + c.message : c.at ? `✅ Saved at ${when(c.at)}. It saves by itself after each lesson.` : ''));
+      if (c.family) {
+        kids.push(h('h3', {}, 'Parents with access'), h('ul', { class: 'plain' }, c.family.members.map(m => h('li', { class: 'parent-row' }, h('span', {}, m.email, m.you ? ' (you)' : '', m.owner ? ' · started the family' : ''),
+          m.you ? '' : h('button', { class: 'btn alt small', onclick: async () => { if (confirm(`Remove ${m.email}? They will no longer see this progress.`)) { const r = await Cloud.removeParent(m.uid); say(r.ok ? `${m.email} was removed.` : r.reason); } } }, 'Remove')))));
+        if (c.family.pending.length) kids.push(h('h3', {}, 'Waiting to join'), h('ul', { class: 'plain' }, c.family.pending.map(p => h('li', { class: 'parent-row' }, h('span', {}, p), h('button', { class: 'btn alt small', onclick: async () => { const r = await Cloud.revoke(p); say(r.ok ? 'Invite cancelled.' : r.reason); } }, 'Cancel invite')))));
+        kids.push(h('h3', {}, 'Invite another parent'), h('p', { class: 'muted small' }, 'They sign in with their own Google account using this exact address. Only that account can accept.'),
+          h('div', { class: 'ans' }, email, h('button', { class: 'btn', onclick: async () => { const r = await Cloud.invite(email.value); if (r.ok) { email.value = ''; say(`Invited ${r.invite}. Ask them to open this app and tap Grown-ups.`); } else say(r.reason); } }, 'Invite')));
       }
+      if (note) kids.push(h('p', { class: 'note' }, note));
+      kids.push(h('div', { class: 'ans', style: 'margin-top:14px' }, h('button', { class: 'btn', onclick: () => Cloud.syncNow() }, 'Save now'), h('button', { class: 'btn alt', onclick: async () => { if (confirm('Sign out on this device? Progress stays here and in the cloud. The Grown-ups area locks.')) { await Cloud.signOut(); go('#/'); } } }, 'Sign out')));
       box.replaceChildren(...kids);
     };
     let shown = false;
     const onChange = () => { if (box.isConnected) shown = true; else if (shown) { Cloud.offChange(onChange); return; } draw(); };
-    if (!window.Cloud) return h('span');
     Cloud.onChange(onChange); Cloud.preload(); draw();
     return box;
   }
-  function passwordCard() {
-    const out = h('textarea', { readonly: 'readonly', rows: 3, class: 'pw-box', 'aria-label': 'Your progress password', placeholder: 'Your password appears here' });
-    const note = h('p', { class: 'muted small' });
-    const show = detail => { out.value = PW.encode(pwState(), detail); note.textContent = `${out.value.replace(/-/g, '').length} characters. Write it down or copy it. Anyone with this password can load this progress, and it never expires.`; };
-    const copy = h('button', { class: 'btn alt', onclick: () => { if (!out.value) return; out.select(); try { navigator.clipboard.writeText(out.value); } catch (e) { document.execCommand && document.execCommand('copy'); } note.textContent = 'Copied.'; } }, 'Copy');
-    const inp = h('textarea', { rows: 3, class: 'pw-box', 'aria-label': 'Enter a password', placeholder: 'Type or paste a password (spaces, dashes and capitals do not matter)' });
-    const msg = h('p', { class: 'fb' });
-    const load = merge => {
-      const dec = PW.decode(inp.value, ALL.length);
-      if (dec.error) { msg.className = 'fb no'; msg.textContent = dec.error; return; }
-      const done = dec.lessons.filter(l => l.status === 1).length, known = dec.lessons.filter(l => l.status === 2).length;
-      const who = dec.name ? ` for ${dec.name}` : '';
-      if (!confirm(`This password${who} has ${done} finished and ${known} marked-as-known lessons${dec.detail ? ', with scores and dates' : ' (no scores or dates)'}.\n\n${merge ? 'Merge it with the progress on this device?' : 'Replace the progress on this device with it?'}`)) return;
-      applyPassword(dec, merge); alert('Progress loaded. Open Today or the Map to see it.'); route();
-    };
-    return h('section', { class: 'card' }, h('h2', {}, '🔑 Progress password'),
-      h('p', { class: 'muted' }, 'Like an old video game: the password holds your progress. Get one here, then type it on another device or browser to carry on where you left off. No account or internet is needed.'),
-      h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => show(false) }, 'Short password (progress only)'), h('button', { class: 'btn', onclick: () => show(true) }, 'Full password (with scores and dates)')),
-      out, h('div', { class: 'ans' }, copy), note,
-      h('h3', { style: 'margin-top:28px' }, 'Load a password'), inp,
-      h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => load(false) }, 'Load (replace this device)'), h('button', { class: 'btn alt', onclick: () => load(true) }, 'Merge with this device')), msg,
-      h('p', { class: 'muted small' }, 'A password carries which lessons are done or marked known, the child\'s first name (letters only, up to 8), the daily plan, and, in the full version, scores and completion dates. It does not carry the streak or half-finished lessons. Save it after each week.'));
-  }
-
   function viewParent() {
     setNav('parent');
     const frag = h('div', {}, h('h1', {}, '🏰 The Keep (for grown-ups)'), h('p', {}, h('button', { class: 'btn alt small', onclick: () => { GATE.lock(); go('#/'); } }, '🔒 Lock grown-ups area now'), h('span', { class: 'muted small' }, '  It also locks itself after 10 minutes.')));
@@ -618,8 +577,7 @@
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'A good evening (about 25 minutes per subject)'),
       h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
         h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong answers are fine, thinking is the point.'))));
-    frag.append(cloudCard());
-    frag.append(passwordCard());
+    frag.append(familyCard());
     const skipSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
     const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Levels 1 to ${n}`)));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Already learned some of this, or marked by mistake?'),
