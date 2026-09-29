@@ -58,10 +58,10 @@
   parent: `Ask "what's the worst that could happen?" and then plan around it.`,
   q: [
     { l:`b`, q:`A drawer has red and blue socks. What is the fewest socks you must take (without looking) to guarantee a matching pair?`, a:`3` },
-    { l:`b`, q:`A bag has red, blue and green balls. Fewest balls you must take to guarantee two of the same colour?`, a:`4` },
-    { l:`c`, q:`8 children are in a class. There are 7 days in a week. Is it true that at least two were born on the same day of the week?`, o:[`yes`,`no`], a:`yes`, s:`Only 7 days for 8 children, so two share.` },
-    { l:`c`, q:`4 friends shake hands once with each other. How many handshakes?`, a:`6` },
-    { l:`s`, q:`6 friends shake hands once with each other. How many handshakes?`, a:`15`, s:`5 + 4 + 3 + 2 + 1 = 15.` },
+    { l:`b`, q:`A bag has red, blue and green balls. What is the fewest balls you must take (without looking) to guarantee two of the same colour?`, a:`4` },
+    { l:`c`, q:`8 children are in a class. There are 7 days in a week. Must at least two of them have been born on the same day of the week? (There are only 7 days in a week.)`, o:[`yes`,`no`], a:`yes`, s:`Only 7 days for 8 children, so two share.` },
+    { l:`c`, q:`4 friends each shake hands once with every other friend. How many handshakes are there in total?`, a:`6` },
+    { l:`s`, q:`6 friends each shake hands once with every other friend. How many handshakes are there in total?`, a:`15`, s:`5 + 4 + 3 + 2 + 1 = 15.` },
     { l:`o`, q:`A bag has 4 red socks and 4 blue socks. What is the fewest you must take to guarantee a pair of BLUE socks?`, a:`6`, h:`Worst case: all the red ones first.`, s:`4 red first, then 2 blue = 6.` }
   ]},
 { t: `Combinations`, sk: `Counting choices`,
@@ -97,10 +97,10 @@
   tip: `<b>Olympiad tip:</b> In competitions, skip a hard one, finish the others, and come back. Never freeze.`,
   parent: `After this, keep going with the review page and mixed practice. Consistency wins.`,
   q: [
-    { l:`b`, q:`47 + 26 = ?`, a:`73` },
-    { l:`b`, q:`81 - 35 = ?`, a:`46` },
+    { l:`b`, q:`Work out: 47 + 26 = ?`, a:`73` },
+    { l:`b`, q:`Work out: 81 - 35 = ?`, a:`46` },
     { l:`c`, q:`Half of 90 = ?`, a:`45` },
-    { l:`c`, q:`1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 = ?`, a:`55` },
+    { l:`c`, q:`Work out: 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 = ?`, a:`55` },
     { l:`s`, q:`A ribbon 30 cm long is cut into 5 cm pieces. How many cuts are needed?`, a:`5`, s:`30 / 5 = 6 pieces, so 5 cuts.` },
     { l:`s`, q:`Tom is 8. His dad is 30 years older. How old will Dad be in 4 years?`, a:`42` },
     { l:`o`, q:`25 children: 14 like football, 17 like swimming, everyone likes at least one. How many like both?`, a:`6`, s:`14 + 17 = 31. 31 - 25 = 6.` },

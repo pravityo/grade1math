@@ -16,7 +16,7 @@
   parent: `Use money-like language: "3 ten-dollar notes and 4 coins". Place value is the base of all column work.`,
   q: [
     { l:`b`, q:`4 tens and 7 ones make what number?`, a:`47` },
-    { l:`b`, q:`60 + 3 = ?`, a:`63` },
+    { l:`b`, q:`Work out: 60 + 3 = ?`, a:`63` },
     { l:`c`, q:`What is 10 more than 47?`, a:`57`, s:`Only the tens digit goes up by 1.` },
     { l:`c`, q:`How many tens are in 90?`, a:`9` },
     { l:`s`, q:`3 tens and 15 ones make what number?`, a:`45`, h:`15 ones is 1 ten and 5 ones.`, s:`30 + 15 = 45.` },
@@ -35,11 +35,11 @@
   tip: `<b>Olympiad tip:</b> Skip counting is fast counting. To count 6 groups of 5 objects you don't need to count one by one.`,
   parent: `Do it on stairs or while walking: clap on every second step.`,
   q: [
-    { l:`b`, q:`2, 4, 6, ?, 10`, a:`8` },
-    { l:`b`, q:`Count by 5: 35, 40, ?`, a:`45` },
+    { l:`b`, q:`2, 4, 6, ?, 10. What is the missing number?`, a:`8` },
+    { l:`b`, q:`Count by 5: 35, 40, ? What number comes next?`, a:`45` },
     { l:`c`, q:`How many fingers are on 6 hands?`, a:`30`, s:`5, 10, 15, 20, 25, 30.` },
     { l:`c`, q:`How many legs do 7 chickens have?`, a:`14`, s:`Each chicken has 2 legs: 2, 4, 6, 8, 10, 12, 14.` },
-    { l:`s`, q:`A frog starts at 0 and jumps 3 steps each time. Which number will it land on?`, o:[`12`,`14`,`16`,`20`], a:`12`, s:`3, 6, 9, 12. Only 12 is on the list.` },
+    { l:`s`, q:`A frog starts at 0 and jumps 3 steps each time. Which of these numbers will it land on?`, o:[`12`,`14`,`16`,`20`], a:`12`, s:`3, 6, 9, 12. Only 12 is on the list.` },
     { l:`o`, q:`I count 2, 4, 6, ... all the way to 20. How many numbers did I say?`, a:`10`, h:`Each number is 2 apart; think 10 twos make 20.`, s:`2 x 10 = 20 so there are 10 numbers.` }
   ]},
 { t: `Comparing & Ordering`, sk: `Comparing numbers`,
@@ -76,12 +76,12 @@
   tip: `<b>Olympiad tip:</b> Numbers reached by +10 always keep the same ones digit. Use it to spot which numbers are reachable.`,
   parent: `Use a 100-chart on the wall. Coloured pencil paths make patterns visible.`,
   q: [
-    { l:`b`, q:`30 + 40 = ?`, a:`70` },
-    { l:`b`, q:`50 + 7 = ?`, a:`57` },
-    { l:`c`, q:`45 + 20 = ?`, a:`65` },
-    { l:`c`, q:`60 + ? = 90`, a:`30`, s:`9 tens - 6 tens = 3 tens.` },
-    { l:`s`, q:`34 + 30 + 5 = ?`, a:`69`, s:`34 + 30 = 64, plus 5 = 69.` },
-    { l:`o`, q:`Start at 7 and keep adding 10. Which number will you land on?`, o:[`37`,`45`,`52`,`60`], a:`37`, s:`7, 17, 27, 37. Every number ends in 7.` }
+    { l:`b`, q:`Work out: 30 + 40 = ?`, a:`70` },
+    { l:`b`, q:`Work out: 50 + 7 = ?`, a:`57` },
+    { l:`c`, q:`Work out: 45 + 20 = ?`, a:`65` },
+    { l:`c`, q:`Find the missing number: 60 + ? = 90`, a:`30`, s:`9 tens - 6 tens = 3 tens.` },
+    { l:`s`, q:`Work out: 34 + 30 + 5 = ?`, a:`69`, s:`34 + 30 = 64, plus 5 = 69.` },
+    { l:`o`, q:`Start at 7 and keep adding 10 (7, 17, 27 ...). Which of these numbers will you land on?`, o:[`37`,`45`,`52`,`60`], a:`37`, s:`7, 17, 27, 37. Every number ends in 7.` }
   ]},
 { t: `Olympiad Day: Odd, Even & Patterns`, sk: `Patterns & parity`,
   goal: `Use odd/even rules and pattern spotting, two of the most common olympiad tools.`,
@@ -96,11 +96,11 @@
   tip: `<b>Olympiad tip:</b> When a puzzle says "can you...", try parity first. It often proves an answer is impossible in one line.`,
   parent: `This is the first true "olympiad" thinking day. Praise the reasoning, even if the answer is wrong.`,
   q: [
-    { l:`b`, q:`Is 38 odd or even?`, o:[`odd`,`even`], a:`even` },
-    { l:`b`, q:`1, 3, 5, 7, ?`, a:`9` },
-    { l:`c`, q:`odd + odd = ?`, o:[`odd`,`even`], a:`even`, s:`3 + 5 = 8, 7 + 1 = 8. The leftovers pair up.` },
+    { l:`b`, q:`Is the number 38 odd or even?`, o:[`odd`,`even`], a:`even` },
+    { l:`b`, q:`1, 3, 5, 7, ? What number comes next?`, a:`9` },
+    { l:`c`, q:`When you add two odd numbers, is the answer odd or even?`, o:[`odd`,`even`], a:`even`, s:`3 + 5 = 8, 7 + 1 = 8. The leftovers pair up.` },
     { l:`c`, q:`Can you share 13 sweets equally between 2 children with none left over?`, o:[`yes`,`no`], a:`no`, s:`13 is odd, so one sweet is left over.` },
-    { l:`s`, q:`2, 4, 7, 11, ? What comes next?`, a:`16`, h:`Look at the gaps between numbers.`, s:`Gaps: 2, 3, 4, next gap 5. 11 + 5 = 16.` },
+    { l:`s`, q:`Look at the pattern: 2, 4, 7, 11, ? What number comes next?`, a:`16`, h:`Look at the gaps between numbers.`, s:`Gaps: 2, 3, 4, next gap 5. 11 + 5 = 16.` },
     { l:`o`, q:`Ann adds 1 + 3 + 5 + 7 + 9. Is her total odd or even?`, o:[`odd`,`even`], a:`odd`, h:`How many odd numbers are being added?`, s:`Five odd numbers: pairs make even, one left over makes odd. (Check: 25.)` }
   ]}
 ]});

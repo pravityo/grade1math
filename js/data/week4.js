@@ -16,7 +16,7 @@
   parent: `Use house numbers or car plates as reading practice.`,
   q: [
     { l:`b`, q:`3 hundreds, 4 tens and 5 ones make what number?`, a:`345` },
-    { l:`b`, q:`200 + 50 + 7 = ?`, a:`257` },
+    { l:`b`, q:`Work out: 200 + 50 + 7 = ?`, a:`257` },
     { l:`c`, q:`How many tens are in 120?`, a:`12`, s:`120 = 12 tens.` },
     { l:`c`, q:`What number comes right after 199?`, a:`200` },
     { l:`s`, q:`What is the biggest 3-digit number you can make using the digits 4, 9 and 1 once each?`, a:`941` },
@@ -35,12 +35,12 @@
   tip: `<b>Olympiad tip:</b> Numbers in an evenly spaced list have the same total as "middle x how many".`,
   parent: `Do one mental sum a day at dinner. Ask "how did you do it?" and accept every method.`,
   q: [
-    { l:`b`, q:`70 + 60 = ?`, a:`130` },
-    { l:`b`, q:`48 + 9 = ?`, a:`57` },
-    { l:`c`, q:`98 + 47 = ?`, a:`145` },
-    { l:`c`, q:`100 - 38 = ?`, a:`62` },
-    { l:`s`, q:`199 + 199 = ?`, a:`398`, h:`Each is 1 less than 200.`, s:`200 + 200 = 400, take away 2 = 398.` },
-    { l:`o`, q:`25 + 26 + 27 + 28 + 29 = ?`, a:`135`, h:`Balance around the middle.`, s:`Middle is 27, five numbers, 27 x 5 = 135.` }
+    { l:`b`, q:`Work out: 70 + 60 = ?`, a:`130` },
+    { l:`b`, q:`Work out: 48 + 9 = ?`, a:`57` },
+    { l:`c`, q:`Work out: 98 + 47 = ?`, a:`145` },
+    { l:`c`, q:`Work out: 100 - 38 = ?`, a:`62` },
+    { l:`s`, q:`Work out: 199 + 199 = ?`, a:`398`, h:`Each is 1 less than 200.`, s:`200 + 200 = 400, take away 2 = 398.` },
+    { l:`o`, q:`Work out: 25 + 26 + 27 + 28 + 29 = ?`, a:`135`, h:`Balance around the middle.`, s:`Middle is 27, five numbers, 27 x 5 = 135.` }
   ]},
 { t: `Doubles & Halves`, sk: `Doubling and halving`,
   goal: `Double and halve numbers within 100.`,
@@ -78,8 +78,8 @@
   q: [
     { l:`b`, q:`3 groups of 4. What is 3 x 4?`, a:`12` },
     { l:`b`, q:`5 bags with 2 apples each. How many apples?`, a:`10` },
-    { l:`c`, q:`2 x 9 = ?`, a:`18` },
-    { l:`c`, q:`4 x 4 = ?`, a:`16` },
+    { l:`c`, q:`Work out: 2 x 9 = ?`, a:`18` },
+    { l:`c`, q:`Work out: 4 x 4 = ?`, a:`16` },
     { l:`s`, q:`6 plates have 3 cakes each. 5 cakes are eaten. How many cakes are left?`, a:`13`, s:`6 x 3 = 18, 18 - 5 = 13.` },
     { l:`o`, q:`A farm has 5 animals, some chickens (2 legs) and some rabbits (4 legs). There are 14 legs in total. How many rabbits?`, a:`2`, h:`Guess all chickens first, then swap.`, s:`5 chickens = 10 legs. Need 4 more legs; each swap adds 2 legs so 2 swaps = 2 rabbits. Check: 2x4 + 3x2 = 14.` }
   ]},
@@ -99,8 +99,8 @@
   q: [
     { l:`b`, q:`12 sweets are shared equally among 3 children. How many does each get?`, a:`4` },
     { l:`b`, q:`15 sweets are put in bags of 5. How many bags?`, a:`3` },
-    { l:`c`, q:`20 / 4 = ?`, a:`5` },
-    { l:`c`, q:`18 / 2 = ?`, a:`9` },
+    { l:`c`, q:`Work out: 20 / 4 = ?`, a:`5` },
+    { l:`c`, q:`Work out: 18 / 2 = ?`, a:`9` },
     { l:`s`, q:`24 cookies are packed in bags of 6. How many bags are needed?`, a:`4` },
     { l:`o`, q:`A 12 m rope is cut into pieces of 3 m each. How many cuts are needed?`, a:`3`, h:`Draw the rope and mark each cut.`, s:`12 / 3 = 4 pieces. Pieces need 4 - 1 = 3 cuts.` }
   ]}

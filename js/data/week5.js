@@ -35,11 +35,11 @@
   parent: `Build a cube from 12 straws and 8 balls of clay to see edges and corners.`,
   q: [
     { l:`b`, q:`A cube has ___ faces.`, a:`6` },
-    { l:`b`, q:`Which of these rolls? cube, ball, box`, o:[`cube`,`ball`,`box`], a:`ball` },
+    { l:`b`, q:`Which of these shapes can roll? a cube, a ball or a box`, o:[`cube`,`ball`,`box`], a:`ball` },
     { l:`c`, q:`How many corners does a cube have?`, a:`8` },
     { l:`c`, q:`How many edges does a cube have?`, a:`12` },
-    { l:`s`, q:`On a dice, the number opposite 2 is ...`, a:`5`, s:`Opposite faces add to 7.` },
-    { l:`o`, q:`A dice is on the table with 4 on top. What do the 4 side faces add up to? (You cannot see the bottom.)`, a:`14`, h:`Total of all faces is 21. What is the bottom face?`, s:`Bottom is 7 - 4 = 3. Sides = 21 - 4 - 3 = 14.` }
+    { l:`s`, q:`On a dice, the numbers on opposite faces add up to 7. What number is opposite the 2?`, a:`5`, s:`Opposite faces add to 7.` },
+    { l:`o`, q:`A dice sits on a table with 4 on top. The bottom face is hidden. Opposite faces add up to 7, and all six faces add up to 21. What do the four side faces add up to?`, a:`14`, h:`Total of all faces is 21. What is the bottom face?`, s:`Bottom is 7 - 4 = 3. Sides = 21 - 4 - 3 = 14.` }
   ]},
 { t: `Length & Measuring`, sk: `Centimetres & metres`,
   goal: `Measure with a ruler and reason about lengths.`,
@@ -77,7 +77,7 @@
     { l:`b`, q:`Write half past 4 as a digital time (like 4:00).`, a:[`4:30`,`430`] },
     { l:`b`, q:`How many minutes are in a half hour?`, a:`30` },
     { l:`c`, q:`What time is it 1 hour after 7:30?`, a:`8:30` },
-    { l:`c`, q:`School starts at 8:00 and finishes at 1:00. How many hours?`, a:`5`, u:`hours` },
+    { l:`c`, q:`School starts at 8:00 in the morning and finishes at 1:00 in the afternoon. How many hours is that?`, a:`5`, u:`hours` },
     { l:`s`, q:`A film starts at 2:30 and lasts 2 hours. What time does it end?`, a:`4:30` },
     { l:`o`, q:`Today is Wednesday. What day will it be in 10 days?`, a:`saturday`, h:`7 days later is Wednesday again.`, s:`10 - 7 = 3. Three days after Wednesday: Thursday, Friday, Saturday.` }
   ]},

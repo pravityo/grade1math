@@ -16,8 +16,8 @@
   tip: `<b>Olympiad tip:</b> If numbers go up by the same step, pair first with last. Number of pairs = how many numbers / 2.`,
   parent: `Tell the Gauss story. Kids love learning that a boy beat his teacher with a trick.`,
   q: [
-    { l:`b`, q:`1 + 2 + 3 + 4 + 5 = ?`, a:`15` },
-    { l:`b`, q:`2 + 4 + 6 + 8 + 10 = ?`, a:`30` },
+    { l:`b`, q:`Work out: 1 + 2 + 3 + 4 + 5 = ?`, a:`15` },
+    { l:`b`, q:`Work out: 2 + 4 + 6 + 8 + 10 = ?`, a:`30` },
     { l:`c`, q:`1 + 2 + 3 + ... + 10 = ?`, a:`55` },
     { l:`c`, q:`10 + 9 + 8 + ... + 1 = ?`, a:`55` },
     { l:`s`, q:`1 + 2 + 3 + ... + 20 = ?`, a:`210`, h:`10 pairs of 21.`, s:`1+20 = 21, 2+19 = 21 ... 10 pairs of 21 = 210.` },
@@ -41,7 +41,7 @@
     { l:`b`, q:`Ann reads from page 3 to page 9, including both. How many pages?`, a:`7` },
     { l:`c`, q:`Trees are planted 1 m apart along a 10 m road, with a tree at both ends. How many trees?`, a:`11` },
     { l:`c`, q:`There are 6 posts in a straight line. How many gaps between them?`, a:`5` },
-    { l:`s`, q:`How many whole numbers are there from 10 to 99?`, a:`90` },
+    { l:`s`, q:`How many whole numbers are there from 10 to 99, counting both 10 and 99?`, a:`90` },
     { l:`o`, q:`A 20 m fence has posts every 5 m, with a post at each end. How many posts are needed?`, a:`5` }
   ]},
 { t: `Sequences & Patterns`, sk: `Find the rule`,
@@ -59,12 +59,12 @@
   tip: `<b>Olympiad tip:</b> Nth item in a repeating pattern: remainder after dividing by block length tells the position.`,
   parent: `Ask "what's the rule?" before "what's next?".`,
   q: [
-    { l:`b`, q:`3, 6, 9, 12, ?`, a:`15` },
-    { l:`b`, q:`1, 2, 4, 8, ?`, a:`16` },
-    { l:`c`, q:`1, 1, 2, 3, 5, 8, ?`, a:`13` },
-    { l:`c`, q:`20, 18, 15, 11, ?`, a:`6`, h:`Gaps: 2, 3, 4.`, s:`The next gap is 5: 11 - 5 = 6.` },
-    { l:`s`, q:`The pattern A B B A B B A B B ... repeats. What is the 10th letter?`, a:`a`, h:`Block of 3: ABB.`, s:`10 = 9 + 1, so it is the 1st letter of a block: A.` },
-    { l:`o`, q:`1, 4, 9, 16, ?`, a:`25`, h:`Look at the gaps: 3, 5, 7...`, s:`Gaps grow by 2: next gap 9. 16 + 9 = 25.` }
+    { l:`b`, q:`3, 6, 9, 12, ? What number comes next?`, a:`15` },
+    { l:`b`, q:`1, 2, 4, 8, ? What number comes next?`, a:`16` },
+    { l:`c`, q:`1, 1, 2, 3, 5, 8, ? What number comes next? (Each number is the two before it added together.)`, a:`13` },
+    { l:`c`, q:`20, 18, 15, 11, ? What number comes next?`, a:`6`, h:`Gaps: 2, 3, 4.`, s:`The next gap is 5: 11 - 5 = 6.` },
+    { l:`s`, q:`The pattern A B B A B B A B B ... keeps repeating. What is the 10th letter?`, o:[`A`,`B`], a:`A`, h:`Block of 3: ABB.`, s:`10 = 9 + 1, so it is the 1st letter of a block: A.` },
+    { l:`o`, q:`1, 4, 9, 16, ? What number comes next?`, a:`25`, h:`Look at the gaps: 3, 5, 7...`, s:`Gaps grow by 2: next gap 9. 16 + 9 = 25.` }
   ]},
 { t: `Ordering & Logic Puzzles`, sk: `Reasoning with clues`,
   goal: `Order people and objects from clues and solve position puzzles.`,
@@ -101,11 +101,11 @@
   tip: `<b>Olympiad tip:</b> Try the middle number of a magic square first. It is the most powerful.`,
   parent: `Puzzle time: try to make your own magic square with the digits 1 to 9.`,
   q: [
-    { l:`b`, q:`? + 7 = 15`, a:`8` },
-    { l:`b`, q:`? - 6 = 9`, a:`15` },
-    { l:`c`, q:`In a magic square every row adds to 15. A row is 4, ?, 8. What is the missing number?`, a:`3` },
+    { l:`b`, q:`Find the missing number: ? + 7 = 15`, a:`8` },
+    { l:`b`, q:`Find the missing number: ? - 6 = 9`, a:`15` },
+    { l:`c`, q:`In a magic square, every row adds up to 15. One row is 4, ?, 8. What is the missing number?`, a:`3` },
     { l:`c`, q:`Two numbers are 9 and 6. Add them and then subtract 4. What do you get?`, a:`11` },
-    { l:`s`, q:`The same digit goes in both boxes: 3[] + []4 = 78. What digit is in the box?`, a:`4`, h:`Try the digit 4 and check.`, s:`34 + 44 = 78.` },
+    { l:`s`, q:`Both boxes hide the same digit. 3□ means 3 tens and some ones. □4 means some tens and 4 ones. If 3□ + □4 = 78, what digit is in the box?`, a:`4`, h:`Try the digit 4 and check.`, s:`34 + 44 = 78.` },
     { l:`o`, q:`Use the digits 1, 2, 3 once each to make the biggest 3-digit number. Then make the smallest. What is the biggest minus the smallest?`, a:`198`, s:`321 - 123 = 198.` }
   ]}
 ]});
