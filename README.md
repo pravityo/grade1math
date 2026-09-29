@@ -104,3 +104,11 @@ last lesson of every level (week) is a Big Boss with a crown. Each lesson opens 
 lesson's monster, whose "calm" bar fills as puzzles are solved until it becomes a friend in the monster book. The map,
 subject cards, questions, rank (Page, Squire, Knight, Champion, Dragon Knight) and the skyline at the bottom of each page
 change with the realm (Number Keep, Story Forest, Dragon Lab). `node tests/theme.test.js` checks all of it.
+
+## Google sign-in and cloud save (optional)
+Grown-ups can sign in with Google in the Parent corner. Progress is then merged with, and saved to, a Firestore document
+`users/<uid>` (Firebase project `grade-1-training-grounds`; config in `js/firebase-config.js`, logic in `js/cloud.js`).
+`js/merge.js` combines two copies: nothing earned is lost, except that a lesson marked "not done" on purpose stays not done
+(tombstones in `S.removed`). The local copy stays the source of truth, so the app works offline and signed out.
+Firestore rules must be: `match /users/{uid}/{document=**} { allow read, write: if request.auth != null && request.auth.uid == uid; }`.
+`pravityo.github.io` must be in Authentication, Settings, Authorized domains. `node tests/merge.test.js` checks the merging.

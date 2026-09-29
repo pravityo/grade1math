@@ -39,11 +39,19 @@
     try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
     if (!S || typeof S !== 'object') S = {};
     S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate';
-    S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {};
+    S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; S.removed = S.removed || {};
     if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; // saved before subjects existed
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ } if (window.Cloud) Cloud.pushSoon(); }
   load();
+  // Optional Google sign-in (js/cloud.js): the cloud copy is merged in and the app redraws when it changes.
+  if (window.Cloud) Cloud.attach({ get: () => S, apply: m => {
+    // update in place, so a lesson that is open keeps writing into the same objects
+    const right = S.right; Object.keys(m.right || {}).forEach(id => { right[id] = Object.assign(right[id] || {}, m.right[id]); });
+    Object.keys(m).forEach(k => { if (k !== 'right' && k !== 'pos') S[k] = m[k]; });
+    load2(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ }
+    if (['', 'map', 'review', 'parent'].includes((location.hash || '#/').slice(2).split('/')[0])) route(); // never redraw in the middle of a lesson
+  } });
   // Safari can drop site data after ~7 idle days unless storage is persisted or the app is added to the Home Screen.
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* unsupported */ }
   // Flush on every way Safari can background or close the page (iOS rarely fires unload).
@@ -74,10 +82,11 @@
   const scoreText = r => r.skipped ? 'already known' : r.noscore ? 'done (score not saved)' : `${r.correct}/${r.total} correct`;
   const scoreShort = r => r.skipped ? 'known' : r.noscore ? 'done' : `${r.correct}/${r.total}`;
   /* "Already learned elsewhere": mark lessons done without any answers. Stars and streak are not affected, and real results are never overwritten. */
-  const markKnown = L => { if (S.done[L.id]) return false; S.done[L.id] = { correct: 0, total: L.q.length, when: todayStr(), skipped: true }; return true; };
-  const unmarkKnown = L => { if (S.done[L.id] && S.done[L.id].skipped) { delete S.done[L.id]; return true; } return false; };
+  const markKnown = L => { if (S.done[L.id]) return false; S.done[L.id] = { correct: 0, total: L.q.length, when: todayStr(), skipped: true, at: Date.now() }; return true; };
+  const tomb = id => { S.removed = S.removed || {}; S.removed[id] = Date.now(); }; // lets the cloud know this was deliberate
+  const unmarkKnown = L => { if (S.done[L.id] && S.done[L.id].skipped) { delete S.done[L.id]; tomb(L.id); return true; } return false; };
   /* "Unlearn": undo a completion (real or marked known). Stars for solved questions stay unless the lesson is started over. */
-  const unmarkDone = L => { if (S.done[L.id]) { delete S.done[L.id]; return true; } return false; };
+  const unmarkDone = L => { if (S.done[L.id]) { delete S.done[L.id]; tomb(L.id); return true; } return false; };
   const startOver = L => { unmarkDone(L); delete S.right[L.id]; };
   const lessonsUpTo = (sb, week) => sb.lessons.filter(l => l.week <= week);
   const norm = s => String(s).trim().toLowerCase().replace(/\s+/g, '').replace(/[.!]+$/, '');
@@ -443,7 +452,7 @@
           h('p', {}, `You solved ${got} of ${total} puzzles. ${monsterFor(L).name} is ${got >= total ? 'calm and happy' : 'getting calmer'}.`),
           h('div', { class: 'key' }, '📜 ' + L.key), h('p', {}, 'Tell a grown-up in your own words what you learned today.'),
           got < total ? h('p', { class: 'muted' }, 'Some questions are still unsolved. Go back and try them, or finish now. They will come back in Look Back.') : '');
-        body.append(h('button', { class: 'btn', onclick: () => { S.done[id] = { correct: counts(), total, when: (S.done[id] && S.done[id].when) || todayStr(), last: todayStr() }; S.pos = { id: nx ? nx.id : id, step: 0 }; markDay(); save(); go('#/done/' + id); } }, S.done[id] ? 'Save again' : '🏰 Finish quest'));
+        body.append(h('button', { class: 'btn', onclick: () => { S.done[id] = { correct: counts(), total, when: (S.done[id] && S.done[id].when) || todayStr(), last: todayStr(), at: Date.now() }; S.pos = { id: nx ? nx.id : id, step: 0 }; markDay(); save(); go('#/done/' + id); } }, S.done[id] ? 'Save again' : '🏰 Finish quest'));
       }
       wrap.append(body);
       const nav = h('div', { class: 'ans' });
@@ -539,6 +548,30 @@
     const firstOpen = SUBJECTS[0].lessons.find(l => !S.done[l.id]); S.pos = firstOpen ? { id: firstOpen.id, step: 0 } : null;
     save();
   }
+  /* Optional Google sign-in: keep progress in the cloud and carry it to other devices without a password (js/cloud.js). */
+  function cloudCard() {
+    const box = h('section', { class: 'card cloud' });
+    const when = t => t ? new Date(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
+    const draw = () => {
+      const c = Cloud.status(), kids = [h('h2', {}, '☁️ Save progress with Google')];
+      if (c.signedIn) {
+        kids.push(h('p', {}, `Signed in as `, h('b', {}, c.email), '. Progress is saved to your Google account and follows your child to any device where you sign in.'),
+          h('p', { class: 'muted' }, c.state === 'syncing' ? 'Saving...' : c.state === 'error' ? '⚠️ ' + c.message : c.at ? `✅ Saved at ${when(c.at)}. It saves by itself after each lesson.` : ''),
+          h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => Cloud.syncNow() }, 'Save now'), h('button', { class: 'btn alt', onclick: () => { if (confirm('Sign out on this device? Progress stays on this device and in the cloud.')) Cloud.signOut(); } }, 'Sign out')));
+      } else {
+        kids.push(h('p', {}, 'Sign in with a grown-up\'s Google account to keep your child\'s progress safe and use it on other devices. No password to remember. Only progress is saved: lessons done, scores, study days and the knight\'s armour.'),
+          h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => Cloud.signIn() }, 'Sign in with Google')),
+          c.message ? h('p', { class: 'muted' }, '⚠️ ' + c.message) : (c.state === 'signing' || c.state === 'loading') ? h('p', { class: 'muted' }, c.message) : '',
+          h('p', { class: 'muted small' }, 'You can still use the progress password below. Signing in with Google is optional.'));
+      }
+      box.replaceChildren(...kids);
+    };
+    let shown = false;
+    const onChange = () => { if (box.isConnected) shown = true; else if (shown) { Cloud.offChange(onChange); return; } draw(); };
+    if (!window.Cloud) return h('span');
+    Cloud.onChange(onChange); Cloud.preload(); draw();
+    return box;
+  }
   function passwordCard() {
     const out = h('textarea', { readonly: 'readonly', rows: 3, class: 'pw-box', 'aria-label': 'Your progress password', placeholder: 'Your password appears here' });
     const note = h('p', { class: 'muted small' });
@@ -570,9 +603,9 @@
     const pl = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' },
       [['rotate', 'Maths every day + English (Mon, Wed, Fri) or Science (Tue, Thu)'], ['all', 'All three subjects every day'], ['math', 'Maths every day, others optional']].map(([v, t]) => h('option', Object.assign({ value: v }, S.plan === v ? { selected: 'selected' } : {}), t)));
     const gl = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5].map(n => h('option', Object.assign({ value: n }, S.goal === n ? { selected: 'selected' } : {}), `${n} evening${n > 1 ? 's' : ''} a week`)));
-    frag.append(h('section', { class: 'card' }, h('h2', {}, 'Setup'), h('div', { class: 'ans' }, nm, h('button', { class: 'btn', onclick: () => { S.name = nm.value.trim(); save(); alert('Saved'); } }, 'Save name')),
-      h('h3', { style: 'margin-top:24px' }, 'Daily plan'), h('div', { class: 'ans' }, pl, h('button', { class: 'btn', onclick: () => { S.plan = pl.value; save(); alert('Saved'); } }, 'Save plan')),
-      h('h3', { style: 'margin-top:24px' }, 'Weekly goal'), h('div', { class: 'ans' }, gl, h('button', { class: 'btn', onclick: () => { S.goal = +gl.value; save(); alert('Saved'); } }, 'Save goal')),
+    frag.append(h('section', { class: 'card' }, h('h2', {}, 'Setup'), h('div', { class: 'ans' }, nm, h('button', { class: 'btn', onclick: () => { S.name = nm.value.trim(); S.setAt = Date.now(); save(); alert('Saved'); } }, 'Save name')),
+      h('h3', { style: 'margin-top:24px' }, 'Daily plan'), h('div', { class: 'ans' }, pl, h('button', { class: 'btn', onclick: () => { S.plan = pl.value; S.setAt = Date.now(); save(); alert('Saved'); } }, 'Save plan')),
+      h('h3', { style: 'margin-top:24px' }, 'Weekly goal'), h('div', { class: 'ans' }, gl, h('button', { class: 'btn', onclick: () => { S.goal = +gl.value; S.setAt = Date.now(); save(); alert('Saved'); } }, 'Save goal')),
       h('p', { class: 'muted small' }, 'Study evenings per week (any day with a solved question or a finished lesson counts). Every 3 study days the knight earns a new piece of armour.'),
       h('p', { class: 'muted small' }, 'Each subject moves forward one lesson at a time, so a subject that is studied 3 times a week takes about 13 weeks to finish.')));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'How the curriculum works'),
@@ -585,6 +618,7 @@
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'A good evening (about 25 minutes per subject)'),
       h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
         h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong answers are fine, thinking is the point.'))));
+    frag.append(cloudCard());
     frag.append(passwordCard());
     const skipSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
     const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Levels 1 to ${n}`)));
@@ -611,7 +645,7 @@
       h('p', {}, h('button', { class: 'btn', style: 'background:var(--bad)', onclick: () => { if (confirm('Erase all progress?')) { S = {}; load2(); save(); go('#/'); } } }, 'Reset all progress'))));
     app(frag);
   }
-  function load2() { S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate'; S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; }
+  function load2() { S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate'; S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; S.removed = S.removed || {}; if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; }
 
   function viewKey(id) {
     setNav('parent');
