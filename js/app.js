@@ -75,7 +75,12 @@
   };
   const vis = html => Visuals.expand(html);
   const fmtDate = iso => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? new Date(+m[1], m[2] - 1, +m[3]).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : ''; };
-  const doneLine = r => `Completed ${fmtDate(r.when)}`;
+  const doneLine = r => r.skipped ? `Marked as already known ${fmtDate(r.when)}` : `Completed ${fmtDate(r.when)}`;
+  const scoreText = r => r.skipped ? 'already known' : `${r.correct}/${r.total} correct`;
+  /* "Already learned elsewhere": mark lessons done without any answers. Stars and streak are not affected, and real results are never overwritten. */
+  const markKnown = L => { if (S.done[L.id]) return false; S.done[L.id] = { correct: 0, total: L.q.length, when: todayStr(), skipped: true }; return true; };
+  const unmarkKnown = L => { if (S.done[L.id] && S.done[L.id].skipped) { delete S.done[L.id]; return true; } return false; };
+  const lessonsUpTo = (sb, week) => sb.lessons.filter(l => l.week <= week);
   const norm = s => String(s).trim().toLowerCase().replace(/\s+/g, '').replace(/[.!]+$/, '');
   function isCorrect(q, given) {
     const g = norm(given); if (!g) return false;
@@ -166,7 +171,7 @@
     const done = S.done[L.id], nx = nextIdx(SUBJ[L.subj]) === L.n;
     return h('a', { class: 'tile ' + (done ? 'done ' : '') + (nx ? 'next' : ''), href: '#/lesson/' + L.id },
       h('small', {}, `Week ${L.week} · ${DAYS[L.day - 1]}`), h('b', {}, (done ? '✅ ' : nx ? '▶ ' : '') + L.t),
-      done ? h('small', {}, `${done.correct}/${done.total} correct`) : '',
+      done ? h('small', {}, scoreText(done)) : '',
       done && done.when ? h('span', { class: 'stamp' }, '✔ ' + doneLine(done)) : '');
   }
   function subjTabs(base, cur, withAll) {
@@ -219,7 +224,7 @@
     frag.append(rc);
     const recent = ALL.filter(l => S.done[l.id]).sort((a, b) => (S.done[b.id].when || '').localeCompare(S.done[a.id].when || '') || b.n - a.n).slice(0, 6);
     if (recent.length) frag.append(h('section', { class: 'card' }, h('h2', {}, '✅ Completed lessons'),
-      h('ul', { class: 'recent', style: 'list-style:none;padding:0' }, recent.map(l => h('li', {}, h('a', { href: '#/lesson/' + l.id }, `${SUBJ[l.subj].icon} ${l.t}`), h('span', { class: 'muted' }, `${fmtDate(S.done[l.id].when)} · ${S.done[l.id].correct}/${S.done[l.id].total}`))))));
+      h('ul', { class: 'recent', style: 'list-style:none;padding:0' }, recent.map(l => h('li', {}, h('a', { href: '#/lesson/' + l.id }, `${SUBJ[l.subj].icon} ${l.t}`), h('span', { class: 'muted' }, `${fmtDate(S.done[l.id].when)} · ${S.done[l.id].skipped ? 'already known' : S.done[l.id].correct + '/' + S.done[l.id].total}`))))));
     frag.append(h('section', { class: 'card' }, h('h2', {}, '🕰️ Evening routine (about 25 minutes per subject)'),
       h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
         h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong is fine. Thinking is the point!'))));
@@ -233,8 +238,12 @@
     sb.weeks.forEach(w => {
       const wl = sb.lessons.filter(l => l.week === w.week), wd = wl.filter(l => S.done[l.id]);
       const last = wd.map(l => S.done[l.id].when).sort().pop();
+      const todo = wl.filter(l => !S.done[l.id]), known = wl.filter(l => S.done[l.id] && S.done[l.id].skipped);
       frag.append(h('div', { class: 'weekh' }, h('h2', {}, `Week ${w.week}: ${w.theme}`),
-        h('span', { class: 'wk' + (wd.length === wl.length ? ' ok' : '') }, wd.length === wl.length ? `✅ Week complete ${fmtDate(last)}` : `${wd.length}/${wl.length} done`)), h('p', { class: 'muted' }, w.blurb));
+        h('span', { class: 'wk' + (wd.length === wl.length ? ' ok' : '') }, wd.length === wl.length ? `✅ Week complete ${fmtDate(last)}` : `${wd.length}/${wl.length} done`)), h('p', { class: 'muted' }, w.blurb),
+        h('div', { class: 'known-row' },
+          todo.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark the ${todo.length} unfinished lesson${todo.length > 1 ? 's' : ''} in Week ${w.week} as already known? They will count as done without questions. You can undo this.`)) { todo.forEach(markKnown); save(); route(); } } }, `✔ Already know all of Week ${w.week}`) : '',
+          known.length ? h('button', { class: 'btn alt small', onclick: () => { known.forEach(unmarkKnown); save(); route(); } }, `↩ Undo ${known.length} marked as known`) : ''));
       frag.append(h('div', { class: 'grid' }, wl.map(tile)));
     });
     app(frag);
@@ -271,7 +280,12 @@
     function draw() {
       wrap.replaceChildren();
       wrap.append(h('span', { class: 'pill dark ' + L.subj }, pillOf(L)), h('h1', {}, L.t));
-      if (S.done[id]) wrap.append(h('div', { class: 'badge-done' }, `✅ ${doneLine(S.done[id])} · ${S.done[id].correct}/${S.done[id].total} correct`));
+      if (S.done[id]) {
+        wrap.append(h('div', { class: 'badge-done' }, `✅ ${doneLine(S.done[id])}${S.done[id].skipped ? '' : ' · ' + scoreText(S.done[id])}`));
+        if (S.done[id].skipped) wrap.append(' ', h('button', { class: 'btn alt small', onclick: () => { unmarkKnown(L); save(); draw(); } }, 'Undo'), h('p', { class: 'muted small' }, 'You can still work through this lesson and finish it to record real results.'));
+      } else {
+        wrap.append(h('div', { class: 'known-row' }, h('button', { class: 'btn alt small', onclick: () => { if (confirm('Mark this lesson as already known? It will count as done without any questions. You can undo this.')) { markKnown(L); S.pos = { id: (sb.lessons[L.n + 1] || L).id, step: 0 }; save(); go('#/map/' + L.subj); } } }, '✔ Already learned this elsewhere')));
+      }
       wrap.append(h('div', { class: 'steps' }, steps.map((st, i) => h('button', { class: (i === cur ? 'on ' : '') + (seen.has(i) && i !== cur ? 'done' : ''), onclick: () => { cur = i; draw(); window.scrollTo(0, 0); } }, st[0]))));
       seen.add(cur); S.pos = { id, step: cur }; save();
       const body = h('section', { class: 'card' });
@@ -326,7 +340,7 @@
     setNav('home');
     const L = BYID[id]; if (!L) return go('#/');
     const nx = SUBJ[L.subj].lessons[L.n + 1], r = S.done[id];
-    app(h('section', { class: 'card hero ' + L.subj }, h('h1', {}, '🎉 Lesson complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? r.correct + '/' + r.total : ''} correct`),
+    app(h('section', { class: 'card hero ' + L.subj }, h('h1', {}, '🎉 Lesson complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? scoreText(r) : ''}`),
       nx ? h('p', {}, 'Next time: ' + nx.t) : h('p', {}, `🎓 That was the last ${SUBJ[L.subj].name} lesson!`), h('a', { class: 'btn light', href: '#/' }, 'Back home')));
   }
 
@@ -361,9 +375,18 @@
         h('li', {}, h('b', {}, 'Rhythm: '), 'About 25 minutes per subject. Progress is lesson-based, so missed days do not skip content.'),
         h('li', {}, h('b', {}, 'Coach tips: '), 'Ask "How do you know?", let them draw, praise effort, and read questions aloud together for English and Science.'),
         h('li', {}, h('b', {}, 'Levels: '), '🌱 Warm-up, ⭐ Core, 🚀 Stretch, 🏆 Olympiad.'))));
+    const skipSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
+    const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Weeks 1 to ${n}`)));
+    frag.append(h('section', { class: 'card' }, h('h2', {}, 'Already learned some of this?'),
+      h('p', { class: 'muted' }, 'Mark lessons as done without questions when your child has already learned them elsewhere. Lessons already completed here keep their real scores. Marked lessons still appear in Look Back so old ideas are refreshed, and you can undo any time from the map.'),
+      h('div', { class: 'ans' }, skipSel, weekSel, h('button', { class: 'btn', onclick: () => {
+        const sb = SUBJ[skipSel.value], list = lessonsUpTo(sb, +weekSel.value).filter(l => !S.done[l.id]);
+        if (!list.length) return alert('Everything in that range is already done.');
+        if (confirm(`Mark ${list.length} ${sb.name} lesson${list.length > 1 ? 's' : ''} (weeks 1 to ${weekSel.value}) as already known?`)) { list.forEach(markKnown); const nx = sb.lessons.find(l => !S.done[l.id]); if (nx) S.pos = { id: nx.id, step: 0 }; save(); alert(`Done. ${list.length} lesson${list.length > 1 ? 's' : ''} marked.`); route(); }
+      } }, 'Mark as known'))));
     SUBJECTS.forEach(sb => {
       const t = h('table', {}, h('tr', {}, h('th', {}, 'Lesson'), h('th', {}, 'Score'), h('th', {}, 'Completed'), h('th', {}, 'Answers')));
-      sb.lessons.forEach(L => t.append(h('tr', {}, h('td', {}, `W${L.week}·${DAYS[L.day - 1]} ${L.t}`), h('td', {}, S.done[L.id] ? `${S.done[L.id].correct}/${S.done[L.id].total}` : '-'), h('td', {}, S.done[L.id] ? fmtDate(S.done[L.id].when) : '-'), h('td', {}, h('a', { href: '#/key/' + L.id }, 'Key')))));
+      sb.lessons.forEach(L => t.append(h('tr', {}, h('td', {}, `W${L.week}·${DAYS[L.day - 1]} ${L.t}`), h('td', {}, S.done[L.id] ? (S.done[L.id].skipped ? 'known' : `${S.done[L.id].correct}/${S.done[L.id].total}`) : '-'), h('td', {}, S.done[L.id] ? fmtDate(S.done[L.id].when) : '-'), h('td', {}, h('a', { href: '#/key/' + L.id }, 'Key')))));
       frag.append(h('section', { class: 'card' }, h('h2', {}, `${sb.icon} ${sb.name}: progress and answer keys`), t));
     });
     const io = h('textarea', { rows: 3, style: 'width:100%', placeholder: 'Paste saved progress here to restore' });
