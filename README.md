@@ -94,7 +94,7 @@ that every outside link returns HTTP 200 (needs internet; use the "Check outside
 "prune" to remove dead ones).
 
 ## Theme and wording
-The app is "Monster Knights": a little knight (js/knightwear.js) who earns armour, a monster buddy, one monster friend per
+The app is "Grade 1 Training Grounds": a little knight (js/knightwear.js) who earns armour, a monster buddy, one monster friend per
 finished lesson, and quest wording. Child-facing lesson text in all three subjects is written for a 6-year-old:
 short sentences, "you", no jargon without an explanation. Adult-facing text (parent notes, Explain it more) stays adult.
 
