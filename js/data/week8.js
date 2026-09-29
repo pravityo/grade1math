@@ -59,7 +59,7 @@
   q: [
     { l:`b`, q:`A drawer has red and blue socks. What is the fewest socks you must take (without looking) to guarantee a matching pair?`, a:`3` },
     { l:`b`, q:`A bag has red, blue and green balls. What is the fewest balls you must take (without looking) to guarantee two of the same colour?`, a:`4` },
-    { l:`c`, q:`8 children are in a class. There are 7 days in a week. Must at least two of them have been born on the same day of the week? (There are only 7 days in a week.)`, o:[`yes`,`no`], a:`yes`, s:`Only 7 days for 8 children, so two share.` },
+    { l:`c`, q:`8 children are in a class. Must at least two of them have been born on the same day of the week? (There are only 7 days in a week.)`, o:[`yes`,`no`], a:`yes`, s:`Only 7 days for 8 children, so two share.` },
     { l:`c`, q:`4 friends each shake hands once with every other friend. How many handshakes are there in total?`, a:`6` },
     { l:`s`, q:`6 friends each shake hands once with every other friend. How many handshakes are there in total?`, a:`15`, s:`5 + 4 + 3 + 2 + 1 = 15.` },
     { l:`o`, q:`A bag has 4 red socks and 4 blue socks. What is the fewest you must take to guarantee a pair of BLUE socks?`, a:`6`, h:`Worst case: all the red ones first.`, s:`4 red first, then 2 blue = 6.` }
