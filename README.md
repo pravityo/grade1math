@@ -66,3 +66,8 @@ Outside links are not verified by the tests and can change, so re-check them occ
 The Parent tab can create an SNES-style password (`js/password.js`) that holds progress: which lessons are done or marked known, the
 first name, the daily plan and, in the full version, scores and completion dates. Enter it on any device or browser to carry on. It is
 data, not a login, so nothing is stored on a server. `node tests/password.test.js` checks round trips and typo detection.
+
+## Grown-ups gate
+
+The Grown-ups tab and the answer keys open only after typing an "-ology" word for a hint shown in a pop-up (`js/gate.js`, 38 words).
+It unlocks for 10 minutes after the last use. It keeps a young child out; it is not real security because the words are in the source.

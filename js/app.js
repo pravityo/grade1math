@@ -436,7 +436,7 @@
 
   function viewParent() {
     setNav('parent');
-    const frag = h('div', {}, h('h1', {}, '👨‍👩‍👧 Parent corner'));
+    const frag = h('div', {}, h('h1', {}, '👨‍👩‍👧 Parent corner'), h('p', {}, h('button', { class: 'btn alt small', onclick: () => { GATE.lock(); go('#/'); } }, '🔒 Lock grown-ups area now'), h('span', { class: 'muted small' }, '  It also locks itself after 10 minutes.')));
     const nm = h('input', { type: 'text', value: S.name, placeholder: 'Child\'s name', style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' });
     const pl = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' },
       [['rotate', 'Maths every day + English (Mon, Wed, Fri) or Science (Tue, Thu)'], ['all', 'All three subjects every day'], ['math', 'Maths every day, others optional']].map(([v, t]) => h('option', Object.assign({ value: v }, S.plan === v ? { selected: 'selected' } : {}), t)));
@@ -495,6 +495,12 @@
   function go(hash) { if (location.hash === hash) route(); else location.hash = hash; }
   function route() {
     const p = (location.hash || '#/').slice(2).split('/');
+    const gated = p[0] === 'parent' || p[0] === 'key';
+    if (gated && window.GATE && !GATE.isUnlocked()) { // grown-ups area: ask for the -ology word first
+      setNav('parent'); app(h('section', { class: 'card' }, h('h1', {}, 'Grown-ups'), h('p', { class: 'muted' }, 'This area is for adults.')));
+      return GATE.require(route, () => go('#/'));
+    }
+    if (gated && window.GATE) GATE.touch();
     ({ '': viewHome, map: () => viewMap(p[1]), lesson: () => viewLesson(p[1]), done: () => viewDone(p[1]), review: () => viewReview(p[1]), parent: viewParent, key: () => viewKey(p[1]) }[p[0]] || viewHome)();
   }
   window.addEventListener('hashchange', route);
