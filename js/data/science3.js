@@ -37,7 +37,7 @@ LS(`Healthy Eating`, `Food groups`, `Sort foods into groups and build a healthy 
   [`Our body needs different foods: <b>fruit and vegetables</b> (vitamins), <b>wholegrains</b> like brown rice (energy), <b>protein</b> like fish, egg, beans (growth), and water.`,
    `[[table:Group,Examples|fruit and veg,apple / spinach|wholegrains,brown rice / oats|protein,fish / egg / tofu|drinks,water]]`,
    `Sweets, fried food and sugary drinks are treats: enjoy them <b>sometimes</b>, not every day.`,
-   `Brush teeth twice a day. Sugar makes germs on teeth produce acid that damages them.`],
+   `Sugar matters for teeth too: germs on your teeth use sugar to make acid that damages them. That is why we brush twice a day.`],
   `<b>Hands-on:</b> Draw a plate with your dinner. Colour half fruit and veg, a quarter grains, a quarter protein.`,
   `<b>Scientist tip:</b> Eat a "rainbow" of colours to get different vitamins.`,
   `Let your child help plan a balanced meal.`,

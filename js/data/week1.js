@@ -10,7 +10,7 @@
     `[[bond:10|3,7]]`,
     `Here the whole is 10 and the parts are 3 and 7. If you know the whole and one part, the other part is a <b>missing part</b>.`,
     `[[frame:6]]`,
-    `6 counters are on the ten-frame. How many empty spaces are there? 4! So <b>6 and 4 make 10</b>.`,
+    `6 counters are on the ten-frame. How many empty spaces are there? 4! So <b>6 and 4 make 10</b>. On the number line below, you jump from 6 up to 10, and that jump is 4.`,
     `[[bar:6,?|10]]`,
     `The same idea drawn as a <b>bar model</b>: the top bar is the whole, the bottom bars are the parts.`
   ],
@@ -31,7 +31,7 @@
   learn: [
     `<b>Making 10</b> is the Singapore secret weapon. To add 8 + 5, take 2 from the 5 to make 10 with the 8.`,
     `[[frame:13]]`,
-    `8 + 5: fill the first frame (8 + 2 = 10). We used 2 of the 5, so 3 are left. 10 + 3 = <b>13</b>.`,
+    `8 + 5: fill the first frame (8 + 2 = 10). We used 2 of the 5, so 3 are left. 10 + 3 = <b>13</b>. On the number line: start at 8, jump 2 to reach 10, then jump 3 more to land on 13.`,
     `[[bond:5|2,3]]`,
     `We split 5 into 2 and 3, then added the 2 to the 8. Bonds to 20 work the same way: 20 = 12 + 8, since 12 needs 8 more to reach 20.`
   ],
@@ -50,8 +50,8 @@
   goal: `Add quickly using make-ten and doubles.`,
   key: `Know doubles (6+6=12). Near-double: 7+8 = 7+7+1.`,
   learn: [
-    `<b>Doubles</b> are easy to remember: 1+1=2, 2+2=4, 3+3=6, 4+4=8, 5+5=10, 6+6=12, 7+7=14, 8+8=16, 9+9=18.`,
-    `<b>Near-doubles:</b> 7 + 8 is one more than 7 + 7. So 7 + 8 = 14 + 1 = 15.`,
+    `<b>Doubles</b> are easy to remember: 1+1=2, 2+2=4, 3+3=6, 4+4=8, 5+5=10, 6+6=12, 7+7=14, 8+8=16, 9+9=18. Picture two baskets with 7 apples each: 7 + 7 = 14.`,
+    `<b>Near-doubles:</b> 7 + 8 is one more than 7 + 7. So 7 + 8 = 14 + 1 = 15. In the bar model below, the 7 and the 8 sit side by side, and the answer bar is the whole.`,
     `[[bar:7,8|?]]`,
     `<b>Three numbers:</b> look for a pair that makes 10 first. 6 + 7 + 4: 6 + 4 = 10, then 10 + 7 = 17.`
   ],
@@ -72,8 +72,8 @@
   learn: [
     `Subtraction is finding a <b>missing part</b>. 15 - 9 = ? means "15 is the whole, 9 is one part, what is the other part?"`,
     `[[bond:15|9,?]]`,
-    `<b>Strategy 1: think addition.</b> 9 + ? = 15. 9 + 1 = 10, then 5 more. That is 6.`,
-    `<b>Strategy 2: take away via 10.</b> 13 - 5: take 3 to reach 10, then take 2 more. 10 - 2 = 8.`,
+    `<b>Strategy 1: think addition.</b> 9 + ? = 15. 9 + 1 = 10, then 5 more. That is 6. On the number line: jump 1 from 9 to 10, then 5 more to reach 15.`,
+    `<b>Strategy 2: take away via 10.</b> 13 - 5: take 3 to reach 10, then take 2 more. 10 - 2 = 8. The bar model shows it too: the whole is 13, one part is 5, and the missing part is 8.`,
     `[[bar:?,5|13]]`
   ],
   do: `<b>Hands-on:</b> Start with 15 counters. Hide some under a cup, show the rest. Your child works out how many are hidden. Swap roles.`,
@@ -94,8 +94,8 @@
     `A <b>fact family</b> uses three numbers: 6, 9, 15. Four facts: 6+9=15, 9+6=15, 15-6=9, 15-9=6.`,
     `<b>Bar model:</b> Mei has 9 stickers. She gets some more and now has 15. How many did she get?`,
     `[[bar:9,?|15]]`,
-    `Whole = 15, one part = 9, missing part = 15 - 9 = 6.`,
-    `<b>Comparison model:</b> Amy has 8 apples. Ben has 5 fewer.`,
+    `Whole = 15, one part = 9, missing part = 15 - 9 = 6. The number line shows the same story: start at Mei's 9 and jump 6 to reach 15.`,
+    `<b>A second kind of story: comparing.</b> Amy has 8 apples. Ben has 5 fewer, so Ben has 8 - 5 = 3. In the picture the long bar is Amy, the short bar is Ben, and the gap between them is the 5 fewer.`,
     `[[cmp:8,3|Amy,Ben]]`
   ],
   do: `<b>Hands-on:</b> Write three-number fact families for (4, 7, 11), (8, 9, 17), (6, 6, 12). Draw a bar model for each.`,

@@ -21,7 +21,7 @@ LS(`Past Tense: Tricky Verbs`, `Irregular past tense`, `Use the special past for
   `Some verbs change completely: go, went. eat, ate. see, saw. run, ran.`,
   [`Some verbs do not add -ed. They <b>change</b>: <b>go, went</b>. <b>eat, ate</b>. <b>see, saw</b>. <b>run, ran</b>. <b>come, came</b>. <b>sit, sat</b>. <b>have, had</b>. <b>is, was</b>.`,
    `[[table:Now,Past|go,went|eat,ate|see,saw|run,ran|catch,caught]]`,
-   `Mistakes like "runned" or "goed" are actually clever: the child is using the -ed rule. Just teach that these are exceptions.`,
+   `If you ever say "runned" or "goed", that is clever: you used the -ed rule. These special verbs are just exceptions to it.`,
    `Learn a few each week and use them in sentences.`],
   `<b>Hands-on:</b> Play "past tense charades": act a verb, your child says what you did ("You jumped!").`,
   `<b>Olympiad tip:</b> Irregular verbs are common in tests. Make a list and quiz yourself each week.`,

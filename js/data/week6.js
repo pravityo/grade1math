@@ -28,7 +28,7 @@
   learn: [
     `A <b>quarter</b> is one of <b>four equal</b> parts. 1/4. Four quarters make 1 whole.`,
     `Quarter of 8 is 2. Quarter of 20 is 5. <b>Trick:</b> half of a half.`,
-    `<b>3/4</b> means 3 of the 4 parts. 3/4 of 12: quarter is 3, so 3 quarters is 9.`,
+    `<b>3/4</b> means 3 of the 4 parts. 3/4 of 12: quarter is 3, so 3 quarters is 9. In the bar below, 12 is cut into four quarters of 3, and 3 of them are 3 + 3 + 3 = 9.`,
     `[[bar:3,3,3,3|12]]`,
     `<b>How many quarters in 3 wholes?</b> 4 in each whole, so 12.`
   ],
@@ -48,7 +48,7 @@
   key: `Divide into equal groups, then count the ones you need.`,
   learn: [
     `<b>1/3 of 9:</b> share 9 into 3 equal groups. Each group is 3. So 1/3 of 9 = 3.`,
-    `<b>2/3 of 9:</b> 2 groups of 3 = 6.`,
+    `<b>2/3 of 9:</b> 2 groups of 3 = 6. The picture above shows the groups, and the bar below shows 9 cut into three parts of 3.`,
     `[[bar:3,3,3|9]]`,
     `1/2 of 14 = 7. 1/5 of 20 = 4.`,
     `<b>Puzzle:</b> "Half of my marbles are red, a quarter are blue, the other 5 are green." Half + quarter = 3/4, so green is 1/4 = 5. The whole is 4 x 5 = 20.`
@@ -70,7 +70,7 @@
   learn: [
     `<b>Tally marks:</b> group in 5s. |||| with a slash across it is 5. Then add the remaining lines.`,
     `<b>Picture graph:</b> each picture stands for 1 (or more) item. Fruit: apples 5, bananas 3, grapes 7. Total = 15. Most = grapes. Grapes more than bananas = 4.`,
-    `<b>Puzzle data:</b> Dogs 6, cats twice as many, birds 3 fewer than cats. Cats = 12, birds = 9. Total = 6 + 12 + 9 = 27.`,
+    `<b>Puzzle data:</b> Dogs 6, cats twice as many, birds 3 fewer than cats. Cats = 12, birds = 9. Total = 6 + 12 + 9 = 27. The bar below puts the three amounts side by side.`,
     `[[bar:6,12,9|27]]`
   ],
   do: `<b>Hands-on:</b> Tally the colours of cars that pass your window in 10 minutes. Draw a picture graph.`,
@@ -88,7 +88,7 @@
   goal: `Handle overlapping groups: some are in both.`,
   key: `Both counted once: total = A + B - both.`,
   learn: [
-    `<b>Odd one out:</b> 3, 5, 7, 8: only 8 is even.`,
+    `<b>Sorting</b> means finding the rule that puts things into groups. <b>Odd one out:</b> in 3, 5, 7, 8 only 8 is even, so it does not belong.`,
     `<b>Venn diagram:</b> two circles that overlap. The middle is for things in <i>both</i>.`,
     `5 like cats, 4 like dogs, 2 like both. Cats only: 5 - 2 = 3. Dogs only: 4 - 2 = 2. At least one: 3 + 2 + 2 = 7.`,
     `<b>Formula idea:</b> If you add 5 + 4 you counted the "both" children twice, so subtract 2 once: 9 - 2 = 7.`,

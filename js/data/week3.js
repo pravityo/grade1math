@@ -6,7 +6,7 @@
   goal: `Add tens to tens and ones to ones.`,
   key: `23 + 41: tens 2+4=6, ones 3+1=4, so 64.`,
   learn: [
-    `Split each number into tens and ones. <b>23 + 41</b>: 20 + 40 = 60 and 3 + 1 = 4. Then 60 + 4 = <b>64</b>.`,
+    `Split each number into tens and ones. <b>23 + 41</b>: 20 + 40 = 60 and 3 + 1 = 4. Then 60 + 4 = <b>64</b>. The blocks below show 23 and 41, and the number bond after them shows 60 and 4 joining to make 64.`,
     `[[bond:64|60,4]]`,
     `Column method: line up tens under tens, ones under ones. Add ones first.`,
     `Three numbers: 14 + 25 + 30. Tens 1 + 2 + 3 = 6, ones 4 + 5 = 9. Answer 69.`
@@ -27,7 +27,7 @@
   key: `27 + 15: 7 + 5 = 12 ones = 1 ten + 2 ones. 20 + 10 + 10 + 2 = 42.`,
   learn: [
     `<b>27 + 15.</b> Ones: 7 + 5 = 12. That is 1 ten and 2 ones. Regroup the ten. Tens: 2 + 1 + 1 = 4. Answer <b>42</b>.`,
-    `<b>Number-line jump:</b> 27 + 15 = 27 + 3 = 30, then + 12 = 42.`,
+    `<b>Another way, number-line jumps:</b> 27 + 15 = 27 + 3 = 30, then + 12 = 42. Below, the number line shows the jumps and the bar model shows 27 and 15 joining together.`,
     `[[bar:27,15|?]]`,
     `<b>Making tens:</b> 38 + 24: 38 needs 2 to reach 40. 24 = 2 + 22. So 40 + 22 = 62.`
   ],
@@ -48,7 +48,7 @@
   learn: [
     `<b>68 - 34:</b> tens 6 - 3 = 3, ones 8 - 4 = 4. Answer <b>34</b>.`,
     `[[bar:34,?|68]]`,
-    `<b>Difference</b> means "how many more". 68 and 34: 68 is 34 more than 34.`,
+    `<b>Difference</b> means "how many more". for 59 and 24, the difference is 59 - 24 = 35, so 59 is 35 more than 24.`,
     `<b>Subtract ones from a two-digit number:</b> 86 - 5 = 81 (only the ones digit changes).`
   ],
   do: `<b>Hands-on:</b> Show 68 with blocks. Take away 34 (3 tens and 4 ones). Count what's left.`,
@@ -67,9 +67,9 @@
   key: `52 - 17: 17 up to 20 is 3, 20 up to 52 is 32. So 35.`,
   learn: [
     `<b>52 - 17.</b> Can't take 7 ones from 2 ones. <b>Break a ten:</b> 52 = 4 tens and 12 ones. Ones: 12 - 7 = 5. Tens: 4 - 1 = 3. Answer <b>35</b>.`,
-    `<b>Count up:</b> from 17 to 20 is 3, then from 20 to 52 is 32. 3 + 32 = 35.`,
+    `<b>Another way, count up:</b> from 17 to 20 is 3, then from 20 to 52 is 32. 3 + 32 = 35. The number line and bar model below show the same jumps.`,
     `[[bar:17,?|52]]`,
-    `<b>From 100:</b> 100 - 37 is the number that goes with 37 to make 100: 63.`
+    `<b>A handy trick, subtracting from 100:</b> 100 - 37 is the number that goes with 37 to make 100: 63.`
   ],
   do: `<b>Hands-on:</b> Show 52 with 5 tens and 2 ones. Trade one tens stick for 10 ones, then subtract 17.`,
   tip: `<b>Olympiad tip:</b> Working backwards. To undo "subtract 15 then add 20", do "subtract 20 then add 15".`,
@@ -86,7 +86,7 @@
   goal: `Solve "more than", "fewer than" and "how many more" using bars.`,
   key: `Draw a longer bar for the bigger amount. The extra piece is the difference.`,
   learn: [
-    `<b>Ben has 24 marbles. Cara has 13 more.</b>`,
+    `<b>Ben has 24 marbles. Cara has 13 more.</b> Draw Ben's bar first, then a longer bar for Cara.`,
     `[[cmp:24,37|Ben,Cara]]`,
     `Cara = 24 + 13 = <b>37</b>.`,
     `<b>Sam has 28 cards, Tia has 19. How many more does Sam have?</b> The difference is 28 - 19 = 9.`,

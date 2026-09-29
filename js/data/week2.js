@@ -26,9 +26,9 @@
   goal: `Count fluently by 2, 5, 10 and start 3s. This is the road to multiplication.`,
   key: `Skip counting = repeated addition. Fingers: 5, 10, 15, 20 ...`,
   learn: [
-    `<b>Count by 2:</b> 2, 4, 6, 8, 10 ... <b>by 5:</b> 5, 10, 15, 20 ... <b>by 10:</b> 10, 20, 30 ...`,
+    `<b>Count by 2:</b> 2, 4, 6, 8, 10 ... <b>by 5:</b> 5, 10, 15, 20 ... <b>by 10:</b> 10, 20, 30 ... The hundred chart below colours the numbers you land on when counting by 5, and the number line shows hops of 2.`,
     `Each count adds the same amount. 5 hands have <b>5 + 5 + 5 + 5 + 5 = 25</b> fingers.`,
-    `<b>Try 3s:</b> 3, 6, 9, 12, 15. A frog that jumps 3 at a time lands only on these numbers.`,
+    `<b>Try 3s:</b> 3, 6, 9, 12, 15. A frog that jumps 3 at a time lands only on these numbers, the coloured squares on this chart.`,
     `Numbers you land on when counting by 2 are <b>even</b>: they end in 0, 2, 4, 6, or 8.`
   ],
   do: `<b>Hands-on:</b> Walk a number line on the floor. Jump in 2s, then 5s, then 3s. Mark where you land with sticky notes.`,
@@ -46,7 +46,7 @@
   goal: `Compare two-digit numbers and build the largest or smallest from digit cards.`,
   key: `Compare tens first. If tens match, compare ones.`,
   learn: [
-    `To compare 58 and 85, look at the <b>tens first</b>: 8 tens is more than 5 tens, so <b>85 &gt; 58</b>.`,
+    `To compare 58 and 85, look at the <b>tens first</b>: 8 tens is more than 5 tens, so <b>85 &gt; 58</b>. The blocks below show it: 58 is 5 tens and 8 ones, 85 is 8 tens and 5 ones.`,
     `If the tens are equal, compare the ones: 63 vs 67. Same tens, so 67 &gt; 63.`,
     `<b>Digit cards:</b> use 3 and 7 to make the biggest number: 73 (put the biggest digit in the tens).`,
     `<b>Between:</b> the number between 46 and 48 is 47.`
@@ -69,7 +69,7 @@
     `<b>Tens are like ones:</b> 3 tens + 4 tens = 7 tens. So 30 + 40 = 70.`,
     `<b>Add a tens number to any number:</b> 45 + 20. Only the tens digit changes: 4 tens + 2 tens = 6 tens. So 65.`,
     `[[bond:57|50,7]]`,
-    `<b>Add ones to a tens number:</b> 50 + 7 = 57.`,
+    `<b>Add ones to a tens number:</b> 50 + 7 = 57. On the hundred chart, the numbers ending in 7 line up in one column.`,
     `Big jumps in tens are easy: start 7, add 10 each time: 7, 17, 27, 37. The ones digit stays 7!`
   ],
   do: `<b>Hands-on:</b> Use a hundred chart. Start on 7, jump down (+10) each time. See the ones digit stay the same.`,
@@ -88,7 +88,7 @@
   key: `Even + even = even. Odd + odd = even. Odd + even = odd.`,
   learn: [
     `<b>Even</b> numbers can be paired up with none left over: 2, 4, 6, 8, 10. <b>Odd</b> numbers always have one left over: 1, 3, 5, 7, 9.`,
-    `<b>Parity rules:</b> even + even = even. odd + odd = even (the two leftovers pair up!). odd + even = odd.`,
+    `<b>Parity rules:</b> even + even = even. odd + odd = even (the two leftovers pair up!). odd + even = odd. Below, 13 and 14 are paired up: 13 has one left over, 14 has none.`,
     `<b>Number patterns:</b> look at the <i>gaps</i>. 2, 4, 7, 11: gaps are 2, 3, 4, so the next gap is 5.`,
     `<b>Odd or even without adding:</b> 1 + 3 + 5 + 7 + 9 has five odd numbers. Five odds leave one odd leftover, so the total is odd.`
   ],

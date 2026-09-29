@@ -10,7 +10,7 @@
     `1 + 2 + 3 + ... + 10. Pair 1 + 10 = 11, 2 + 9 = 11, 3 + 8 = 11, 4 + 7 = 11, 5 + 6 = 11. Five pairs of 11 = <b>55</b>.`,
     `[[bar:11,11,11,11,11|55]]`,
     `<b>1 to 100:</b> 50 pairs of 101 = 5050.`,
-    `<b>Handshakes:</b> 5 friends each shake hands once with everyone else. First person: 4, next: 3, then 2, then 1. 4 + 3 + 2 + 1 = 10 handshakes.`
+    `<b>The same adding trick counts handshakes.</b> 5 friends each shake hands once with everyone else. First person: 4, next: 3, then 2, then 1. 4 + 3 + 2 + 1 = 10 handshakes.`
   ],
   do: `<b>Hands-on:</b> Write 1 to 10 in two rows (second row backwards). Add each column. What do you notice?`,
   tip: `<b>Olympiad tip:</b> If numbers go up by the same step, pair first with last. Number of pairs = how many numbers / 2.`,
@@ -28,7 +28,7 @@
   key: `Numbers from A to B (including both) = B - A + 1.`,
   learn: [
     `<b>How many numbers from 5 to 12?</b> 12 - 5 = 7, but both ends count, so <b>8</b> numbers.`,
-    `<b>Fence posts:</b> a 20 m fence with posts every 5 m, one at each end: posts at 0, 5, 10, 15, 20 = <b>5 posts</b> (not 4!). Always 1 more post than gaps.`,
+    `<b>Fence posts:</b> a 20 m fence with posts every 5 m, one at each end: posts at 0, 5, 10, 15, 20 = <b>5 posts</b> (not 4!). Always 1 more post than gaps. The bar below shows the 4 gaps of 5 m.`,
     `[[bar:5,5,5,5|20]]`,
     `<b>Trees along a road:</b> 10 m road, trees every 1 m, both ends: 11 trees.`,
     `<b>From 10 to 99:</b> 99 - 10 + 1 = 90 numbers.`
@@ -92,8 +92,8 @@
   learn: [
     `<b>Missing number:</b> box + 7 = 15. Box = 15 - 7 = 8.`,
     `<b>Magic square:</b> each row, column and diagonal adds to 15.`,
-    `[[bond:15|4,3,8]]`,
-    `Row is 4, box, 8. 4 + 8 = 12, so box = 3.`,
+    `Here is a finished magic square. Check the top row: 2 + 7 + 6 = 15.`,
+    `<b>Now a puzzle row:</b> the row is 4, box, 8. 4 + 8 = 12, so box = 3.`,
     `<b>Same digit in each box:</b> 3[] + []4 = 78. If the box is 4: 34 + 44 = 78. It works!`,
     `<b>Biggest minus smallest:</b> use 1, 2, 3 once each. Biggest 321. Smallest 123. 321 - 123 = 198.`
   ],

@@ -6,7 +6,7 @@
   goal: `Read and build 3-digit numbers.`,
   key: `345 = 3 hundreds + 4 tens + 5 ones.`,
   learn: [
-    `Ten tens make one <b>hundred</b>. 345 is <b>3 hundreds, 4 tens, 5 ones</b>.`,
+    `Ten tens make one <b>hundred</b>. 345 is <b>3 hundreds, 4 tens, 5 ones</b>. The blocks below show it, and the number bond splits 345 into 300 and 45.`,
     `[[bond:345|300,45]]`,
     `<b>The number after 199</b> is 200 (1 hundred 9 tens 9 ones + 1 = 2 hundreds).`,
     `<b>Biggest number from digits 4, 9, 1:</b> put the biggest digit in the highest place: 941.`
@@ -46,8 +46,8 @@
   goal: `Double and halve numbers within 100.`,
   key: `Double = x2. Half = share into 2 equal groups.`,
   learn: [
-    `<b>Double</b> means two equal groups. Double 35: double 30 = 60, double 5 = 10. 60 + 10 = 70.`,
-    `<b>Half</b> means split into 2 equal parts. Half of 86: half of 80 = 40, half of 6 = 3, so 43.`,
+    `<b>Double</b> means two equal groups. Double 35: double 30 = 60, double 5 = 10. 60 + 10 = 70. Small case to picture: two groups of 8 apples is double 8 = 16.`,
+    `<b>Half</b> means split into 2 equal parts. Half of 86: half of 80 = 40, half of 6 = 3, so 43. Another half: 18 splits into two equal parts, 9 and 9, so half of 18 is 9.`,
     `[[bond:18|9,9]]`,
     `Halving is the reverse of doubling.`,
     `<b>Equal-parts puzzle:</b> "double a number then add 3 gives 27". Undo: 27 - 3 = 24, half = 12.`
@@ -69,8 +69,8 @@
   learn: [
     `<b>Equal groups:</b> 3 plates with 4 cookies each. Total = 4 + 4 + 4 = 12. We write <b>3 x 4 = 12</b>.`,
     `[[bar:4,4,4|12]]`,
-    `<b>Order doesn't matter:</b> 3 x 4 = 4 x 3.`,
-    `<b>Chickens and rabbits:</b> 5 animals and 14 legs. Guess 5 chickens = 10 legs (need 4 more). Each swap of a chicken to a rabbit adds 2 legs. So we need 2 swaps: <b>2 rabbits, 3 chickens</b>.`
+    `<b>Order doesn't matter:</b> 3 x 4 = 4 x 3. The bar above shows three 4s making 12.`,
+    `<b>Olympiad puzzle, chickens and rabbits:</b> chickens have 2 legs and rabbits have 4 legs. There are 5 animals and 14 legs. Guess 5 chickens = 10 legs (need 4 more). Each swap of a chicken to a rabbit adds 2 legs. So we need 2 swaps: <b>2 rabbits, 3 chickens</b>.`
   ],
   do: `<b>Hands-on:</b> Make 3 groups of 4 with counters. Now 4 groups of 3. Same total?`,
   tip: `<b>Olympiad tip:</b> Guess-and-check with smart adjustments solves "heads and legs" puzzles.`,
@@ -88,7 +88,7 @@
   key: `12 shared among 3 = 4 each. 12 made into groups of 3 = 4 groups.`,
   learn: [
     `<b>Sharing:</b> 12 sweets shared equally among 3 children. Each gets 4. 12 / 3 = 4.`,
-    `<b>Grouping:</b> 15 sweets in bags of 5. Number of bags = 3. 15 / 5 = 3.`,
+    `<b>Grouping:</b> 15 sweets in bags of 5. Number of bags = 3. 15 / 5 = 3. The bar below shows three bags of 5.`,
     `[[bar:5,5,5|15]]`,
     `Division undoes multiplication. 4 x 3 = 12, so 12 / 3 = 4.`,
     `<b>Cutting puzzle:</b> A rope 12 m long is cut every 3 m. That makes 4 pieces but only <b>3 cuts</b>.`

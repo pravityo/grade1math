@@ -48,6 +48,7 @@
     `A <b>ruler</b> measures in <b>centimetres (cm)</b>. Start at <b>0</b>, not 1.`,
     `Use <b>cm</b> for a pencil and <b>m</b> (metre) for a room. 1 m = 100 cm.`,
     `<b>Broken ruler:</b> a pencil starts at 3 and ends at 11. Its length is 11 - 3 = 8 cm.`,
+    `<b>Comparing lengths:</b> Tom's rope is 25 cm long and Ann's rope is 16 cm long. The difference is 25 - 16 = 9 cm, so Tom's rope is 9 cm longer.`,
     `[[cmp:25,16|Tom's rope,Ann's rope]]`
   ],
   do: `<b>Hands-on:</b> Measure 5 items at home in cm. Rank them longest to shortest. Then measure your foot with paper clips.`,
@@ -68,7 +69,7 @@
     `The <b>short hand</b> shows hours. The <b>long hand</b> shows minutes.`,
     `<b>O'clock:</b> long hand on 12. <b>Half past:</b> long hand on 6 (30 minutes). <b>Quarter past:</b> long hand on 3 (15 min). <b>Quarter to:</b> long hand on 9 (45 min).`,
     `<b>Duration:</b> School from 8:00 to 1:00 is 5 hours (8 to 12 is 4 hours, then 1 more).`,
-    `<b>Days of the week cycle every 7 days.</b> If today is Wednesday, in 7 days it is Wednesday again. In 10 days it is 3 days later: Saturday.`
+    `<b>Time also repeats in days.</b> The days of the week cycle every 7 days. If today is Wednesday, in 7 days it is Wednesday again. In 10 days it is 3 days later: Saturday.`
   ],
   do: `<b>Hands-on:</b> Use a paper plate clock. Show times your child does daily (wake up, dinner, math time).`,
   tip: `<b>Olympiad tip:</b> Days-of-week puzzles: subtract full weeks (7) and count the rest.`,

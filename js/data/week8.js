@@ -10,7 +10,7 @@
     `[[cmp:9,6|Brother,Amy]]`,
     `The gap is always 3. When Amy is 11 the brother is 14.`,
     `<b>Sum and difference:</b> Ann and Mum's ages add to 40. Mum is 28 years older. 40 - 28 = 12, half is 6. Ann = 6, Mum = 34.`,
-    `<b>In 3 years Ben will be 9.</b> So now he is 6. 4 years ago he was 2.`
+    `<b>Looking forward and back:</b> in 3 years Ben will be 9. So now he is 6. 4 years ago he was 2.`
   ],
   do: `<b>Hands-on:</b> Make a family table with ages now, in 5 years, and 10 years ago. What stays constant?`,
   tip: `<b>Olympiad tip:</b> Age problems: find "now" first. Then move forward or backward.`,
@@ -51,7 +51,7 @@
     `<b>Three colours:</b> take 4 to guarantee a pair (red, blue, green, then anything).`,
     `<b>7 days of the week:</b> with 8 children, at least two share a birthday weekday.`,
     `<b>Harder:</b> 4 red and 4 blue socks. To guarantee a <b>blue pair</b>, worst luck: 4 red first, then 2 blue. That is <b>6</b>.`,
-    `<b>Handshakes for 4 friends:</b> 3 + 2 + 1 = 6. For 6 friends: 5 + 4 + 3 + 2 + 1 = 15.`
+    `<b>Handshakes again</b> (the pairing trick from Gauss Day). For 4 friends: 3 + 2 + 1 = 6. For 6 friends: 5 + 4 + 3 + 2 + 1 = 15.`
   ],
   do: `<b>Hands-on:</b> Put 3 red and 3 blue socks in a bag. Take without looking. What's the fewest to guarantee a pair?`,
   tip: `<b>Olympiad tip:</b> "Guarantee" means worst luck. Imagine the unluckiest possible draw, then add one.`,
