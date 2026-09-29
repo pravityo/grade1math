@@ -8,6 +8,16 @@
   const LESSONS = [];
   window.CURRICULUM.forEach(w => w.lessons.forEach((l, d) => LESSONS.push(Object.assign({ n: LESSONS.length, week: w.week, day: d + 1, theme: w.theme }, l))));
   const WEEKS = window.CURRICULUM;
+  /* Questions wired to a generator (js/data/gens.js) get fresh numbers each time they are asked. */
+  function resolve(L, qi) {
+    const base = L.q[qi], name = (window.GENS || {})[L.n + ':' + qi], gen = name && window.GEN[name];
+    if (!gen) return base;
+    try {
+      const out = gen();
+      if (!out || out.a == null || /undefined|NaN|Infinity/.test(JSON.stringify(out))) return base;
+      return Object.assign({ l: base.l, gen: name }, out);
+    } catch (e) { return base; }
+  }
   const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
   /* ---------- state ---------- */
@@ -73,13 +83,13 @@
       const L = LESSONS[n - k]; if (!L) return;
       const pool = L.q.map((q, qi) => ({ q, qi })).filter(x => (i < 3 ? 'bc' : 'so').includes(x.q.l));
       const pick = pool[(n + k) % pool.length];
-      out.push({ L, qi: pick.qi, q: pick.q, ago: k });
+      out.push({ L, qi: pick.qi, q: resolve(L, pick.qi), ago: k });
     });
     return out;
   }
   function mixedQs(upTo, count) {
     const all = [];
-    LESSONS.slice(0, Math.max(upTo, 1)).forEach(L => L.q.forEach((q, qi) => all.push({ L, qi, q })));
+    LESSONS.slice(0, Math.max(upTo, 1)).forEach(L => L.q.forEach((q, qi) => all.push({ L, qi, q: resolve(L, qi) })));
     for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
     return all.slice(0, count);
   }
@@ -95,7 +105,7 @@
     box.append(h('span', { class: 'lv ' + q.l }, lv[1] + ' ' + lv[0]));
     if (opts.tag) box.append(' ', h('span', { class: 'muted small' }, opts.tag));
     box.append(h('div', { class: 'text' }, q.q));
-    const qp = (window.QPICS || {})[(item.n != null ? item.n : item.L && item.L.n) + ':' + item.qi];
+    const qp = q.gen ? q.p : (window.QPICS || {})[(item.n != null ? item.n : item.L && item.L.n) + ':' + item.qi];
     if (qp) box.append(h('div', { class: 'qpic', html: vis(qp) }));
 
     function showSol() { if (q.s) extra.append(h('div', { class: 'sol' }, '💡 ' + q.s)); }
@@ -129,7 +139,7 @@
       q.o.forEach(o => wrap.append(h('button', { onclick: e => { if (solved) return; submit(o); e.target.classList.add(solved && box.classList.contains('right') ? 'good' : 'picked'); } }, o)));
       box.append(wrap);
     } else {
-      const input = h('input', { type: 'text', inputmode: (/^-?\d/.test(String([].concat(q.a)[0])) ? 'numeric' : 'text'), autocomplete: 'off', 'aria-label': 'Your answer', placeholder: 'Answer' });
+      const input = h('input', { type: 'text', inputmode: (/^\d+$/.test(String([].concat(q.a)[0])) ? 'numeric' : 'text'), autocomplete: 'off', 'aria-label': 'Your answer', placeholder: 'Answer' });
       input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(input.value); });
       box.append(h('div', { class: 'ans' }, input, q.u ? h('span', { class: 'muted' }, q.u) : '', h('button', { class: 'btn chk', onclick: () => submit(input.value) }, 'Check')));
     }
@@ -204,6 +214,7 @@
     let cur = S.pos && S.pos.n === n ? Math.min(S.pos.step | 0, steps.length - 1) : 0; const seen = new Set();
     const wrap = h('div');
     const right = S.right[n] = S.right[n] || {};
+    const Q = L.q.map((_, qi) => resolve(L, qi)); // fixed for this visit so numbers do not change between steps
     const counts = () => Object.keys(right).length;
     function draw() {
       wrap.replaceChildren();
@@ -231,7 +242,7 @@
         body.append(h('div', { class: 'key' }, '🔑 Remember: ' + L.key), h('div', { class: 'callout do', html: L.do }), h('div', { class: 'callout oly', html: L.tip }),
           h('div', { class: 'callout small', html: '<b>Parent note:</b> ' + L.parent }));
       } else if (kind === 'prac' || kind === 'chal') {
-        const set = L.q.map((q, qi) => ({ q, qi })).filter(x => (kind === 'prac' ? 'bc' : 'so').includes(x.q.l));
+        const set = Q.map((q, qi) => ({ q, qi })).filter(x => (kind === 'prac' ? 'bc' : 'so').includes(x.q.l));
         body.append(h('h2', {}, kind === 'prac' ? '✏️ Practice' : '🚀 Challenge time'),
           h('p', { class: 'muted' }, kind === 'prac' ? 'Draw a picture if you get stuck.' : 'These are harder. Think, draw, try. Use hints if you need them.'));
         set.forEach(x => {
@@ -307,7 +318,7 @@
     const L = LESSONS[n]; if (!L) return go('#/parent');
     app(h('div', {}, h('a', { href: '#/parent' }, '◀ Parent corner'), h('h1', {}, `Answer key: ${L.t}`),
       h('section', { class: 'card', html: '<p><b>Olympiad tip:</b> ' + L.tip.replace(/^<b>Olympiad tip:<\/b>\s*/, '') + '</p>' }),
-      h('section', { class: 'card' }, L.q.map((q, i) => h('div', { style: 'margin:10px 0' }, h('b', {}, `${i + 1}. ${LV[q.l][1]} `), q.q, h('div', {}, h('b', {}, 'Answer: '), answerText(q)), q.s ? h('div', { class: 'muted small' }, q.s) : '')))));
+      h('section', { class: 'card' }, h('p', { class: 'muted small' }, 'Questions marked "random" get new numbers every time. The answer and working are shown to your child after they answer; below is one example.'), L.q.map((_, i) => { const q = resolve(L, i); return h('div', { style: 'margin:14px 0' }, h('b', {}, `${i + 1}. ${LV[q.l][1]} `), q.gen ? h('span', { class: 'pill dark' }, 'random') : '', ' ', q.q, h('div', {}, h('b', {}, 'Answer: '), answerText(q)), q.s ? h('div', { class: 'muted small' }, q.s) : ''); }))));
   }
 
   /* ---------- router ---------- */

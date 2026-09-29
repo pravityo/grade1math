@@ -119,7 +119,7 @@
     const n = +arg, g = Math.floor(n / 5), r = n % 5; let s = '';
     const grp = (x, k, slash) => { for (let i = 0; i < k; i++) s += `<line class="s-line" x1="${x + i * 11}" y1="10" x2="${x + i * 11}" y2="60" stroke-width="4" stroke-linecap="round"/>`; if (slash) s += `<line class="s-line" x1="${x - 6}" y1="52" x2="${x + 50}" y2="18" stroke-width="4" stroke-linecap="round"/>`; };
     rng(g).forEach(i => grp(14 + i * 70, 4, true)); if (r) grp(14 + g * 70, r, false);
-    return fig(svg(`0 0 ${Math.max(1, g + (r ? 1 : 0)) * 70 + 10} 70`, s, `${n} tally marks`), '', `${n} in tally marks`);
+    return fig(svg(`0 0 ${Math.max(1, g + (r ? 1 : 0)) * 70 + 10} 70`, s, `${n} tally marks`));
   };
 
   /* ruler with pencil: ruler:3,11 */

@@ -38,3 +38,10 @@ Visual tokens in `learn`: `[[bond:10|3,7]]`, `[[bar:6,?|10]]`, `[[cmp:8,3|Amy,Be
 
 GitHub Pages via `.github/workflows/pages.yml` (repo Settings > Pages > Source: GitHub Actions).
 Live at https://pravityo.github.io/grade1math/ . On iPad/iPhone Safari use Share > Add to Home Screen so progress is not evicted.
+
+## Randomised questions
+
+Most warm-up, core and stretch questions are generated with fresh numbers every time a lesson is opened
+(`js/gen.js`, wired up in `js/data/gens.js` as `"lesson:question" -> generator`). The static question in
+`weekN.js` stays as the fallback and defines the level. Run `node tests/gen.test.js` to check every generator
+1,500 times against independent calculations.
