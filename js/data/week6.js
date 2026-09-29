@@ -77,11 +77,11 @@
   tip: `<b>Olympiad tip:</b> "Twice as many" means two equal bars. Draw it to avoid mistakes.`,
   parent: `Do a family survey (favourite fruit) and make a graph together.`,
   q: [
-    { l:`b`, q:`Graph: apples 5, bananas 3, grapes 7. How many fruits in total?`, a:`15` },
-    { l:`b`, q:`In the same graph, which fruit is the most?`, o:[`apples`,`bananas`,`grapes`], a:`grapes` },
-    { l:`c`, q:`How many more grapes than bananas?`, a:`4` },
+    { l:`b`, q:`A picture graph shows apples 5, bananas 3 and grapes 7. How many fruits are there in total?`, a:`15` },
+    { l:`b`, q:`A picture graph shows apples 5, bananas 3 and grapes 7. Which fruit is the most?`, o:[`apples`,`bananas`,`grapes`], a:`grapes` },
+    { l:`c`, q:`A picture graph shows apples 5, bananas 3 and grapes 7. How many more grapes than bananas?`, a:`4` },
     { l:`c`, q:`A tally shows one group of five (|||| with a slash) and then |||. What number is that?`, a:`8` },
-    { l:`s`, q:`If 4 more bananas are added to the graph, how many bananas now?`, a:`7` },
+    { l:`s`, q:`A picture graph shows apples 5, bananas 3 and grapes 7. If 4 more bananas are added, how many bananas are there now?`, a:`7` },
     { l:`o`, q:`There are 6 dogs. There are twice as many cats as dogs. There are 3 fewer birds than cats. How many pets altogether?`, a:`27`, h:`Cats first, then birds.`, s:`Cats 12, birds 9. 6 + 12 + 9 = 27.` }
   ]},
 { t: `Sorting & Venn Diagrams`, sk: `Logic sets`,
@@ -101,7 +101,7 @@
     { l:`b`, q:`Which one doesn't belong? 3, 5, 7, 8`, a:`8` },
     { l:`b`, q:`How many even numbers are in this list? 3, 4, 8, 11, 12`, a:`3` },
     { l:`c`, q:`5 children like cats, 4 like dogs, and 2 like both. How many children like at least one of them?`, a:`7` },
-    { l:`c`, q:`In the same class, how many children like ONLY cats?`, a:`3` },
+    { l:`c`, q:`In a class, 5 children like cats, 4 like dogs, and 2 like both cats and dogs. How many children like ONLY cats?`, a:`3` },
     { l:`s`, q:`In a group of 10, 6 wear glasses, 7 wear a watch. Everyone wears at least one. How many wear both?`, a:`3`, s:`6 + 7 = 13, that is 3 more than 10, so 3 wear both.` },
     { l:`o`, q:`20 children: 12 can swim, 15 can cycle, and everyone can do at least one. How many can do both?`, a:`7` }
   ]}

@@ -42,5 +42,5 @@ window.PICS = {
 window.QPICS = {
   '6:4': '[[hundred:3]]', '18:0': '[[groups:3,4,🍪]]', '21:4': '[[dice:2]]',
   '22:5': '[[ruler:3,11]]', '23:0': '[[clock:4,30]]', '24:0': '[[coins:20,10,5]]', '26:3': '[[pie:3,4]]',
-  '28:0': '[[graph:apples 5,bananas 3,grapes 7]]', '30:5': '[[handshake:5]]', '34:2': '[[magic:4,?,8]]'
+  '28:0': '[[graph:apples 5,bananas 3,grapes 7]]', '28:1': '[[graph:apples 5,bananas 3,grapes 7]]', '28:2': '[[graph:apples 5,bananas 3,grapes 7]]', '28:4': '[[graph:apples 5,bananas 3,grapes 7]]', '30:5': '[[handshake:5]]', '34:2': '[[magic:4,?,8]]'
 };
