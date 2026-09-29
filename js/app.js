@@ -168,12 +168,15 @@
   /* ---------- views ---------- */
   function setNav(name) { document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === name)); }
   const pillOf = L => `${SUBJ[L.subj].icon} ${SUBJ[L.subj].name} · Week ${L.week} · ${DAYS[L.day - 1]} · ${L.theme}`;
+  let pick = null; // Set of lesson ids while choosing lessons to mark as known on the map
   function tile(L) {
-    const done = S.done[L.id], nx = nextIdx(SUBJ[L.subj]) === L.n;
-    return h('a', { class: 'tile ' + (done ? 'done ' : '') + (nx ? 'next' : ''), href: '#/lesson/' + L.id },
-      h('small', {}, `Week ${L.week} · ${DAYS[L.day - 1]}`), h('b', {}, (done ? '✅ ' : nx ? '▶ ' : '') + L.t),
+    const done = S.done[L.id], nx = nextIdx(SUBJ[L.subj]) === L.n, choosing = pick && !done;
+    const a = h('a', { class: 'tile ' + (done ? 'done ' : '') + (nx ? 'next ' : '') + (choosing ? 'pickable ' : '') + (choosing && pick.has(L.id) ? 'picked' : ''), href: '#/lesson/' + L.id },
+      h('small', {}, `Week ${L.week} · ${DAYS[L.day - 1]}`), h('b', {}, (done ? '✅ ' : nx && !pick ? '▶ ' : '') + L.t),
       done ? h('small', {}, scoreText(done)) : '',
       done && done.when ? h('span', { class: 'stamp' }, '✔ ' + doneLine(done)) : '');
+    if (choosing) a.addEventListener('click', e => { e.preventDefault(); if (pick.has(L.id)) pick.delete(L.id); else pick.add(L.id); route(); });
+    return a;
   }
   function subjTabs(base, cur, withAll) {
     return h('div', { class: 'subj-tabs' }, (withAll ? [{ key: 'all', icon: '🌟', name: 'All' }] : []).concat(SUBJECTS).map(sb => h('a', { class: sb.key === cur ? 'on ' + sb.key : sb.key, href: '#/' + base + '/' + sb.key }, `${sb.icon} ${sb.name}`)));
@@ -186,56 +189,72 @@
     else if (plan === 'rotate') main = ['math', [1, 3, 5].includes(dow) ? 'eng' : 'sci'];
     return { weekend, main: weekend ? [] : main, optional: SUBJECTS.map(x => x.key).filter(k => weekend || !main.includes(k)) };
   }
+  /* ---- home: friendly owl, big adventure cards, sticker book ---- */
+  const OWL = `<svg class="owl" viewBox="0 0 120 132" role="img" aria-label="A friendly owl waving hello">
+    <path d="M20 46 L28 12 L52 34 Z M100 46 L92 12 L68 34 Z" fill="#8a5730"/>
+    <ellipse cx="60" cy="82" rx="42" ry="44" fill="#a86a3c"/><ellipse cx="60" cy="92" rx="26" ry="29" fill="#f6dcae"/>
+    <circle cx="60" cy="52" r="37" fill="#b9793f"/>
+    <circle cx="44" cy="52" r="16" fill="#fff"/><circle cx="76" cy="52" r="16" fill="#fff"/>
+    <circle class="pupil" cx="46" cy="54" r="7" fill="#2b2a4c"/><circle class="pupil" cx="74" cy="54" r="7" fill="#2b2a4c"/>
+    <circle cx="48.5" cy="51" r="2.4" fill="#fff"/><circle cx="76.5" cy="51" r="2.4" fill="#fff"/>
+    <path d="M53 64 L60 77 L67 64 Z" fill="#f5a623"/>
+    <path d="M14 88 Q4 104 22 112 Q22 96 30 86 Z" fill="#8a5730"/>
+    <g class="wave"><path d="M106 88 Q118 72 112 58 Q104 66 98 84 Z" fill="#8a5730"/></g>
+    <ellipse cx="46" cy="124" rx="10" ry="5" fill="#f5a623"/><ellipse cx="74" cy="124" rx="10" ry="5" fill="#f5a623"/></svg>`;
+  const ICONS = {
+    math: `<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="18" y="6" width="26" height="26" rx="6" fill="#7fe0c2" stroke="#fff" stroke-width="3"/><rect x="4" y="34" width="26" height="26" rx="6" fill="#ffd84d" stroke="#fff" stroke-width="3"/><rect x="34" y="34" width="26" height="26" rx="6" fill="#ff7a90" stroke="#fff" stroke-width="3"/><g font-family="ui-rounded,system-ui" font-weight="800" font-size="20" fill="#fff" text-anchor="middle"><text x="31" y="27">3</text><text x="17" y="55">1</text><text x="47" y="55">2</text></g></svg>`,
+    eng: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 14 Q32 4 32 14 V56 Q32 46 6 56 Z" fill="#fff"/><path d="M58 14 Q32 4 32 14 V56 Q32 46 58 56 Z" fill="#ffe6a3"/><path d="M32 14 V56" stroke="#0f9d8a" stroke-width="3"/><text x="19" y="42" font-family="ui-rounded,system-ui" font-weight="800" font-size="22" fill="#0f9d8a" text-anchor="middle">A</text><text x="45" y="42" font-family="ui-rounded,system-ui" font-weight="800" font-size="22" fill="#e0862b" text-anchor="middle">b</text></svg>`,
+    sci: `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M25 6 h14 v18 l15 27 q4 9 -6 9 h-32 q-10 0 -6 -9 l15 -27 z" fill="#fff" fill-opacity=".92"/><path d="M17 44 h30 l7 12 q1 3 -3 3 h-38 q-4 0 -3 -3 z" fill="#7fe0c2"/><circle cx="28" cy="38" r="3" fill="#fff"/><circle cx="37" cy="30" r="2.4" fill="#fff"/><circle cx="34" cy="46" r="2" fill="#fff"/></svg>`
+  };
+  const greeting = () => { const hr = new Date().getHours(); return hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'; };
   function subjCard(sb, primary) {
-    const n = nextIdx(sb), L = sb.lessons[n];
-    if (!L) return h('section', { class: 'card hero ' + sb.key }, h('h2', {}, `${sb.icon} ${sb.name}`), h('p', {}, `🎓 All ${sb.lessons.length} lessons done!`), h('a', { class: 'btn light', href: '#/map/' + sb.key }, 'See the map'));
+    const n = nextIdx(sb), L = sb.lessons[n], icon = h('div', { class: 'sc-icon', html: ICONS[sb.key] });
+    if (!L) return h('section', { class: 'sc ' + sb.key }, icon, h('div', { class: 'sc-body' }, h('h2', {}, sb.name), h('p', {}, 'You finished every lesson!')), h('a', { class: 'go', href: '#/map/' + sb.key }, 'Map'));
     const cont = S.pos && S.pos.id === L.id && S.pos.step > 0;
-    return h('section', { class: 'card hero ' + sb.key + (primary ? '' : ' optional') },
-      h('span', { class: 'pill' }, `${sb.icon} ${sb.name} · Week ${L.week} · ${DAYS[L.day - 1]}${primary ? '' : ' · optional'}`),
-      h('h2', {}, L.t), h('p', {}, L.goal),
-      h('a', { class: 'btn light', href: '#/lesson/' + L.id }, cont ? '▶ Continue where you stopped' : primary ? '▶ Start today\'s lesson' : '▶ Start this lesson'));
+    const card = h('section', { class: 'sc ' + sb.key + (primary ? '' : ' extra') }, icon,
+      h('div', { class: 'sc-body' }, h('span', { class: 'sc-tag' }, sb.name + (primary ? '' : ' · extra')), h('h2', {}, L.t),
+        h('div', { class: 'meter light' }, h('i', { style: `width:${doneCount(sb) / sb.lessons.length * 100}%` })), h('small', {}, `Lesson ${n + 1} of ${sb.lessons.length}`)),
+      h('a', { class: 'go', href: '#/lesson/' + L.id }, cont ? 'Keep going' : 'Go!'));
+    const skip = h('button', { class: 'linkbtn', onclick: () => { if (confirm(`Mark "${L.t}" as already known? It will count as done without any questions. You can undo this.`)) { markKnown(L); const nx = sb.lessons.find(l => !S.done[l.id]); S.pos = nx ? { id: nx.id, step: 0 } : null; save(); route(); } } }, 'I already know this one');
+    return h('div', { class: 'sc-wrap' }, card, skip);
   }
 
   function viewHome() {
     setNav('home');
     const frag = h('div'), plan = todayPlan();
-    frag.append(h('h1', {}, (S.name ? `Hi ${S.name}! ` : 'Hi there! ') + (plan.weekend ? '🌴 Weekend' : '📅 Today\'s plan')));
-    if (plan.weekend) frag.append(h('p', { class: 'muted' }, 'Rest is good. If you feel like it, pick anything below or do a Look Back.'));
-    else frag.append(h('p', { class: 'muted' }, 'About 25 minutes each. Do the first card, then the second if there is time.'));
+    frag.append(h('section', { class: 'hello' }, h('div', { class: 'owl-wrap', html: OWL }),
+      h('div', { class: 'bubble' }, h('h1', {}, `${greeting()}, ${S.name || 'friend'}!`),
+        h('p', {}, plan.weekend ? 'It is the weekend. Pick anything you like!' : 'Your adventures for today are waiting.'))));
+    frag.append(h('h2', { class: 'sect' }, plan.weekend ? 'Pick an adventure' : 'Today\'s adventures'));
     plan.main.forEach(k => frag.append(subjCard(SUBJ[k], true)));
     if (plan.optional.length) {
-      frag.append(h('h2', { style: 'margin-top:36px' }, plan.main.length ? 'Extra, if you want more' : 'Pick a subject'));
+      frag.append(h('h2', { class: 'sect' }, plan.main.length ? 'Want more?' : 'All adventures'));
       plan.optional.forEach(k => frag.append(subjCard(SUBJ[k], false)));
     }
-    frag.append(h('div', { class: 'stats' },
-      h('div', { class: 'stat' }, h('b', {}, `${doneCount()}/${ALL.length}`), 'lessons done'),
-      h('div', { class: 'stat' }, h('b', {}, '⭐ ' + starCount()), 'stars earned'),
-      h('div', { class: 'stat' }, h('b', {}, '🔥 ' + streak()), 'day streak')));
-    frag.append(h('div', { class: 'subj-progress' }, SUBJECTS.map(sb => h('div', {}, h('span', {}, `${sb.icon} ${sb.name}`), h('div', { class: 'meter' }, h('i', { class: sb.key, style: `width:${doneCount(sb) / sb.lessons.length * 100}%` })), h('small', { class: 'muted' }, `${doneCount(sb)}/${sb.lessons.length}`)))));
-    // look back: one or two reminders from each subject being studied today
-    const rc = h('section', { class: 'card' }, h('h2', {}, '🔁 Look Back'));
-    const picks = [];
-    (plan.main.length ? plan.main : SUBJECTS.map(x => x.key)).forEach(k => { const sb = SUBJ[k], L = sb.lessons[Math.min(nextIdx(sb), sb.lessons.length - 1)]; if (doneCount(sb)) picks.push(...lookBackQs(L).slice(0, 2)); });
-    if (!picks.length) rc.append(h('p', { class: 'muted' }, 'After your first lesson, old topics will show up here so they stay fresh.'));
-    else {
-      rc.append(h('p', { class: 'muted' }, 'Quick reminders from earlier lessons:'));
-      picks.forEach(x => rc.append(h('div', { class: 'recap' }, h('span', {}, `📌 ${SUBJ[x.L.subj].icon} ${x.L.t}: ${x.L.key}`), h('a', { class: 'btn alt small', href: '#/lesson/' + x.L.id }, 'Open'))));
-      rc.append(h('p', {}, h('a', { class: 'btn', href: '#/review' }, 'Try a mixed review quiz')));
-    }
-    frag.append(rc);
-    const recent = ALL.filter(l => S.done[l.id]).sort((a, b) => (S.done[b.id].when || '').localeCompare(S.done[a.id].when || '') || b.n - a.n).slice(0, 6);
-    if (recent.length) frag.append(h('section', { class: 'card' }, h('h2', {}, '✅ Completed lessons'),
-      h('ul', { class: 'recent', style: 'list-style:none;padding:0' }, recent.map(l => h('li', {}, h('a', { href: '#/lesson/' + l.id }, `${SUBJ[l.subj].icon} ${l.t}`), h('span', { class: 'muted' }, `${S.done[l.id].when ? fmtDate(S.done[l.id].when) + ' · ' : ''}${scoreText(S.done[l.id])}`))))));
-    frag.append(h('section', { class: 'card' }, h('h2', {}, '🕰️ Evening routine (about 25 minutes per subject)'),
-      h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
-        h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong is fine. Thinking is the point!'))));
+    frag.append(h('div', { class: 'chips' },
+      h('div', { class: 'chip' }, h('b', {}, starCount()), 'stars'),
+      h('div', { class: 'chip' }, h('b', {}, streak()), streak() === 1 ? 'day in a row' : 'days in a row'),
+      h('div', { class: 'chip' }, h('b', {}, `${doneCount()}/${ALL.length}`), 'lessons done')));
+    frag.append(h('a', { class: 'quick', href: '#/review' }, h('span', { class: 'quick-die', html: '🎲' }), h('span', {}, h('b', {}, 'Quick game'), h('br'), 'Questions from lessons you have done')));
+    const book = h('section', { class: 'book' }, h('h2', { class: 'sect' }, 'My sticker book'));
+    SUBJECTS.forEach(sb => {
+      const nx = nextIdx(sb);
+      book.append(h('div', { class: 'book-row' }, h('div', { class: 'book-label' }, h('b', {}, sb.name), h('small', {}, `${doneCount(sb)} of ${sb.lessons.length}`)),
+        h('div', { class: 'stickers' }, sb.lessons.map(L => { const r = S.done[L.id]; return h('a', { class: `stk ${sb.key} ${r ? (r.skipped ? 'known' : 'got') : ''} ${L.n === nx ? 'next' : ''}`, href: '#/lesson/' + L.id, title: L.t, 'aria-label': L.t + (r ? ' (done)' : '') }, r ? (r.skipped ? '✓' : '★') : ''); }))));
+    });
+    frag.append(book);
     app(frag);
   }
 
   function viewMap(key) {
     setNav('map');
     const sb = SUBJ[key] || SUBJECTS[0];
-    const frag = h('div', {}, h('h1', {}, '🗺️ Learning Map'), subjTabs('map', sb.key), h('p', { class: 'muted' }, `${sb.blurb} 8 weeks, 5 lessons a week. Tap any lesson to open it.`));
+    if (pick && pick.subj !== sb.key) pick = null;
+    const frag = h('div', {}, h('h1', {}, 'Adventure Map'), subjTabs('map', sb.key), h('p', { class: 'muted' }, `${sb.blurb} 8 weeks, 5 lessons a week. Tap any lesson to open it.`));
+    if (!pick) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Already learned some of these before?'), h('button', { class: 'btn', onclick: () => { pick = new Set(); pick.subj = sb.key; route(); } }, 'Choose the ones I know')));
+    else frag.append(h('div', { class: 'pickbar' }, h('b', {}, pick.size ? `${pick.size} chosen` : 'Tap the lessons you already know'),
+      h('button', Object.assign({ class: 'btn', onclick: () => { if (!pick.size) return; if (confirm(`Mark ${pick.size} lesson${pick.size > 1 ? 's' : ''} as already known? They will count as done without any questions. You can undo this.`)) { [...pick].forEach(id => markKnown(BYID[id])); pick = null; save(); route(); } } }, pick.size ? {} : { disabled: 'disabled' }), 'Mark as known'),
+      h('button', { class: 'btn alt', onclick: () => { pick = null; route(); } }, 'Cancel')));
     sb.weeks.forEach(w => {
       const wl = sb.lessons.filter(l => l.week === w.week), wd = wl.filter(l => S.done[l.id]);
       const last = wd.map(l => S.done[l.id].when).sort().pop();
@@ -285,7 +304,7 @@
         wrap.append(h('div', { class: 'badge-done' }, `✅ ${doneLine(S.done[id])}${S.done[id].skipped ? '' : ' · ' + scoreText(S.done[id])}`));
         if (S.done[id].skipped) wrap.append(' ', h('button', { class: 'btn alt small', onclick: () => { unmarkKnown(L); save(); draw(); } }, 'Undo'), h('p', { class: 'muted small' }, 'You can still work through this lesson and finish it to record real results.'));
       } else {
-        wrap.append(h('div', { class: 'known-row' }, h('button', { class: 'btn alt small', onclick: () => { if (confirm('Mark this lesson as already known? It will count as done without any questions. You can undo this.')) { markKnown(L); S.pos = { id: (sb.lessons[L.n + 1] || L).id, step: 0 }; save(); go('#/map/' + L.subj); } } }, '✔ Already learned this elsewhere')));
+        wrap.append(h('div', { class: 'known-card' }, h('span', {}, 'Learned this before, somewhere else?'), h('button', { class: 'btn', onclick: () => { if (confirm('Mark this lesson as already known? It will count as done without any questions. You can undo this.')) { markKnown(L); S.pos = { id: (sb.lessons[L.n + 1] || L).id, step: 0 }; save(); go('#/map/' + L.subj); } } }, '✔ I already know this')));
       }
       wrap.append(h('div', { class: 'steps' }, steps.map((st, i) => h('button', { class: (i === cur ? 'on ' : '') + (seen.has(i) && i !== cur ? 'done' : ''), onclick: () => { cur = i; draw(); window.scrollTo(0, 0); } }, st[0]))));
       seen.add(cur); S.pos = { id, step: cur }; save();
@@ -421,6 +440,9 @@
         h('li', {}, h('b', {}, 'Rhythm: '), 'About 25 minutes per subject. Progress is lesson-based, so missed days do not skip content.'),
         h('li', {}, h('b', {}, 'Coach tips: '), 'Ask "How do you know?", let them draw, praise effort, and read questions aloud together for English and Science.'),
         h('li', {}, h('b', {}, 'Levels: '), '🌱 Warm-up, ⭐ Core, 🚀 Stretch, 🏆 Olympiad.'))));
+    frag.append(h('section', { class: 'card' }, h('h2', {}, 'A good evening (about 25 minutes per subject)'),
+      h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
+        h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong answers are fine, thinking is the point.'))));
     frag.append(passwordCard());
     const skipSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
     const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Weeks 1 to ${n}`)));
