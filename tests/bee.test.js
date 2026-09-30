@@ -38,8 +38,9 @@ eq('new words per day is capped', [B0.newPerDay(360, 30), B0.newPerDay(360, 30, 
 /* ---- a daily session ---- */
 const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
 let S1 = B0.buildSession(bee, list, '2026-09-30', { rnd });
-eq('day one: 6 new words (the daily maximum)', [S1.order.length, S1.fresh.length, S1.review.length], [6, 6, 0]);
-eq('new words come from the start of the list', S1.fresh.map(x => x.w).slice(0, 3), ['cat', 'hat', 'mat']);
+eq('day one: a full 10-word drill', [S1.order.length, S1.fresh.length, S1.review.length], [10, 10, 0]);
+eq('new words mix levels', [1, 2, 3].map(t => S1.fresh.filter(x => x.tier === t).length), [5, 4, 1]);
+eq('new words mix spelling groups', new Set(S1.fresh.map(x => x.gid)).size >= 4, true);
 S1.order.forEach(x => B0.record(bee, x.w, 'first', '2026-09-30'));
 let S2 = B0.buildSession(bee, list, '2026-10-01', { rnd });
 eq('day two has 10 words and no repeats', [S2.order.length, new Set(S2.order.map(x => x.w)).size], [10, 10]);
@@ -57,6 +58,19 @@ eq('last week session is small when few words are known', S5.order.length, 6);
 const top = B0.blank(); B0.record(top, 'cat', 'first', '2026-10-01'); const S6 = B0.buildSession(Object.assign(top, { date: '2026-12-01', start: '2026-10-01' }), list, '2026-10-01', { rnd, size: 4 });
 eq('small size respected', S6.order.length, 4);
 
+eq('optional extension has five words', B0.buildSession(B0.blank(), list, '2026-09-30', { size: 5, newMax: 5 }).order.length, 5);
+eq('existing defaults upgrade to ten', [B0.norm({ size: 10, newMax: 6 }).size, B0.norm({ size: 10, newMax: 6 }).newMax], [10, 10]);
+eq('parent choices after upgrade remain', B0.norm({ drillVersion: 2, size: 12, newMax: 4 }).newMax, 4);
+/* ---- new word selection ---- */
+const seeded = seed => () => ((seed = seed * 16807 % 2147483647) / 2147483647);
+const mixA = B0.mixedNewWords(list, 6, seeded(42)), mixB = B0.mixedNewWords(list, 6, seeded(99));
+eq('selection changes with the random seed', mixA.map(x => x.w).join() !== mixB.map(x => x.w).join(), true);
+eq('selection is reproducible for testing', mixA.map(x => x.w), B0.mixedNewWords(list, 6, seeded(42)).map(x => x.w));
+eq('selection never duplicates words', new Set(mixA.map(x => x.w)).size, mixA.length);
+eq('selection does not mutate the source', list[0].w, 'cat');
+[1, 2, 3].forEach(t => { const chosen = B0.mixedNewWords(list.filter(x => x.tier === t), 6, seeded(t)); eq('single tier remains usable ' + t, [chosen.length, chosen.every(x => x.tier === t)], [6, true]); });
+eq('small pool gracefully exhausted', B0.mixedNewWords(list.slice(0, 2), 6, seeded(1)).length, 2);
+eq('empty pool', B0.mixedNewWords([], 6).length, 0);
 /* ---- mock bee ---- */
 const mock = B0.mockWords(B0.blank(), list, rnd); eq('mock bee has 12 words in 3 rounds', [mock.length, mock.slice(0, 4).every(x => x.tier === 1), mock.slice(4, 8).every(x => x.tier === 2), mock.slice(8).every(x => x.tier === 3)], [12, true, true, true]);
 eq('hard words are the ones missed', B0.hardWords(bee, list).map(x => x.w).includes('fan'), true);

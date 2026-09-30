@@ -2,7 +2,7 @@
 { week: 1, theme: `Number Bonds & Making 10`,
   blurb: `The single most important skill in Singapore maths: seeing every number as two parts.`,
   lessons: [
-{ t: `Number Bonds to 10`, sk: `Number bonds: two parts make a whole`,
+{ t: `Make 10`, sk: `Number bonds: two parts make a whole`,
   goal: `See 10 as two parts in every way you can, and do it quickly.`,
   key: `Two parts make a whole. 10 = 1+9 = 2+8 = 3+7 = 4+6 = 5+5.`,
   learn: [

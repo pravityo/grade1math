@@ -539,3 +539,12 @@ input,select,textarea{font:inherit;color:var(--ink);background:var(--card);max-w
  .parent-section a:not(.btn){color:var(--link)}
  .tile.done .stamp,.badge-done{color:var(--ok)}
 }
+
+/* Keep the adventure scenery on menus and the learning space quiet. */
+body.learning{background-image:none}body.learning::after{display:none}
+.bee-garden{font-weight:800;margin:0 0 16px;padding:12px 16px;border-left:5px solid #d49a16;border-radius:12px;background:var(--card)}
+.bee-garden span{font-weight:400;font-size:.9rem}
+.bee-daily{border-top:3px solid #d49a16;background-image:linear-gradient(30deg,transparent 46%,color-mix(in srgb,#d49a16 10%,transparent) 47%,color-mix(in srgb,#d49a16 10%,transparent) 53%,transparent 54%);background-size:32px 28px;padding:16px;border-radius:12px}
+.bee-rewards{margin-top:16px;text-align:left}.bee-rewards summary{min-height:48px;cursor:pointer;font-weight:700}.bee-rewards p{margin:8px 0}
+
+@media(max-width:560px){.bee .drillbtn{gap:10px;padding:16px 12px}.bee .db-mon,.bee .db-mon .mon{width:64px}.bee .db-mon{flex-basis:64px}.bee .db-go{padding:10px 14px}.bee .db-body{font-size:1rem}}

@@ -57,7 +57,7 @@
   function mergeBee(a, b) {
     if (!a) return clone(b); if (!b) return clone(a);
     const o = {}, useA = num(a.setAt) >= num(b.setAt), p = useA ? a : b, q = useA ? b : a;
-    ['date', 'mode', 'size', 'newMax', 'sound'].forEach(k => { o[k] = p[k] != null ? p[k] : q[k]; });
+    ['date', 'mode', 'size', 'newMax', 'sound', 'drillVersion'].forEach(k => { o[k] = p[k] != null ? p[k] : q[k]; });
     o.setAt = Math.max(num(a.setAt), num(b.setAt));
     o.start = [a.start, b.start].filter(Boolean).sort()[0] || null;
     ['xp', 'drills', 'perfect', 'mockBest', 'maxCombo'].forEach(k => { o[k] = Math.max(num(a[k]), num(b[k])); });

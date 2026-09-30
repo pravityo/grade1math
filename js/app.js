@@ -2,18 +2,18 @@
   'use strict';
   const $app = document.getElementById('app');
   const KEY = 'grade1math.v1';
-  const LV = { b: ['Squire', '🛡️'], c: ['Knight', '⚔️'], s: ['Champion', '🏅'], o: ['Dragon slayer', '🐉'] };
+  const LV = { b: ['Warm-up', '🌱'], c: ['Practice', '✏️'], s: ['Challenge', '⭐'], o: ['Dragon challenge', '🐉'] };
   /* Every lesson has a monster to tame (js/monsters.js); the last lesson of each week is a Big Boss. */
   const monsterFor = L => Monsters.forLesson(L);
   document.body.insertAdjacentHTML('afterbegin', Monsters.sprite());
   const monPic = (L, cls, shadow) => { const m = monsterFor(L); return Monsters.use(m.i, m.boss, (cls || '') + (shadow ? ' shadow' : '')); };
   /* Words for the grown-up-written labels in lesson data, in the knight story. */
-  const themeText = html => String(html).replace('<b>Olympiad tip:</b>', '<b>🐉 Dragon-slayer tip:</b>').replace('<b>Scientist tip:</b>', '<b>🧙 Wizard\'s tip:</b>').replace('<b>Hands-on:</b>', '<b>🛡️ Squire\'s task:</b>');
+  const themeText = html => String(html).replace('<b>Olympiad tip:</b>', '<b>🐉 Challenge hint:</b>').replace('<b>Scientist tip:</b>', '<b>🔬 Science hint:</b>').replace('<b>Hands-on:</b>', '<b>👐 Try it:</b>');
 
   const SUBJECTS = [
-    { key: 'math', name: 'Maths', realm: 'Number Keep', icon: '🧮', prefix: '', weeks: window.CURRICULUM || [], blurb: 'The Number Keep is full of number monsters. Solve their puzzles to tame them.' },
-    { key: 'eng', name: 'English', realm: 'Story Forest', icon: '📚', prefix: 'e', weeks: window.ENGLISH || [], blurb: 'The Story Forest hides word monsters. Read, spell and write to tame them.' },
-    { key: 'sci', name: 'Science', realm: 'Dragon Lab', icon: '🔬', prefix: 's', weeks: window.SCIENCE || [], blurb: 'The Dragon Lab bubbles with science monsters. Ask questions and test ideas to tame them.' }
+    { key: 'math', name: 'Maths', realm: 'Number Keep', icon: '🧮', prefix: '', weeks: window.CURRICULUM || [], blurb: 'The Number Keep is full of number monsters. Solve puzzles and make monster friends.' },
+    { key: 'eng', name: 'English', realm: 'Story Forest', icon: '📚', prefix: 'e', weeks: window.ENGLISH || [], blurb: 'The Story Forest hides word monsters. Read, spell and make monster friends.' },
+    { key: 'sci', name: 'Science', realm: 'Dragon Lab', icon: '🔬', prefix: 's', weeks: window.SCIENCE || [], blurb: 'The Dragon Lab bubbles with science monsters. Ask questions and try things with monster friends.' }
   ];
   const SUBJ = {}; const BYID = {};
   SUBJECTS.forEach(sb => {
@@ -158,7 +158,7 @@
     function win() {
       solved = true; box.classList.remove('wrong'); box.classList.add('right');
       track(tries === 0);
-      fb.className = 'fb ok'; fb.textContent = ['Huzzah! ', 'Well fought! ', 'Correct! ', 'Brilliant, brave knight! '][(item.qi + tries) % 4] + '✅';
+      fb.className = 'fb ok'; fb.textContent = ['You got it! ', 'Nice work! ', 'Correct! ', 'Great thinking! '][(item.qi + tries) % 4] + '✅';
       extra.replaceChildren(); showSol();
       if (opts.onRight) opts.onRight();
       box.querySelectorAll('input,button.chk').forEach(x => x.disabled = true);
@@ -249,7 +249,7 @@
     const cont = S.pos && S.pos.id === L.id && S.pos.step > 0;
     const card = h('section', { class: 'sc ' + sb.key + (primary ? '' : ' extra') }, icon,
       h('div', { class: 'sc-body' }, h('span', { class: 'sc-tag' }, sb.name + ' · ' + sb.realm + (primary ? '' : ' · extra')), h('h2', {}, L.t),
-        h('div', { class: 'meter light' }, h('i', { style: `width:${doneCount(sb) / sb.lessons.length * 100}%` })), h('small', {}, `Guarded by ${monsterFor(L).name} · quest ${n + 1} of ${sb.lessons.length}`)),
+        h('div', { class: 'meter light' }, h('i', { style: `width:${doneCount(sb) / sb.lessons.length * 100}%` })), h('small', {}, `Meet ${monsterFor(L).name} · Quest ${n + 1}`)),
       h('a', { class: 'go', href: '#/lesson/' + L.id }, cont ? 'Keep going' : 'Start!'));
     const skip = h('button', { class: 'linkbtn', onclick: () => { if (confirm(`Mark "${L.t}" as already known? It will count as done without any questions. You can undo this.`)) { markKnown(L); const nx = sb.lessons.find(l => !S.done[l.id]); S.pos = nx ? { id: nx.id, step: 0 } : null; save(); route(); } } }, 'I already know this one');
     const check = doneCount(sb) === 0 && !S.placed[sb.key] ? h('a', { class: 'linkbtn', href: '#/placement/' + sb.key }, 'Not sure where to start? Take a quick check') : '';
@@ -278,7 +278,7 @@
     const st = streak(), wk = Adapt.week(S.days, todayStr()), goal = Math.min(5, Math.max(1, S.goal)), left = goal - wk.count, nxt = KnightWear.untilNext(S.days.length);
     const rk = Monsters.rank(doneCount());
     const card = h('section', { class: 'goal' },
-      h('div', { class: 'rank' }, h('b', {}, `${rk.icon} Rank: ${rk.name}`), h('div', { class: 'meter' }, h('i', { style: `width:${rk.pct}%` })), h('small', { class: 'muted' }, rk.next ? `${rk.next.left} more quest${rk.next.left > 1 ? 's' : ''} to become a ${rk.next.name}` : 'The highest rank!')),
+      h('div', { class: 'rank' }, h('b', {}, `${rk.icon} Rank: ${rk.name}`), rk.name === 'Page' ? h('small', {}, 'A Page is a new knight in training.') : rk.name === 'Squire' ? h('small', {}, 'A Squire is a knight’s helper.') : '', h('div', { class: 'meter' }, h('i', { style: `width:${rk.pct}%` })), h('small', { class: 'muted' }, rk.next ? `${rk.next.left} more quest${rk.next.left > 1 ? 's' : ''} to become a ${rk.next.name}` : 'The highest rank!')),
       h('div', { class: 'goal-top' }, h('b', {}, `🔥 ${st} ${st === 1 ? 'day' : 'days'} in a row`), h('span', { class: 'muted small' }, `Quest goal: ${goal} evening${goal > 1 ? 's' : ''} this week`)),
       h('div', { class: 'goal-days' }, wk.days.map((d, i) => h('div', { class: 'gd' + (d.on ? ' on' : '') + (d.today ? ' today' : '') }, h('small', {}, DAYS[i]), h('span', {}, d.on ? '⭐' : '')))),
       h('p', { class: 'goal-msg' }, left <= 0 ? '🎯 Quest goal reached. Well done, brave knight!' : `${left} more evening${left > 1 ? 's' : ''} to reach this week's quest goal.`),
@@ -313,7 +313,7 @@
       h('div', { class: 'chip' }, h('b', {}, S.days.length), S.days.length === 1 ? 'study day' : 'study days'),
       h('div', { class: 'chip' }, h('b', {}, `${friendCount()}/${ALL.length}`), 'monster friends')));
     frag.append(h('a', { class: 'quick', href: '#/review' }, h('span', { class: 'quick-die', html: '⚔️' }), h('span', {}, h('b', {}, 'Monster training'), h('br'), 'Practise with questions from lessons you have done')));
-    const book = h('section', { class: 'book' }, h('h2', { class: 'sect' }, 'My monster book'), h('p', { class: 'muted book-note' }, 'Finish a quest to tame its monster. Big Bosses wear crowns.'));
+    const book = h('section', { class: 'book' }, h('h2', { class: 'sect' }, 'My monster book'), h('p', { class: 'muted book-note' }, 'Finish a quest to make a monster friend. Big Bosses wear crowns.'));
     SUBJECTS.forEach(sb => {
       const nx = nextIdx(sb);
       book.append(h('div', { class: 'book-row' }, h('div', { class: 'book-label' }, h('b', {}, sb.name), h('small', {}, `${doneCount(sb)} of ${sb.lessons.length}`)),
@@ -322,7 +322,7 @@
     frag.append(book);
     const intro = frag.querySelector('.hello');
     const greetingTitle = intro.querySelector('h1');
-    const welcome = h('section', { class: 'home-welcome' }, greetingTitle, h('p', { class: 'muted' }, 'Choose a quest and let us begin!'));
+    const welcome = h('section', { class: 'home-welcome' }, greetingTitle, h('p', { class: 'muted' }, 'Pick a quest. Let’s play!'));
     const firstHeading = Array.from(frag.children).find(el => el.tagName === 'H2');
     const questNodes = []; let collecting = false;
     Array.from(frag.children).forEach(el => { if (el === firstHeading) collecting = true; if (collecting && (el.tagName === 'H2' || el.classList.contains('sc-wrap') || el.classList.contains('sc'))) questNodes.push(el); else if (collecting) collecting = false; });
@@ -355,7 +355,7 @@
       const last = wd.map(l => S.done[l.id].when).sort().pop();
       const todo = wl.filter(l => !S.done[l.id]), known = wl.filter(l => S.done[l.id] && S.done[l.id].skipped);
       level.append(h('summary', { class: 'weekh' }, h('span', {}, `🏰 Level ${w.week}: ${w.theme}`),
-        h('span', { class: 'wk' + (wd.length === wl.length ? ' ok' : '') }, wd.length === wl.length ? `✅ Level cleared ${fmtDate(last)}` : `${wd.length}/${wl.length} tamed`)), h('p', { class: 'muted' }, w.blurb), (() => { const bl = wl[wl.length - 1], bm = monsterFor(bl); return h('p', { class: 'bossline' }, h('span', { class: 'boss-pic', html: monPic(bl, '', !S.done[bl.id]) }), `👑 Big Boss of this level: ${bm.name}` + (S.done[bl.id] ? ' (tamed!)' : '')); })(),
+        h('span', { class: 'wk' + (wd.length === wl.length ? ' ok' : '') }, wd.length === wl.length ? `✅ Level cleared ${fmtDate(last)}` : `${wd.length}/${wl.length} quests done`)), h('p', { class: 'muted' }, w.blurb), (() => { const bl = wl[wl.length - 1], bm = monsterFor(bl); return h('p', { class: 'bossline' }, h('span', { class: 'boss-pic', html: monPic(bl, '', !S.done[bl.id]) }), `👑 Big Boss of this level: ${bm.name}` + (S.done[bl.id] ? ' (your friend!)' : '')); })(),
         adult ? h('div', { class: 'known-row' },
           todo.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark the ${todo.length} unfinished lesson${todo.length > 1 ? 's' : ''} in Level ${w.week} as already known? They will count as done without questions. You can undo this.`)) { todo.forEach(markKnown); save(); route(); } } }, `✔ Already know all of Level ${w.week}`) : '',
           known.length ? h('button', { class: 'btn alt small', onclick: () => { known.forEach(unmarkKnown); save(); route(); } }, `↩ Undo ${known.length} marked as known`) : '',
@@ -370,8 +370,8 @@
   function deepSections(L, body) {
     const d = (window.DEEP || {})[L.id]; if (!d) return;
     const sec = (cls, title, ...kids) => body.append(h('section', { class: 'deep ' + cls }, h('h3', {}, title), ...kids));
-    sec('why', '🔮 Explain it more', d.why.map(p => h('p', { html: p })));
-    sec('worked', '🗡️ Try it step by step: ' + d.worked.t, h('ol', {}, d.worked.s.map(t => h('li', { html: t }))));
+    sec('why', '📖 Read together', d.why.map(p => h('p', { html: p })));
+    sec('worked', '✏️ Try it step by step: ' + d.worked.t, h('ol', {}, d.worked.s.map(t => h('li', { html: t }))));
     sec('watch', '🐉 Watch out for', h('ul', {}, d.watch.map(t => h('li', { html: t }))));
     sec('talk', '🏰 Talk about it', h('ul', {}, d.talk.map(t => h('li', { html: t }))));
     sec('words', '📜 Words to know', h('div', { class: 'wordlist' }, d.words.map(w => h('div', { class: 'word' }, h('b', {}, w[0]), h('span', {}, w[1])))));
@@ -389,15 +389,15 @@
     const mon = monsterFor(L), total = L.q.length, right = () => S.right[L.id] || {}, sb = SUBJ[L.subj];
     const foe = h('div', { class: 'ar-foe' }), calm = h('i'), msg = h('div', { class: 'ar-msg' }), pct = h('span', { class: 'ar-pct' });
     const box = h('section', { class: `arena realm-${L.subj}${mon.boss ? ' boss' : ''}` },
-      h('div', { class: 'ar-realm' }, `${sb.icon} ${sb.realm}${mon.boss ? ' · 👑 Boss battle' : ''}`),
+      h('div', { class: 'ar-realm' }, `${sb.icon} ${sb.realm}${mon.boss ? ' · 👑 Boss challenge' : ''}`),
       h('div', { class: 'ar-scene' }, h('div', { class: 'ar-knight', html: knightHtml() }), h('div', { class: 'ar-vs' }, 'VS'), foe),
-      h('div', { class: 'ar-calm' }, h('span', {}, 'Monster calm'), h('div', { class: 'meter' }, calm), pct), msg);
+      h('div', { class: 'ar-calm' }, h('span', {}, 'Puzzles solved'), h('div', { class: 'meter' }, calm), pct), msg);
     function update(hit) {
       const g = Math.min(total, Object.keys(right()).length), d = S.done[L.id], friend = !!d || g >= total, ratio = friend ? 1 : g / total;
       foe.innerHTML = Monsters.svg(mon.i, { boss: mon.boss, tamed: friend });
       calm.style.width = Math.round(ratio * 100) + '%'; pct.textContent = Math.round(ratio * 100) + '%';
       box.classList.toggle('tamed', friend);
-      msg.textContent = d && d.skipped ? `${mon.name} is already your friend.` : friend ? `${mon.name} is calm and happy. You tamed it!` : g ? `${mon.name} is getting calmer! ${g} of ${total} puzzles solved.` : `${mon.name} blocks the path! Solve puzzles to calm it down.`;
+      msg.textContent = d && d.skipped ? `${mon.name} is already your friend.` : friend ? `${mon.name} is your new friend!` : g ? `${g} of ${total} puzzles solved. Keep helping ${mon.name}!` : `Help ${mon.name} solve the puzzles!`;
       if (hit) { box.classList.remove('hit'); void box.offsetWidth; box.classList.add('hit'); }
     }
     update(false);
@@ -408,7 +408,7 @@
     setNav('home');
     const L = BYID[id]; if (!L) return go('#/');
     const sb = SUBJ[L.subj];
-    const stepsBase = [['🛡️ Look Back', 'lb'], ['📜 Learn', 'learn'], ['⚔️ Practice', 'prac'], ['🐉 Challenge', 'chal'], ['🏰 Wrap-up', 'wrap']];
+    const stepsBase = [['🛡️ Look Back', 'lb'], ['📜 Learn', 'learn'], ['✏️ Practice', 'prac'], ['🐉 Challenge', 'chal'], ['🏰 Wrap-up', 'wrap']];
     let cur = S.pos && S.pos.id === id ? Math.min(S.pos.step | 0, stepsBase.length - 1) : 0; const seen = new Set();
     const wrap = h('div');
     const right = S.right[id] = S.right[id] || {};
@@ -458,12 +458,12 @@
       } else if (kind === 'chal' && chalLocked()) {
         body.append(h('h2', {}, '🔒 The Dragon\'s Gate is still closed'),
           h('p', {}, `It opens when you have solved most of the Practice questions. You have solved ${pracSolved()} of ${pracIdx.length} so far.`),
-          h('p', { class: 'muted' }, 'That way the hard puzzles are fun, not frustrating. Go and finish Practice first!'),
+          h('p', { class: 'muted' }, 'Try the Practice puzzles first. Then come back for this challenge!'),
           h('button', { class: 'btn', onclick: () => { cur = 2; draw(); window.scrollTo(0, 0); } }, '⚔️ Back to Practice'));
       } else if (kind === 'prac' || kind === 'chal') {
         const set = Q.map((q, qi) => ({ q, qi })).filter(x => (kind === 'prac' ? 'bc' : 'so').includes(x.q.l));
-        body.append(h('h2', {}, kind === 'prac' ? '⚔️ Practice' : '🐉 Dragon challenge'),
-          h('p', { class: 'muted' }, kind === 'prac' ? (L.subj === 'math' ? 'Draw a picture if you get stuck.' : 'Read each question slowly, twice.') : 'These are harder. Think, try, and use hints if you need them.'));
+        body.append(h('h2', {}, kind === 'prac' ? '✏️ Practice' : '🐉 Dragon challenge'),
+          h('p', { class: 'muted' }, kind === 'prac' ? (L.subj === 'math' ? 'Draw a picture if you get stuck.' : 'Read the question. Need help? Read it again.') : 'These are harder. Think, try, and use hints if you need them.'));
         set.forEach(x => {
           const el = questionEl({ q: x.q, qi: x.qi, L }, { onRight: () => { right[x.qi] = true; markDay(); save(); ar.update(true); } });
           if (right[x.qi]) el.append(h('div', { class: 'muted small' }, '🪙 You won a coin for this one before.'));
@@ -473,7 +473,7 @@
         const total = L.q.length, got = counts(), nx = sb.lessons[L.n + 1];
         body.append(h('h2', {}, '🏰 Wrap-up'),
           h('p', { class: 'bigstars' }, '⭐'.repeat(Math.round((got / total) * 5)) + '☆'.repeat(5 - Math.round((got / total) * 5))),
-          h('p', {}, `You solved ${got} of ${total} puzzles. ${monsterFor(L).name} is ${got >= total ? 'calm and happy' : 'getting calmer'}.`),
+          h('p', {}, `You solved ${got} of ${total} puzzles. ${got >= total ? 'You helped ' + monsterFor(L).name + '!' : 'Keep helping ' + monsterFor(L).name + '!'}`),
           h('div', { class: 'key' }, '📜 ' + L.key), h('p', {}, 'Tell a grown-up in your own words what you learned today.'),
           got < total ? h('p', { class: 'muted' }, 'Some questions are still unsolved. Go back and try them, or finish now. They will come back in Look Back.') : '');
         body.append(h('button', { class: 'btn', onclick: () => { S.done[id] = { correct: counts(), total, when: (S.done[id] && S.done[id].when) || todayStr(), last: todayStr(), at: Date.now() }; S.pos = { id: nx ? nx.id : id, step: 0 }; markDay(); save(); go('#/done/' + id); } }, S.done[id] ? 'Save again' : '🏰 Finish quest'));
@@ -492,8 +492,8 @@
     const L = BYID[id]; if (!L) return go('#/');
     const nx = SUBJ[L.subj].lessons[L.n + 1], r = S.done[id], mon = monsterFor(L);
     const news = knightNews();
-    app(h('div', {}, news || '', h('section', { class: 'card hero ' + L.subj }, h('h1', {}, mon.boss ? '👑 Big Boss tamed!' : '🏰 Quest complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? scoreText(r) : ''}`),
-      r && !r.skipped ? h('div', { class: 'newmon' }, h('span', { class: 'newmon-face', html: Monsters.svg(mon.i, { boss: mon.boss, tamed: true }) }), h('span', {}, h('b', {}, mon.boss ? `You tamed ${mon.name}, the Big Boss!` : `You tamed ${mon.name}, a new monster friend!`), h('br'), 'Find it in your monster book on the home page.')) : '',
+    app(h('div', {}, news || '', h('section', { class: 'card hero ' + L.subj }, h('h1', {}, mon.boss ? '👑 Big Boss quest complete!' : '🏰 Quest complete!'), h('p', {}, `${SUBJ[L.subj].icon} ${L.t}: ${r ? scoreText(r) : ''}`),
+      r && !r.skipped ? h('div', { class: 'newmon' }, h('span', { class: 'newmon-face', html: Monsters.svg(mon.i, { boss: mon.boss, tamed: true }) }), h('span', {}, h('b', {}, mon.boss ? `${mon.name}, the Big Boss, is your new friend!` : `${mon.name} is your new monster friend!`), h('br'), 'Find it in your monster book on the home page.')) : '',
       h('div', { class: 'sparkles', 'aria-hidden': 'true' }, ['✨', '⭐', '🎉', '✨', '⭐', '🎉', '✨', '⭐'].map((e, k) => h('span', { style: `left:${8 + k * 12}%;animation-delay:${(k % 4) * 0.25}s` }, e))),
       nx ? h('p', {}, 'Next time: ' + nx.t) : h('p', {}, `🎓 That was the last ${SUBJ[L.subj].name} quest!`), h('a', { class: 'btn light', href: '#/' }, 'Back home'))));
   }
@@ -520,7 +520,7 @@
       const next = h('button', { class: 'btn', onclick: () => { passed.push(ok); if (ok && pi + 1 < probes.length) ask(pi + 1); else finish(); } }, pi + 1 < probes.length ? 'Next ▶' : 'See my result ▶');
       next.disabled = true;
       const onResult = first => { results.push(first); if (!first) ok = false; if (results.length === qs.length) next.disabled = false; };
-      wrap.replaceChildren(h('h1', {}, `Squire's trial: ${sb.name}`), h('p', { class: 'muted' }, `Trial ${pi + 1} of ${probes.length}. Answer what you can. It is fine to get some wrong; this only helps us choose where to start.`),
+      wrap.replaceChildren(h('h1', {}, `Find your starting quest: ${sb.name}`), h('p', { class: 'muted' }, `Step ${pi + 1} of ${probes.length}. Give it a try! This helps us find your first quest.`),
         ...qs.map(x => questionEl({ L, qi: x.qi, q: resolve(L, x.qi) }, { tag: 'squire trial', onResult, noEasier: true })),
         h('div', { class: 'ans', style: 'margin-top:14px' }, next, h('button', { class: 'btn alt', onclick: finish }, 'Stop here')));
       window.scrollTo(0, 0);
@@ -597,7 +597,7 @@
         h('li', {}, h('b', {}, 'Science: '), 'living things, plants, body, materials, forces, Earth and sky, the environment, and fair-test thinking. Beyond school level at this age, and each lesson has a safe hands-on activity.'),
         h('li', {}, h('b', {}, 'Rhythm: '), 'About 25 minutes per subject. Progress is lesson-based, so missed days do not skip content.'),
         h('li', {}, h('b', {}, 'Coach tips: '), 'Ask "How do you know?", let them draw, praise effort, and read questions aloud together for English and Science.'),
-        h('li', {}, h('b', {}, 'Levels: '), '🛡️ Squire, ⚔️ Knight, 🏅 Champion, 🐉 Dragon slayer.'))));
+        h('li', {}, h('b', {}, 'Levels: '), '🌱 Warm-up, ✏️ Practice, ⭐ Challenge, 🐉 Dragon challenge.'))));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'A good evening (about 25 minutes per subject)'),
       h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
         h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong answers are fine, thinking is the point.'))));
@@ -657,7 +657,7 @@
   }
 
   /* ---------- router ---------- */
-  function app(node) { $app.replaceChildren(node); window.scrollTo(0, 0); const title = $app.querySelector('h1, h2'); if (title) { title.tabIndex = -1; title.focus({ preventScroll: true }); } }
+  function app(node) { document.body.classList.toggle('learning', /^#\/lesson\/|^#\/bee\/(drill|mock|hard)/.test(location.hash)); $app.replaceChildren(node); window.scrollTo(0, 0); const title = $app.querySelector('h1, h2'); if (title) { title.tabIndex = -1; title.focus({ preventScroll: true }); } }
   function go(hash) { if (location.hash === hash) route(); else location.hash = hash; }
   function route() {
     const p = (location.hash || '#/').slice(2).split('/');

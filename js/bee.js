@@ -12,9 +12,10 @@
   const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
 
   /* Fresh, normalised bee state. */
-  const blank = () => ({ date: null, start: null, words: {}, xp: 0, drills: 0, perfect: 0, days: [], friends: [], trophies: {}, mockBest: 0, maxCombo: 0, lists: [], active: ['grade1'], tiers: [1, 2, 3], mode: 'tiles', size: 10, newMax: 6, sound: true, setAt: 0 });
+  const blank = () => ({ date: null, start: null, words: {}, xp: 0, drills: 0, perfect: 0, days: [], friends: [], trophies: {}, mockBest: 0, maxCombo: 0, lists: [], active: ['grade1'], tiers: [1, 2, 3], mode: 'tiles', size: 10, newMax: 10, drillVersion: 2, sound: true, setAt: 0 });
   function norm(B) {
-    const b = Object.assign(blank(), B || {}); ['words', 'trophies'].forEach(k => { b[k] = b[k] || {}; }); ['days', 'friends', 'lists'].forEach(k => { b[k] = Array.isArray(b[k]) ? b[k] : []; });
+    const b = Object.assign(blank(), B || {});
+    if (B && B.drillVersion !== 2) { b.size = 10; b.newMax = 10; b.drillVersion = 2; b.setAt = Math.max(Date.now(), (+B.setAt || 0) + 1); } ['words', 'trophies'].forEach(k => { b[k] = b[k] || {}; }); ['days', 'friends', 'lists'].forEach(k => { b[k] = Array.isArray(b[k]) ? b[k] : []; });
     if (Array.isArray(b.custom) && b.custom.length) { b.lists.push({ id: 'own', name: 'Your own words', words: b.custom }); } delete b.custom;   // older saves had one flat list of own words
     if (!Array.isArray(b.active) || !b.active.length) b.active = ['grade1']; b.active = [...new Set(b.active.map(id => id === 'onebee-extra' ? 'grade1' : id))]; if (!Array.isArray(b.tiers) || !b.tiers.length) b.tiers = [1, 2, 3];
     return b;
@@ -123,17 +124,42 @@
   }
 
   function shuffle(a, rnd) { a = a.slice(); rnd = rnd || Math.random; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  /* Mixed new words: mostly accessible words, some challenge, and varied patterns.
+     Randomise within tiers before choosing, so neither source order nor alphabet decides the drill. */
+  function mixedNewWords(words, count, rnd) {
+    const remaining = shuffle(words, rnd), picked = [], groups = new Map(), endings = new Map();
+    const plan = [1, 2, 1, 2, 1, 3];
+    for (let start = 0; picked.length < count && remaining.length; start += plan.length) {
+      const tiers = shuffle(plan.slice(0, Math.min(plan.length, count - picked.length)), rnd);
+      for (const tier of tiers) {
+        if (!remaining.length) break;
+        const available = remaining.some(x => x.tier === tier);
+        let best = -1, score = Infinity;
+        remaining.forEach((x, i) => {
+          if (available && x.tier !== tier) return;
+          const ending = x.w.slice(-2), group = x.gid || ending;
+          const value = (groups.get(group) || 0) * 2 + (endings.get(ending) || 0);
+          if (value < score) { score = value; best = i; }
+        });
+        const word = remaining.splice(best, 1)[0], ending = word.w.slice(-2), group = word.gid || ending;
+        picked.push(word); groups.set(group, (groups.get(group) || 0) + 1); endings.set(ending, (endings.get(ending) || 0) + 1);
+      }
+    }
+    return picked;
+  }
   /* Today's drill: some new words plus words that are due for another look. */
   function buildSession(B, list, today, opts) {
-    opts = opts || {}; const size = opts.size || B.size || 10, rnd = opts.rnd, hi = opts.newMax || B.newMax || 6;
+    opts = opts || {}; const size = opts.size || B.size || 10, rnd = opts.rnd, hi = opts.newMax || B.newMax || 10;
     const unseen = list.filter(x => !B.words[x.w]), seen = list.filter(x => B.words[x.w]);
     const left = daysLeft(B, today), lastWeek = left != null && left <= 7;
     const due = seen.filter(x => B.words[x.w].due <= today).sort((a, b) => (B.words[a.w].box - B.words[b.w].box) || B.words[a.w].due.localeCompare(B.words[b.w].due));
     let newN = lastWeek ? 0 : Math.min(unseen.length, size, opts.newCount != null ? opts.newCount : newPerDay(unseen.length, sessionsLeft(B, today), 3, hi));
+    // Reserve up to half the session for due reviews before introducing more words.
+    newN = Math.min(newN, size - Math.min(due.length, Math.ceil(size / 2)));
     let revN = Math.min(due.length, size - newN);
     if (!lastWeek && newN + revN < size && unseen.length > newN) newN = Math.min(unseen.length, hi, newN + (size - newN - revN));   // not much to review yet: meet a few more new words
     revN = Math.min(due.length, size - newN);
-    const fresh = unseen.slice(0, newN), review = due.slice(0, revN);
+    const fresh = mixedNewWords(unseen, newN, rnd), review = due.slice(0, revN);
     let extra = [];
     if (fresh.length + review.length < size) {     // top up with the shakiest words that are not due yet
       const used = new Set(fresh.concat(review).map(x => x.w));
@@ -154,13 +180,13 @@
 
   /* Trophies: earned when the condition holds; the date is kept once earned. */
   const TROPHIES = [
-    { id: 'first', name: 'First Buzz', emoji: '🐝', desc: 'Finish your first drill.', ok: c => c.B.drills >= 1 },
+    { id: 'first', name: 'First Buzz', emoji: '🐝', desc: 'Finish your first spelling practice.', ok: c => c.B.drills >= 1 },
     { id: 'learn25', name: '25 Words Met', emoji: '📖', desc: 'Meet 25 different words.', ok: c => c.seen >= 25 },
     { id: 'learn100', name: '100 Words Met', emoji: '📚', desc: 'Meet 100 different words.', ok: c => c.seen >= 100 },
-    { id: 'master25', name: '25 Words Mastered', emoji: '⭐', desc: 'Master 25 words.', ok: c => c.mastered >= 25 },
-    { id: 'master100', name: '100 Words Mastered', emoji: '🌟', desc: 'Master 100 words.', ok: c => c.mastered >= 100 },
-    { id: 'master250', name: '250 Words Mastered', emoji: '💫', desc: 'Master 250 words.', ok: c => c.mastered >= 250 },
-    { id: 'flawless', name: 'Flawless', emoji: '💎', desc: 'A whole drill with no mistakes.', ok: c => c.B.perfect >= 1 },
+    { id: 'master25', name: '25 Words I Know', emoji: '⭐', desc: 'Remember 25 words.', ok: c => c.mastered >= 25 },
+    { id: 'master100', name: '100 Words I Know', emoji: '🌟', desc: 'Remember 100 words.', ok: c => c.mastered >= 100 },
+    { id: 'master250', name: '250 Words I Know', emoji: '💫', desc: 'Remember 250 words.', ok: c => c.mastered >= 250 },
+    { id: 'flawless', name: 'First-Try Star', emoji: '💎', desc: 'Spell every word on your first try.', ok: c => c.B.perfect >= 1 },
     { id: 'combo10', name: 'Word Storm', emoji: '⚡', desc: '10 right in a row on the first try.', ok: c => c.B.maxCombo >= 10 },
     { id: 'streak3', name: 'Three-Day Buzz', emoji: '🔥', desc: 'Practise 3 days in a row.', ok: c => c.streak >= 3 },
     { id: 'streak7', name: 'Week of Words', emoji: '🗓️', desc: 'Practise 7 days in a row.', ok: c => c.streak >= 7 },
@@ -168,7 +194,7 @@
     { id: 'tier1', name: 'Simple Words Champion', emoji: '🥉', desc: 'Master every simple word in the grade 1 list.', ok: c => c.tier1 },
     { id: 'tier2', name: 'Advanced Words Champion', emoji: '🥈', desc: 'Master every advanced word in the grade 1 list.', ok: c => c.tier2 },
     { id: 'mock', name: 'Bee Ready', emoji: '🏆', desc: 'Get 9 or more in a mock bee.', ok: c => c.B.mockBest >= 9 },
-    { id: 'drills10', name: 'Ten Drills', emoji: '🐉', desc: 'Finish 10 drills.', ok: c => c.B.drills >= 10 }
+    { id: 'drills10', name: 'Ten Practices', emoji: '🐉', desc: 'Finish 10 spelling practices.', ok: c => c.B.drills >= 10 }
   ];
   /* Returns the trophies newly earned (and records them). */
   function award(B, list, today, streak) {
@@ -178,5 +204,5 @@
     TROPHIES.forEach(t => { if (!B.trophies[t.id] && t.ok(ctx)) { B.trophies[t.id] = today; fresh.push(t); } });
     return fresh;
   }
-  root.Bee = { GAPS, RANKS, TIERS, TIER_TIP, TROPHIES, blank, norm, flatten, pool, parseWords, parseCustom: parseWords, rowsFromText, extractFromRows, addList, autoTier, tierOf, record, isMastered, status, counts, score, rank, daysLeft, sessionsLeft, newPerDay, pace, buildSession, mockWords, hardWords, award, shuffle, addDays, daysBetween, iso };
+  root.Bee = { GAPS, RANKS, TIERS, TIER_TIP, TROPHIES, blank, norm, flatten, pool, parseWords, parseCustom: parseWords, rowsFromText, extractFromRows, addList, autoTier, tierOf, record, isMastered, status, counts, score, rank, daysLeft, sessionsLeft, newPerDay, pace, buildSession, mixedNewWords, mockWords, hardWords, award, shuffle, addDays, daysBetween, iso };
 })(typeof window !== 'undefined' ? window : globalThis);

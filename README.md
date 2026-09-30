@@ -115,7 +115,7 @@ area for 10 minutes (`js/gate.js`) and keeps progress in a shared family record 
 A "Bee" tab prepares for a grade 1 spelling bee. The built-in list is our own 360 practice words in 30 pattern groups (tiers 1
 to 3), combined with the One Bee words from the two user-supplied PDFs; a parent can paste the organisers' list in the Grown-ups area
 (one word per line, optionally `word | meaning | sentence`), and those words are taught first.
-- **Daily drill:** about 10 words, some new (at most 6 a day, set by the parent) and the rest due for review in Leitner boxes (1, 2, 4, 7, 14, 30 days). The last 7 days before the bee date have no new words, only review.
+- **Daily drill:** about 10 words, some new (up to 10 by default, adjustable by the parent) and the rest due for review in Leitner boxes (1, 2, 4, 7, 14, 30 days). The last 7 days before the bee date have no new words, only review.
 - **Ways to answer:** letter tiles, typing, or saying it out loud with a self-check. Words are spoken with the browser's speech (a pronouncer: word, meaning, sentence, repeat); without sound a grown-up reads it.
 - **Game:** each drill is a fight with a word monster (5 hearts); points (10 first try, 5 second, 1 for trying, plus a combo bonus), ranks (Word Page to Word Wizard), 14 trophies, tamed monsters, streaks, and a Mock Bee (12 words in 3 harder rounds, 3 lives).
 - **Countdown:** the parent sets the bee date; the app shows days left and whether the child is on track.
@@ -138,3 +138,9 @@ and progress filters, and 40-word pages, including large groups.
 Optional browser regression checks: `node tests/ux.browser.check.js` (requires Playwright).
 They exercise phone/iPad widths, light/dark mode, parent controls, pagination and overflow
 in isolated browser contexts. `BROWSER_EXECUTABLE` can select an installed Chrome binary.
+
+Drills randomize which new words are selected as well as their question order. With all levels available, six new words aim for three Simple, two Advanced and one Expert, preferring different groups and word endings. Level filters still apply; due reviews and the last-week review-only rule are unchanged.
+
+Daily drills default to 10 words, including the first session. After finishing, children can choose **Keep practising: 5 more words**, or stop at Bee HQ. Extensions prefer words outside the previous session. The review-only rule before the bee date still applies, so small eligible pools may produce fewer words. Older drill settings are migrated once to the 10-word default; subsequent parent choices are preserved.
+
+Child-facing copy uses short, literal actions with friendly monster stories. Question difficulty labels are Warm-up, Practice, Challenge and Dragon challenge; earned knight ranks remain separate. Spelling lives in the Word Garden in Story Forest. Planning status is in Grown-ups, completion statistics are expandable, and lesson/spelling sessions suppress decorative background scenery.
