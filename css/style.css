@@ -548,3 +548,7 @@ body.learning{background-image:none}body.learning::after{display:none}
 .bee-rewards{margin-top:16px;text-align:left}.bee-rewards summary{min-height:48px;cursor:pointer;font-weight:700}.bee-rewards p{margin:8px 0}
 
 @media(max-width:560px){.bee .drillbtn{gap:10px;padding:16px 12px}.bee .db-mon,.bee .db-mon .mon{width:64px}.bee .db-mon{flex-basis:64px}.bee .db-go{padding:10px 14px}.bee .db-body{font-size:1rem}}
+
+/* The knight welcomes the child before the quests; trivia expands beside it. */
+.home-guide{align-items:center;margin:0 0 12px}.home-guide .bubble{margin-bottom:0;min-width:0}.home-guide .bubble h1{font-size:1.4rem;line-height:1.3}.home-fact{margin-top:6px}.home-fact summary{cursor:pointer;min-height:44px;display:list-item;font-weight:700;color:var(--link);font-size:.95rem}.home-guide .buddy{display:none}
+@media(max-width:560px){.home-guide{gap:12px}.home-guide .kn-wrap{flex-basis:88px}.home-guide .kn{width:88px}.home-guide .bubble{padding:12px;border-radius:20px}.home-guide .bubble h1{font-size:1.25rem}.home-guide .bubble p{font-size:.95rem}}

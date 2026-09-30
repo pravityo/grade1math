@@ -290,11 +290,11 @@
     const frag = h('div'), plan = todayPlan();
     const news = knightNews(); // may give the knight new armour, so do it before the knight is drawn
     const fact = h('span', {}), hop = () => { const o = frag.querySelector('.kn-wrap'); if (o) { o.classList.remove('hop'); void o.offsetWidth; o.classList.add('hop'); } };
-    const another = () => { fact.textContent = nextFact(); hop(); };
+    const another = () => { fact.textContent = nextFact(); const panel = fact.closest('details'); if (panel) panel.open = true; hop(); };
     fact.textContent = nextFact();
     frag.append(h('section', { class: 'hello' }, h('button', { class: 'kn-wrap', 'aria-label': 'Tap the knight for a fun fact', onclick: another, html: knightHtml() }),
       h('div', { class: 'bubble' }, h('h1', {}, `${greeting()}, ${S.name || 'brave knight'}!`),
-        h('p', { class: 'fact' }, h('b', {}, 'Did you know? '), fact), h('button', { class: 'linkbtn', onclick: another }, 'Tell me another!')), h('div', { class: 'buddy', html: MONSTER })));
+        h('p', {}, 'Pick a quest. Let’s play!'), h('details', { class: 'home-fact' }, h('summary', {}, 'Tell me a fun fact!'), h('p', { class: 'fact' }, h('b', {}, 'Did you know? '), fact), h('button', { class: 'linkbtn', onclick: another }, 'Tell me another!'))), h('div', { class: 'buddy', html: MONSTER })));
     if (news) frag.append(news);
     const refreshKnight = () => { const o = frag.querySelector('.kn-wrap'); if (o) o.innerHTML = knightHtml(); };
     const gc = goalCard(), wardEl = h('div', { class: 'ward-wrap', style: 'display:none' });
@@ -321,15 +321,12 @@
     });
     frag.append(book);
     const intro = frag.querySelector('.hello');
-    const greetingTitle = intro.querySelector('h1');
-    const welcome = h('section', { class: 'home-welcome' }, greetingTitle, h('p', { class: 'muted' }, 'Pick a quest. Let’s play!'));
+    intro.classList.add('home-guide');
     const firstHeading = Array.from(frag.children).find(el => el.tagName === 'H2');
     const questNodes = []; let collecting = false;
     Array.from(frag.children).forEach(el => { if (el === firstHeading) collecting = true; if (collecting && (el.tagName === 'H2' || el.classList.contains('sc-wrap') || el.classList.contains('sc'))) questNodes.push(el); else if (collecting) collecting = false; });
     intro.remove();
-    const trivia = h('details', { class: 'fold' }, h('summary', {}, 'Meet your knight and learn a fun fact'), intro);
-    frag.prepend(welcome, ...questNodes);
-    frag.append(trivia);
+    frag.prepend(intro, ...questNodes);
     app(frag);
   }
 
