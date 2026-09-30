@@ -1,6 +1,6 @@
 /* Grade 1 spelling bee practice words. This is our own list of common grade 1 words, grouped by spelling pattern, NOT the official
    Scripps list (which is copyrighted). Parents can paste the organisers' list in the Grown-ups area.
-   Each line: word | short child-friendly meaning | sentence that uses the word. US spelling. Tier 1 = easiest, 3 = stretch. */
+   Each line: word | short child-friendly meaning | sentence that uses the word. US spelling. Level 1 = simple, 2 = advanced, 3 = expert (our own judgement for a grade 1 speller). */
 (function () {
   const G = (id, name, tier, emoji, tip, lines) => ({ id, name, tier, emoji, tip, words: lines.trim().split('\n').map(l => l.split('|').map(s => s.trim())) });
   window.BEE_GROUPS = [
@@ -277,7 +277,7 @@ coin|a small round piece of money|I found a coin.
 oil|a slippery liquid|Mom cooks with oil.
 toy|something you play with|My toy is a robot.
 joy|great happiness|The puppy brought us joy.`),
-    G('tricky-words', 'Trickiest words', 3, '🧩', 'Some words break the rules. Circle the tricky part and learn it by heart.', `
+    G('tricky-words', 'Trickiest words', 2, '🧩', 'Some words break the rules. Circle the tricky part and learn it by heart.', `
 friend|a person you like and play with|My friend came over to play.
 because|a word that gives a reason|I am happy because it is Friday.
 people|men, women and children|Many people were at the park.
@@ -290,6 +290,71 @@ every|each one|I go to school every day.
 many|a large number of|We saw many stars.
 once|one time|I rode a horse once.
 other|not the same one|Where is the other shoe?`),
+    G('food', 'Food', 2, '🍕', 'Tasty words to spell.', `
+banana|a long yellow fruit|I peeled a banana.
+orange|a round fruit with a thick peel|I drank orange juice.
+apple|a crunchy red or green fruit|An apple a day is good for you.
+cookie|a small sweet baked treat|I ate a chocolate cookie.
+pizza|a baked dish with cheese and sauce|We had pizza for dinner.
+sandwich|two pieces of bread with food in between|I ate a cheese sandwich.
+cheese|a food made from milk|The mouse loves cheese.
+lemon|a sour yellow fruit|The lemon tastes sour.
+carrot|an orange vegetable that grows underground|The rabbit ate a carrot.
+cherry|a small round red fruit|A cherry was on top of the cake.
+pancake|a flat cake cooked in a pan|I ate a pancake with syrup.
+popcorn|corn that pops when it is heated|We ate popcorn at the movies.`),
+    G('home-school', 'Home and school', 2, '🏫', 'Words you use every day at home and at school.', `
+school|a place where children learn|I walk to school.
+pencil|something you write with that has lead|Sharpen your pencil.
+paper|thin sheets you write or draw on|I drew on the paper.
+table|a piece of furniture with a flat top|We eat at the table.
+window|a glass opening in a wall|I looked out the window.
+kitchen|the room where food is cooked|Mom is in the kitchen.
+garden|a place where flowers or vegetables grow|We planted seeds in the garden.
+bedroom|the room where you sleep|My bedroom has a blue rug.
+library|a place with lots of books to borrow|We got books at the library.
+classroom|the room where a class meets|Our classroom has a fish tank.
+homework|schoolwork you do at home|I finished my homework.
+backpack|a bag you wear on your back|I carry my books in my backpack.`),
+    G('nature', 'Nature and weather', 2, '🌋', 'Words about the world outside.', `
+thunder|the loud noise after lightning|The thunder made me jump.
+forest|a large area full of trees|Deer live in the forest.
+ocean|a huge body of salt water|Whales swim in the ocean.
+river|a long stream of water that flows|The river runs to the sea.
+island|land with water all around it|We sailed to an island.
+mountain|a very high hill|We climbed the mountain.
+winter|the cold season|It snows in winter.
+summer|the hot season|We swim in summer.
+flower|the colorful part of a plant|She picked a flower.
+windy|having a lot of wind|It is a windy day.
+sunny|bright with sunshine|It is sunny today.
+rainy|wet with rain|It was a rainy day.`),
+    G('feelings-actions', 'Feelings and actions', 2, '😊', 'Words for how we feel and what we do.', `
+happy|feeling good and glad|I am happy today.
+angry|feeling very mad|He was angry when he lost.
+sleepy|ready for bed|I am sleepy after the long day.
+hungry|wanting to eat|I am hungry for lunch.
+laugh|to make a happy sound|The joke made us laugh.
+smile|to turn up the corners of your mouth|Please smile for the picture.
+dance|to move your body to music|We like to dance.
+listen|to pay attention to sounds|Listen to the birds.
+whisper|to speak very softly|Please whisper in the library.
+please|a polite word when you ask for something|May I have a cookie, please?
+thanks|a word you say to show you are grateful|Thanks for the help.
+giggle|to laugh in a silly, high way|The baby began to giggle.`),
+    G('endings', 'Words with endings', 2, '🏃', 'Add -ing, -ed, -es or -s to change a word.', `
+jumping|moving up into the air|The frog is jumping.
+playing|having fun|The kids are playing tag.
+looked|used your eyes|She looked at the map.
+wanted|wished for|He wanted a snack.
+running|moving fast on your feet|The dog is running.
+boxes|more than one box|The boxes are full of toys.
+dishes|more than one dish|Please wash the dishes.
+babies|more than one baby|The babies are asleep.
+eating|chewing and swallowing food|We are eating lunch.
+walked|moved on your feet|We walked to the store.
+helped|made something easier|She helped me with my shoes.
+wishes|hopes for things|Her wishes came true.`),
     G('animals', 'Animals', 3, '🦒', 'Say the word slowly and count the beats.', `
 elephant|a huge gray animal with a trunk|The elephant sprayed water.
 giraffe|a very tall animal with a long neck|The giraffe ate leaves from the tree.
@@ -303,32 +368,6 @@ chicken|a farm bird that lays eggs|The chicken pecked at the corn.
 kitten|a baby cat|The kitten drank some milk.
 tiger|a big cat with stripes|The tiger has orange stripes.
 zebra|a horse-like animal with black and white stripes|The zebra ran across the plain.`),
-    G('food', 'Food', 3, '🍕', 'Tasty words to spell.', `
-banana|a long yellow fruit|I peeled a banana.
-orange|a round fruit with a thick peel|I drank orange juice.
-apple|a crunchy red or green fruit|An apple a day is good for you.
-cookie|a small sweet baked treat|I ate a chocolate cookie.
-pizza|a baked dish with cheese and sauce|We had pizza for dinner.
-sandwich|two pieces of bread with food in between|I ate a cheese sandwich.
-cheese|a food made from milk|The mouse loves cheese.
-lemon|a sour yellow fruit|The lemon tastes sour.
-carrot|an orange vegetable that grows underground|The rabbit ate a carrot.
-cherry|a small round red fruit|A cherry was on top of the cake.
-pancake|a flat cake cooked in a pan|I ate a pancake with syrup.
-popcorn|corn that pops when it is heated|We ate popcorn at the movies.`),
-    G('home-school', 'Home and school', 3, '🏫', 'Words you use every day at home and at school.', `
-school|a place where children learn|I walk to school.
-pencil|something you write with that has lead|Sharpen your pencil.
-paper|thin sheets you write or draw on|I drew on the paper.
-table|a piece of furniture with a flat top|We eat at the table.
-window|a glass opening in a wall|I looked out the window.
-kitchen|the room where food is cooked|Mom is in the kitchen.
-garden|a place where flowers or vegetables grow|We planted seeds in the garden.
-bedroom|the room where you sleep|My bedroom has a blue rug.
-library|a place with lots of books to borrow|We got books at the library.
-classroom|the room where a class meets|Our classroom has a fish tank.
-homework|schoolwork you do at home|I finished my homework.
-backpack|a bag you wear on your back|I carry my books in my backpack.`),
     G('compound', 'Two words joined', 3, '🌻', 'Two small words join to make a new word: sun + flower.', `
 sunflower|a tall yellow flower that follows the sun|A sunflower grew by the fence.
 rainbow|colors in the sky after rain|We saw a rainbow after the storm.
@@ -342,45 +381,6 @@ sunshine|the light from the sun|We played in the sunshine.
 snowman|a figure made from rolled snow|We made a snowman.
 airplane|a machine that flies through the sky|The airplane flew over the city.
 lunchbox|a box that holds your lunch|I packed a sandwich in my lunchbox.`),
-    G('nature', 'Nature and weather', 3, '🌋', 'Words about the world outside.', `
-thunder|the loud noise after lightning|The thunder made me jump.
-forest|a large area full of trees|Deer live in the forest.
-ocean|a huge body of salt water|Whales swim in the ocean.
-river|a long stream of water that flows|The river runs to the sea.
-island|land with water all around it|We sailed to an island.
-mountain|a very high hill|We climbed the mountain.
-winter|the cold season|It snows in winter.
-summer|the hot season|We swim in summer.
-flower|the colorful part of a plant|She picked a flower.
-windy|having a lot of wind|It is a windy day.
-sunny|bright with sunshine|It is sunny today.
-rainy|wet with rain|It was a rainy day.`),
-    G('feelings-actions', 'Feelings and actions', 3, '😊', 'Words for how we feel and what we do.', `
-happy|feeling good and glad|I am happy today.
-angry|feeling very mad|He was angry when he lost.
-sleepy|ready for bed|I am sleepy after the long day.
-hungry|wanting to eat|I am hungry for lunch.
-laugh|to make a happy sound|The joke made us laugh.
-smile|to turn up the corners of your mouth|Please smile for the picture.
-dance|to move your body to music|We like to dance.
-listen|to pay attention to sounds|Listen to the birds.
-whisper|to speak very softly|Please whisper in the library.
-please|a polite word when you ask for something|May I have a cookie, please?
-thanks|a word you say to show you are grateful|Thanks for the help.
-giggle|to laugh in a silly, high way|The baby began to giggle.`),
-    G('endings', 'Words with endings', 3, '🏃', 'Add -ing, -ed, -es or -s to change a word.', `
-jumping|moving up into the air|The frog is jumping.
-playing|having fun|The kids are playing tag.
-looked|used your eyes|She looked at the map.
-wanted|wished for|He wanted a snack.
-running|moving fast on your feet|The dog is running.
-boxes|more than one box|The boxes are full of toys.
-dishes|more than one dish|Please wash the dishes.
-babies|more than one baby|The babies are asleep.
-eating|chewing and swallowing food|We are eating lunch.
-walked|moved on your feet|We walked to the store.
-helped|made something easier|She helped me with my shoes.
-wishes|hopes for things|Her wishes came true.`),
     G('challenge', 'Big challenge words', 3, '🏆', 'Stretch words for the big day. Say them in chunks.', `
 beautiful|very pretty|The garden is beautiful.
 together|with each other|We played together.

@@ -66,8 +66,14 @@
     o.days = [...new Set([...(a.days || []), ...(b.days || [])])].sort();
     o.friends = [...new Set([...(a.friends || []), ...(b.friends || [])])];
     o.trophies = {}; [a.trophies, b.trophies].forEach(m => Object.entries(m || {}).forEach(([id, d]) => { if (!o.trophies[id] || d < o.trophies[id]) o.trophies[id] = d; }));
-    const seen = new Set(); o.custom = [];
-    [...(a.custom || []), ...(b.custom || [])].forEach(c => { if (c && !seen.has(c[0])) { seen.add(c[0]); o.custom.push(c); } });
+    const legacy = x => (x.lists || []).concat(Array.isArray(x.custom) && x.custom.length ? [{ id: 'own', name: 'Your own words', words: x.custom }] : []);
+    o.lists = [];
+    [...legacy(p), ...legacy(q)].forEach(l => {
+      if (!l || !l.id) return; let t = o.lists.find(z => z.id === l.id);
+      if (!t) { t = { id: l.id, name: l.name, words: [] }; o.lists.push(t); }
+      const seen = new Set(t.words.map(w => w[0])); (l.words || []).forEach(w => { if (w && !seen.has(w[0])) { seen.add(w[0]); t.words.push(clone(w)); } });
+    });
+    o.active = clone(p.active || q.active || ['grade1']); o.tiers = clone(p.tiers || q.tiers || [1, 2, 3]);
     return o;
   }
   /* Two copies are "the same" if merging changes nothing (used to skip needless writes and reloads). */

@@ -3,6 +3,8 @@
 (function (root) {
   'use strict';
   const GAPS = [1, 2, 4, 7, 14, 30];                 // days until a word comes back, by box (0 = shaky ... 5 = solid)
+  const TIERS = { 1: { name: 'Simple', emoji: '🟢' }, 2: { name: 'Advanced', emoji: '🟡' }, 3: { name: 'Expert', emoji: '🔴' } };
+  const TIER_TIP = { 1: 'Short words that mostly follow the sound rules.', 2: 'Longer words with blends, vowel teams or a tricky part.', 3: 'Long or tricky words. Say them in chunks.' };
   const RANKS = [[0, 'Word Page', '🪶'], [150, 'Word Squire', '📜'], [400, 'Word Knight', '⚔️'], [900, 'Word Champion', '🏅'], [1800, 'Word Wizard', '🧙']];
   const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   const parse = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? new Date(+m[1], m[2] - 1, +m[3]) : null; };
@@ -10,27 +12,69 @@
   const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
 
   /* Fresh, normalised bee state. */
-  const blank = () => ({ date: null, start: null, words: {}, xp: 0, drills: 0, perfect: 0, days: [], friends: [], trophies: {}, mockBest: 0, maxCombo: 0, custom: [], mode: 'tiles', size: 10, newMax: 6, sound: true, setAt: 0 });
-  function norm(B) { const b = Object.assign(blank(), B || {}); ['words', 'trophies'].forEach(k => { b[k] = b[k] || {}; }); ['days', 'friends', 'custom'].forEach(k => { b[k] = Array.isArray(b[k]) ? b[k] : []; }); return b; }
+  const blank = () => ({ date: null, start: null, words: {}, xp: 0, drills: 0, perfect: 0, days: [], friends: [], trophies: {}, mockBest: 0, maxCombo: 0, lists: [], active: ['grade1'], tiers: [1, 2, 3], mode: 'tiles', size: 10, newMax: 6, sound: true, setAt: 0 });
+  function norm(B) {
+    const b = Object.assign(blank(), B || {}); ['words', 'trophies'].forEach(k => { b[k] = b[k] || {}; }); ['days', 'friends', 'lists'].forEach(k => { b[k] = Array.isArray(b[k]) ? b[k] : []; });
+    if (Array.isArray(b.custom) && b.custom.length) { b.lists.push({ id: 'own', name: 'Your own words', words: b.custom }); } delete b.custom;   // older saves had one flat list of own words
+    if (!Array.isArray(b.active) || !b.active.length) b.active = ['grade1']; if (!Array.isArray(b.tiers) || !b.tiers.length) b.tiers = [1, 2, 3];
+    return b;
+  }
+  /* A judgement of how hard a word is for a young speller: length, number of beats, and spelling traps such as silent letters,
+     ph, gh, tion, ie/ei, double letters. 1 = simple, 2 = advanced, 3 = expert. */
+  const TRAPS = [/ph/, /gh/, /kn/, /wr/, /gn/, /mb$/, /tion|sion|cian/, /ough|augh|eigh/, /ei|ie/, /ce$|ge$|dge/, /(.)\1/, /[aeiou]{3}/, /^ps|^pn/, /que$|gue$/, /ough|ei[gn]/, /ti[ao]|ci[ao]/];
+  // common words that break the sound rules: harder than their length suggests
+  const IRREGULAR = new Set('people island answer friend once could would should laugh enough busy build guess heart earth learn scissors castle listen whistle wrist knife knock thumb climb lamb comb ghost school chorus choir yacht bury sugar eye colonel sword two four eight one walk talk half calf chalk shoe move prove love done gone none some come does doesn\'t toward business beauty beautiful because although through thought though tough enough bought caught daughter neighbor weight height straight'.split(' '));
+  const syllables = w => { const g = w.toLowerCase().replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '').match(/[aeiouy]{1,2}/g); return Math.max(1, g ? g.length : 1); };
+  function autoTier(word) {
+    const w = String(word).toLowerCase(), n = w.length; let sc = n <= 4 ? 0 : n <= 6 ? 1 : n <= 8 ? 2 : 3;
+    const sy = syllables(w); sc += sy >= 4 ? 2 : sy === 3 ? 1 : 0;
+    sc += Math.min(2, TRAPS.filter(t => t.test(w)).length) + (IRREGULAR.has(w) ? 1 : 0);
+    return sc <= 1 ? 1 : sc <= 3 ? 2 : 3;
+  }
+  const tierOf = t => { const v = String(t == null ? '' : t).trim().toLowerCase(); return /^(1|simple|easy)$/.test(v) ? 1 : /^(2|advanced|medium)$/.test(v) ? 2 : /^(3|expert|hard)$/.test(v) ? 3 : 0; };
 
-  /* One flat list: the parent's own words first, then the built-in groups in order. */
-  function flatten(groups, custom) {
-    const out = [], seen = new Set();
-    (custom || []).forEach(c => { if (!seen.has(c[0])) { seen.add(c[0]); out.push({ w: c[0], def: c[1] || '', sent: c[2] || '', tier: 2, gid: 'custom', gname: 'Your own words', tip: 'Words from your grown-up.', emoji: '📝', custom: true }); } });
-    groups.forEach((g, gi) => g.words.forEach(x => { if (!seen.has(x[0])) { seen.add(x[0]); out.push({ w: x[0], def: x[1], sent: x[2], tier: g.tier, gid: g.id, gname: g.name, tip: g.tip, emoji: g.emoji, gi }); } }));
+  /* One flat list. Each word remembers every list it belongs to (item.lists). The built-in grade 1 list is "grade1"; the rest are the parent's own lists. */
+  function flatten(groups, lists) {
+    const out = [], at = new Map();
+    const add = (it, listId) => { const k = at.get(it.w); if (k) { if (!k.lists.includes(listId)) k.lists.push(listId); } else { it.lists = [listId]; at.set(it.w, it); out.push(it); } };
+    groups.forEach((g, gi) => g.words.forEach(x => add({ w: x[0], def: x[1], sent: x[2], tier: g.tier, gid: g.id, gname: g.name, tip: g.tip, emoji: g.emoji, gi }, 'grade1')));
+    (lists || []).forEach(l => (l.words || []).map(x => ({ x, t: tierOf(x[3]) || autoTier(x[0]) })).sort((a, b) => a.t - b.t).forEach(({ x, t }) => add({ w: x[0], def: x[1] || '', sent: x[2] || '', tier: t, gid: `${l.id}-t${t}`, gname: `${l.name}: ${TIERS[t].name}`, tip: TIER_TIP[t], emoji: TIERS[t].emoji, custom: true, listName: l.name }, l.id)));
     return out;
   }
-  /* "word | meaning | sentence" per line. Only letters allowed in the word. */
-  function parseCustom(text) {
+  /* The words to practise now: the chosen lists and difficulty levels. */
+  const pool = (B, all) => all.filter(x => x.lists.some(id => B.active.includes(id)) && B.tiers.includes(x.tier));
+  /* "word | meaning | sentence | level" per line (level: simple, advanced, expert or 1 to 3; blank = worked out automatically). Only letters in the word. */
+  function parseWords(text) {
     const added = [], skipped = [];
     String(text || '').split(/\r?\n/).forEach(line => {
       const parts = line.split('|').map(s => s.trim()); const w = (parts[0] || '').toLowerCase();
       if (!w) return;
-      if (!/^[a-z]{2,20}$/.test(w)) { skipped.push(parts[0]); return; }
-      if (!added.some(a => a[0] === w)) added.push([w, (parts[1] || '').slice(0, 120), (parts[2] || '').slice(0, 160)]);
+      if (!/^[a-z]{2,24}$/.test(w)) { skipped.push(parts[0]); return; }
+      if (!added.some(a => a[0] === w)) added.push([w, (parts[1] || '').slice(0, 120), (parts[2] || '').slice(0, 160), tierOf(parts[3]) || autoTier(w)]);
     });
     return { added, skipped };
   }
+  /* Rows of cells from pasted or file text: one row per line, cells split at tabs, commas, bars or wide gaps. */
+  const rowsFromText = text => String(text || '').split(/\r?\n/).map(l => l.split(/\t|\||,|\s{2,}/).map(c => c.trim()).filter(Boolean)).filter(r => r.length);
+  /* Candidate words from rows. mode 'row': the first word of each row (word + meaning tables); 'cell': the first word of every cell
+     (word lists in columns); 'all': every word. Only plain letters; duplicates dropped. */
+  function extractFromRows(rows, mode, minLen) {
+    minLen = minLen || 3; const seen = new Set(), out = [];
+    const take = tok => { const w = String(tok).toLowerCase(); if (/^[a-z]+$/.test(w) && w.length >= minLen && w.length <= 24 && !seen.has(w)) { seen.add(w); out.push(w); } };
+    const toks = c => c.match(/[A-Za-z][A-Za-z'’-]*/g) || [];
+    rows.forEach(r => {
+      if (mode === 'all') r.forEach(c => toks(c).forEach(take));
+      else if (mode === 'cell') r.forEach(c => { const t = toks(c)[0]; if (t) take(t); });
+      else { const t = toks(r[0] || '')[0]; if (t) take(t); }
+    });
+    return out;
+  }
+  const addList = (B, name, words, id) => {
+    name = String(name || '').trim().slice(0, 40) || 'My list'; id = id || ('l' + Date.now().toString(36) + Math.floor(Math.random() * 1e3));
+    const have = B.lists.find(l => l.id === id || l.name.toLowerCase() === name.toLowerCase());
+    if (have) { const s = new Set(have.words.map(x => x[0])); words.forEach(x => { if (!s.has(x[0])) { have.words.push(x); s.add(x[0]); } }); return have; }
+    const l = { id, name, words: words.slice() }; B.lists.push(l); return l;
+  };
 
   /* outcome: 'first' (right first try), 'second' (right on a second try) or 'miss'. */
   function record(B, word, outcome, today) {
@@ -96,7 +140,7 @@
   function mockWords(B, list, rnd, per) {
     per = per || 4; const out = [];
     [1, 2, 3].forEach(t => {
-      const pool = list.filter(x => x.tier === t || (t === 2 && x.custom)), met = pool.filter(x => B.words[x.w]), rest = pool.filter(x => !B.words[x.w]);
+      const pool = list.filter(x => x.tier === t), met = pool.filter(x => B.words[x.w]), rest = pool.filter(x => !B.words[x.w]);
       out.push(...shuffle(met, rnd).concat(shuffle(rest, rnd)).slice(0, per));
     });
     return out;
@@ -116,17 +160,18 @@
     { id: 'streak3', name: 'Three-Day Buzz', emoji: '🔥', desc: 'Practise 3 days in a row.', ok: c => c.streak >= 3 },
     { id: 'streak7', name: 'Week of Words', emoji: '🗓️', desc: 'Practise 7 days in a row.', ok: c => c.streak >= 7 },
     { id: 'streak14', name: 'Fortnight Fighter', emoji: '🛡️', desc: 'Practise 14 days in a row.', ok: c => c.streak >= 14 },
-    { id: 'tier1', name: 'Easy Round Champion', emoji: '🥉', desc: 'Master every tier 1 word.', ok: c => c.tier1 },
+    { id: 'tier1', name: 'Simple Words Champion', emoji: '🥉', desc: 'Master every simple word in the grade 1 list.', ok: c => c.tier1 },
+    { id: 'tier2', name: 'Advanced Words Champion', emoji: '🥈', desc: 'Master every advanced word in the grade 1 list.', ok: c => c.tier2 },
     { id: 'mock', name: 'Bee Ready', emoji: '🏆', desc: 'Get 9 or more in a mock bee.', ok: c => c.B.mockBest >= 9 },
     { id: 'drills10', name: 'Ten Drills', emoji: '🐉', desc: 'Finish 10 drills.', ok: c => c.B.drills >= 10 }
   ];
   /* Returns the trophies newly earned (and records them). */
   function award(B, list, today, streak) {
-    const cn = counts(B, list), t1 = list.filter(x => x.tier === 1);
-    const ctx = { B, seen: cn.seen, mastered: cn.mastered, streak: streak || 0, tier1: t1.length > 0 && t1.every(x => isMastered(B.words[x.w])) };
+    const cn = counts(B, list), t1 = list.filter(x => x.tier === 1 && x.lists.includes('grade1'));
+    const ctx = { B, seen: cn.seen, mastered: cn.mastered, streak: streak || 0, tier1: t1.length > 0 && t1.every(x => isMastered(B.words[x.w])), tier2: (() => { const t2 = list.filter(x => x.tier === 2 && x.lists.includes('grade1')); return t2.length > 0 && t2.every(x => isMastered(B.words[x.w])); })() };
     const fresh = [];
     TROPHIES.forEach(t => { if (!B.trophies[t.id] && t.ok(ctx)) { B.trophies[t.id] = today; fresh.push(t); } });
     return fresh;
   }
-  root.Bee = { GAPS, RANKS, TROPHIES, blank, norm, flatten, parseCustom, record, isMastered, status, counts, score, rank, daysLeft, sessionsLeft, newPerDay, pace, buildSession, mockWords, hardWords, award, shuffle, addDays, daysBetween, iso };
+  root.Bee = { GAPS, RANKS, TIERS, TIER_TIP, TROPHIES, blank, norm, flatten, pool, parseWords, parseCustom: parseWords, rowsFromText, extractFromRows, addList, autoTier, tierOf, record, isMastered, status, counts, score, rank, daysLeft, sessionsLeft, newPerDay, pace, buildSession, mockWords, hardWords, award, shuffle, addDays, daysBetween, iso };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -64,7 +64,17 @@ eq('hard words are the ones missed', B0.hardWords(bee, list).map(x => x.w).inclu
 /* ---- custom words ---- */
 const cu = B0.parseCustom('Elephant | a big animal | The elephant is big.\nbee\nbad word!\n  \nbee | dupe\nx1y\nzebra|striped|');
 eq('custom words parsed', cu.added.map(a => a[0]), ['elephant', 'bee', 'zebra']); eq('bad words skipped', cu.skipped, ['bad word!', 'x1y']);
-const withCustom = B0.flatten(BEE_GROUPS, cu.added); eq('custom words come first and are not duplicated', [withCustom[0].w, withCustom.filter(x => x.w === 'elephant').length, withCustom.length], ['elephant', 1, 360 + 1]);
+const bl = B0.blank(); const own = B0.addList(bl, 'Test list', cu.added); B0.addList(bl, 'test LIST', [['zip', '', '', 0]]);
+eq('lists are deduped by name', [bl.lists.length, own.words.length], [1, 4]);
+const fl = B0.flatten(BEE_GROUPS, bl.lists); eq('list words are flattened once per word', [fl.filter(x => x.w === 'elephant').length, fl.length > 360], [1, true]);
+eq('own list is off until ticked', B0.pool(bl, fl).some(x => x.custom && !x.lists.includes('grade1')), false);
+bl.active = ['grade1', own.id]; eq('ticking a list adds its words', B0.pool(bl, fl).some(x => x.w === 'zebra'), true);
+bl.tiers = [3]; eq('level filter keeps only that level', B0.pool(bl, fl).every(x => x.tier === 3), true);
+eq('legacy custom list is migrated', B0.norm({ custom: [['zip']] }).lists.map(l => l.id), ['own']);
+eq('levels by judgement', ['cat', 'friend', 'elephant', 'beautiful'].map(B0.autoTier), [1, 2, 3, 3]);
+eq('explicit level in a line wins', B0.parseWords('cat | | | 3').added[0][3], 3);
+eq('rows from text', B0.extractFromRows(B0.rowsFromText('apple  a fruit\nBanana, yellow\nx  a'), 'row', 3), ['apple', 'banana']);
+eq('every-word mode', B0.extractFromRows([['big red', 'a']], 'all', 2), ['big', 'red']);
 
 /* ---- trophies ---- */
 const T = Object.assign(B0.blank(), { drills: 1 }); let got = B0.award(T, list, '2026-10-01', 1); eq('first drill earns First Buzz', got.map(t => t.id), ['first']);

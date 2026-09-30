@@ -120,3 +120,7 @@ to 3), not the official Scripps list, which is copyrighted; a parent can paste t
 - **Game:** each drill is a fight with a word monster (5 hearts); points (10 first try, 5 second, 1 for trying, plus a combo bonus), ranks (Word Page to Word Wizard), 14 trophies, tamed monsters, streaks, and a Mock Bee (12 words in 3 harder rounds, 3 lives).
 - **Countdown:** the parent sets the bee date; the app shows days left and whether the child is on track.
 - Progress syncs with the rest of the saved progress (`js/merge.js`). Tests: `node tests/bee.test.js`.
+
+### Word lists and levels
+Words are graded **Simple, Advanced or Expert** (built-in groups by hand, imported words by `Bee.autoTier`: length, syllables, spelling traps such as silent letters, ph, gh, double letters, plus a set of common irregular words). Add `| 1`, `| 2` or `| 3` after a line to set a level yourself. The Bee page has tick boxes to choose which lists and levels to practise; the mock bee runs Simple, Advanced, then Expert rounds.
+Grown-ups can add extra lists (school list, Scripps "Words of the Champions") from **Grown-ups > Spelling Bee**: paste words, or choose a .txt/.csv/.pdf file (PDFs are read in the browser with pdf.js from cdnjs). A preview lets you choose "first word of each line / column / every word" and edit the result before saving. Official lists are copyrighted, so they are not bundled in the repo; imported lists are saved only in the family's progress.

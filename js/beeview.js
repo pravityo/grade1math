@@ -7,7 +7,9 @@
   const bee = () => { const S = kit().S; if (!S.bee || !S.bee.words) S.bee = Bee.norm(S.bee); return S.bee; };
   const save = () => { bee().setAt = bee().setAt || 0; kit().save(); };
   let cache = null;
-  const list = () => { const n = bee().custom.length; if (!cache || cache.n !== n || cache.first !== (bee().custom[0] || [])[0]) cache = { n, first: (bee().custom[0] || [])[0], items: Bee.flatten(BEE_GROUPS, bee().custom) }; return cache.items; };
+  const list = () => { const key = bee().lists.map(l => l.id + ':' + l.words.length).join(','); if (!cache || cache.key !== key) cache = { key, items: Bee.flatten(BEE_GROUPS, bee().lists) }; return cache.items; };
+  const pl = () => Bee.pool(bee(), list());          // the words for the lists and levels that are switched on
+  const tierTag = x => h('span', { class: 'tier t' + x.tier }, `${Bee.TIERS[x.tier].emoji} ${Bee.TIERS[x.tier].name}`);
   const byWord = w => list().find(x => x.w === w);
   const MONSTER_NAMES = () => Monsters.LIST.map(m => m.name);
 
@@ -89,10 +91,10 @@
 
   /* ---------- Bee HQ ---------- */
   function statusLine() {
-    const B = bee(), left = Bee.daysLeft(B, today()), c = Bee.counts(B, list());
+    const B = bee(), left = Bee.daysLeft(B, today()), c = Bee.counts(B, pl());
     if (left == null) return h('p', { class: 'bee-count' }, h('b', {}, '🗓️ No bee date yet. '), 'A grown-up can set it in the Grown-ups area.');
     if (left < 0) return h('p', { class: 'bee-count' }, h('b', {}, 'The big bee day has passed. '), 'Great work! Keep practising for the next one.');
-    const p = Bee.pace(B, list(), today());
+    const p = Bee.pace(B, pl(), today());
     return h('div', { class: 'bee-count' }, h('div', { class: 'big-count' }, left === 0 ? 'Today is the big bee!' : left), left === 0 ? '' : h('span', {}, left === 1 ? 'day until the big bee' : 'days until the big bee'),
       p ? h('span', { class: 'pace ' + p.status.replace(' ', '-') }, p.status === 'ahead' ? '🚀 Ahead of plan' : p.status === 'on track' ? '✅ On track' : '⏳ A little behind') : '');
   }
@@ -107,7 +109,7 @@
     const K = kit(); K.setNav('bee');
     if (sub === 'drill') return startDrill(); if (sub === 'mock') return startMock(); if (sub === 'words') return trail();
     if (sub === 'group') return groupView(arg); if (sub === 'hard') return startHard();
-    const B = bee(), L = list(), c = Bee.counts(B, L), r = Bee.rank(B.xp), st = Adapt.streak(B.days, today()), doneToday = B.days.includes(today());
+    const B = bee(), L = pl(), c = Bee.counts(B, L), r = Bee.rank(B.xp), st = Adapt.streak(B.days, today()), doneToday = B.days.includes(today());
     const wrap = h('div', { class: 'bee' });
     wrap.append(h('h1', {}, '🐝 Spelling Bee Training'),
       h('section', { class: 'card bee-hero' }, statusLine(),
@@ -126,6 +128,14 @@
     wrap.append(h('section', { class: 'card' }, h('h2', {}, 'How do you want to spell?'), modeChips(() => view()),
       h('label', { class: 'soundtoggle' }, h('input', Object.assign({ type: 'checkbox', onchange: e => { bee().sound = e.target.checked; save(); if (!e.target.checked) Speech.stop(); } }, B.sound !== false ? { checked: 'checked' } : {})), ' 🔊 Say the words out loud'),
       Speech.ok ? '' : h('p', { class: 'muted small' }, 'This device cannot speak, so a grown-up will need to read the words.')));
+    // word lists and levels
+    const all = list(), listDefs = [{ id: 'grade1', name: 'Grade 1 practice words' }].concat(B.lists.map(l => ({ id: l.id, name: l.name })));
+    const toggle = (arr, v) => { const i = arr.indexOf(v); if (i >= 0) { if (arr.length > 1) arr.splice(i, 1); } else arr.push(v); B.setAt = Date.now(); save(); view(); };
+    wrap.append(h('section', { class: 'card' }, h('h2', {}, '📚 Which words?'), h('p', { class: 'muted small' }, 'Tick the word lists to practise. A grown-up can add more lists in the Grown-ups area, for example the school bee list.'),
+      h('div', { class: 'checks' }, listDefs.map(d => { const n = all.filter(x => x.lists.includes(d.id)).length; return h('label', { class: 'check' }, h('input', Object.assign({ type: 'checkbox', onchange: () => toggle(B.active, d.id) }, B.active.includes(d.id) ? { checked: 'checked' } : {})), ` ${d.name} `, h('small', {}, `(${n} words)`)); })),
+      h('div', { class: 'checks' }, [1, 2, 3].map(t => { const n = all.filter(x => x.tier === t && x.lists.some(id => B.active.includes(id))).length; return h('label', { class: 'check t' + t }, h('input', Object.assign({ type: 'checkbox', onchange: () => toggle(B.tiers, t) }, B.tiers.includes(t) ? { checked: 'checked' } : {})), ` ${Bee.TIERS[t].emoji} ${Bee.TIERS[t].name} `, h('small', {}, `(${n})`)); })),
+      h('p', { class: 'muted small' }, `${L.length} words in your practice now. Simple words are short and follow the sound rules, advanced ones are longer or have a tricky part, and expert ones are long or very tricky.`),
+      L.length ? '' : h('p', { class: 'feedback-warn' }, '⚠️ Nothing to practise with this choice. Tick a list and a level.')));
     // trophies
     wrap.append(h('section', { class: 'card' }, h('h2', {}, '🏆 Trophy shelf'), h('div', { class: 'trophies' }, Bee.TROPHIES.map(t => { const got = B.trophies[t.id]; return h('div', { class: 'bee-trophy' + (got ? ' got' : '') }, h('span', { class: 't-emoji' }, got ? t.emoji : '🔒'), h('b', {}, t.name), h('small', {}, got ? 'Earned!' : t.desc)); }))));
     // tamed word monsters
@@ -141,32 +151,37 @@
 
   /* ---------- word trail ---------- */
   function trail() {
-    const B = bee(), K = kit(), wrap = h('div', { class: 'bee' });
-    wrap.append(h('a', { href: '#/bee' }, '◀ Bee HQ'), h('h1', {}, '🗺️ Word Trail'), h('p', { class: 'muted' }, 'Word groups from easy to tricky. Tap a group to see its words or practise it.'));
-    const groups = (B.custom.length ? [{ id: 'custom', name: 'Your own words', tier: 2, emoji: '📝', words: B.custom }] : []).concat(BEE_GROUPS);
-    groups.forEach(g => {
-      const ws = g.words.map(x => x[0]), mast = ws.filter(w => Bee.isMastered(B.words[w])).length, met = ws.filter(w => B.words[w]).length;
-      wrap.append(h('a', { class: 'group', href: '#/bee/group/' + g.id }, h('span', { class: 'g-emoji' }, g.emoji), h('span', { class: 'g-body' }, h('b', {}, g.name), h('small', {}, ` tier ${g.tier}`), h('br'), meter(mast / ws.length * 100, 'gold'), h('small', {}, `${mast} mastered · ${met} met · ${ws.length} words`))));
+    const B = bee(), K = kit(), wrap = h('div', { class: 'bee' }), all = list();
+    wrap.append(h('a', { href: '#/bee' }, '◀ Bee HQ'), h('h1', {}, '🗺️ Word Trail'), h('p', { class: 'muted' }, 'Word groups by list and level. Tap a group to see its words or practise it.'));
+    const gids = []; all.forEach(x => { if (!gids.includes(x.gid)) gids.push(x.gid); });
+    let lastList = null;
+    gids.forEach(gid => {
+      const items = all.filter(x => x.gid === gid), f = items[0], list0 = f.custom ? f.listName : 'Grade 1 practice words';
+      if (list0 !== lastList) { wrap.append(h('h2', { class: 'sect' }, list0)); lastList = list0; }
+      const mast = items.filter(x => Bee.isMastered(B.words[x.w])).length, met = items.filter(x => B.words[x.w]).length;
+      wrap.append(h('a', { class: 'group', href: '#/bee/group/' + gid }, h('span', { class: 'g-emoji' }, f.emoji), h('span', { class: 'g-body' }, h('b', {}, f.custom ? Bee.TIERS[f.tier].name : f.gname), ' ', tierTag(f), h('br'), meter(mast / items.length * 100, 'gold'), h('small', {}, `${mast} mastered · ${met} met · ${items.length} words`))));
     });
     K.app(wrap);
   }
   function groupView(id) {
-    const B = bee(), K = kit(), L = list(), items = L.filter(x => x.gid === id), g = BEE_GROUPS.find(x => x.id === id) || { name: 'Your own words', emoji: '📝', tip: 'Words from your grown-up.' };
+    const B = bee(), K = kit(), items = list().filter(x => x.gid === id);
     if (!items.length) return K.go('#/bee/words');
-    const wrap = h('div', { class: 'bee' }, h('a', { href: '#/bee/words' }, '◀ Word Trail'), h('h1', {}, `${g.emoji} ${g.name}`), h('p', { class: 'key' }, '💡 ' + g.tip),
-      h('button', { class: 'btn', onclick: () => runSession({ kind: 'group', title: g.name, words: Bee.shuffle(items), fresh: [], hearts: 0 }) }, '⚔️ Practise this group'));
-    wrap.append(h('div', { class: 'wordgrid' }, items.map(x => { const e = B.words[x.w], s = Bee.status(e); return h('div', { class: 'bee-wchip ' + s, title: x.def }, h('b', {}, x.w), h('small', {}, s === 'new' ? 'new' : s === 'mastered' ? '⭐ mastered' : 'learning')); })));
+    const f = items[0], big = items.length > 60, show = big ? items.slice(0, 60) : items;
+    const wrap = h('div', { class: 'bee' }, h('a', { href: '#/bee/words' }, '◀ Word Trail'), h('h1', {}, `${f.emoji} ${f.gname}`), h('p', { class: 'key' }, '💡 ' + f.tip),
+      h('button', { class: 'btn', onclick: () => runSession({ kind: 'group', title: f.gname, words: Bee.shuffle(items).slice(0, 15), fresh: [], hearts: 0 }) }, '⚔️ Practise this group' + (big ? ' (15 words)' : '')));
+    wrap.append(h('div', { class: 'wordgrid' }, show.map(x => { const e = B.words[x.w], st = Bee.status(e); return h('div', { class: 'bee-wchip ' + st, title: x.def }, h('b', {}, x.w), h('small', {}, st === 'new' ? 'new' : st === 'mastered' ? '⭐ mastered' : 'learning')); })), big ? h('p', { class: 'muted small' }, `Showing 60 of ${items.length} words.`) : '');
     K.app(wrap);
   }
 
   /* ---------- starting sessions ---------- */
   function startDrill() {
-    const B = bee(), s = Bee.buildSession(B, list(), today());
+    const B = bee(), s = Bee.buildSession(B, pl(), today());
+    if (!s.order.length) { alert('There are no words to practise. Turn on a word list and at least one level in Bee HQ.'); return kit().go('#/bee'); }
     if (!B.start) { B.start = today(); save(); }
     runSession({ kind: 'drill', title: "Today's drill", words: s.order, fresh: s.fresh, hearts: 5 });
   }
-  function startMock() { runSession({ kind: 'mock', title: 'Mock Bee', words: Bee.mockWords(bee(), list()), fresh: [], hearts: 3 }); }
-  function startHard() { const w = Bee.hardWords(bee(), list()).slice(0, 10); if (!w.length) return kit().go('#/bee'); runSession({ kind: 'hard', title: 'Tricky words', words: Bee.shuffle(w), fresh: [], hearts: 0 }); }
+  function startMock() { runSession({ kind: 'mock', title: 'Mock Bee', words: Bee.mockWords(bee(), pl()), fresh: [], hearts: 3 }); }
+  function startHard() { const w = Bee.hardWords(bee(), pl()).slice(0, 10); if (!w.length) return kit().go('#/bee'); runSession({ kind: 'hard', title: 'Tricky words', words: Bee.shuffle(w), fresh: [], hearts: 0 }); }
 
   /* ---------- the session: meet new words, then battle ---------- */
   function runSession(cfg) {
@@ -182,7 +197,7 @@
       if (k >= cfg.fresh.length) return battle();
       const x = cfg.fresh[k], shell = h('div', {});
       const cover = h('div', {}), fully = h('div', { class: 'card studycard' });
-      fully.append(h('div', { class: 'muted small' }, `New word ${k + 1} of ${cfg.fresh.length}`), h('div', { class: 'sw' }, letters(x.w, 'huge')), pronouncer(x, true),
+      fully.append(h('div', { class: 'muted small' }, `New word ${k + 1} of ${cfg.fresh.length} `, tierTag(x)), h('div', { class: 'sw' }, letters(x.w, 'huge')), pronouncer(x, true),
         h('div', { class: 'ans center' }, h('button', { class: 'btn alt', onclick: () => Speech.spell(x.w) }, '🔤 Say the letters')),
         x.def ? h('p', {}, h('b', {}, 'Meaning: '), x.def) : '', x.sent ? h('p', { class: 'sentence' }, h('b', {}, 'Sentence: '), x.sent) : '', h('p', { class: 'key' }, `${x.emoji} ${x.tip}`), silentHelp(x),
         h('p', { class: 'muted' }, 'Look at it, say it, then cover it and try to spell it from memory.'),
@@ -245,7 +260,7 @@
         return h('div', {}, h('p', { class: 'muted' }, 'Spell the word out loud, letter by letter. Then check.'), h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => { reveal.replaceChildren(h('div', { class: 'reveal' }, letters(x.w)), h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => finishWord('first') }, '✅ I spelled it right'), h('button', { class: 'btn alt', onclick: () => finishWord('miss') }, '❌ Not yet'))); Speech.spell(x.w); } }, '👀 Show me the letters')), reveal);
       };
       inputBox.append(mode === 'say' ? sayMode() : input());
-      sect.append(arena(), h('div', { class: 'card wordcard' }, h('div', { class: 'muted small' }, `Word ${Math.min(st.i + 1, st.queue.length)} of ${st.queue.length}${cfg.kind === 'mock' ? ' · Round ' + (Math.floor(st.i / 4) + 1) : ''}`), h('h2', {}, cfg.kind === 'mock' ? '🐝 Spell the word' : 'Spell the word'), pronouncer(x, true), silentHelp(x), modeSwitch(), inputBox, fb));
+      sect.append(arena(), h('div', { class: 'card wordcard' }, h('div', { class: 'muted small' }, `Word ${Math.min(st.i + 1, st.queue.length)} of ${st.queue.length}${cfg.kind === 'mock' ? ' · ' + Bee.TIERS[x.tier].emoji + ' ' + Bee.TIERS[x.tier].name + ' round' : ''}`), h('h2', {}, cfg.kind === 'mock' ? '🐝 Spell the word' : 'Spell the word'), tierTag(x), pronouncer(x, true), silentHelp(x), modeSwitch(), inputBox, fb));
       show(sect); Speech.say(x.w, 0.8);
     }
     const modeSwitch = () => h('div', { class: 'bee-modes small' }, [['tiles', '🔤'], ['type', '⌨️'], ['say', '🗣️']].map(([k, e]) => h('button', { class: 'bee-mode' + (B.mode === k ? ' on' : ''), 'aria-label': k, onclick: () => { B.mode = k; save(); word(); } }, e)));
@@ -262,14 +277,14 @@
         line = perfect ? 'A flawless drill!' : tamed ? `You tamed ${monName}!` : `${monName} got away this time. Try again tomorrow!`;
       } else if (cfg.kind === 'mock') {
         const score = outs.filter(o => o.outcome !== 'miss').length; B.mockBest = Math.max(B.mockBest, score); bonus = 10;
-        line = eliminated ? `Out in round ${Math.floor(Math.max(0, st.i - 1) / 4) + 1}. That is how real bees go, and you learned from it!` : score === total ? 'A perfect mock bee!' : 'You made it through every round!';
+        line = eliminated ? `Out in the ${Bee.TIERS[(st.queue[Math.max(0, st.i - 1)] || { tier: 1 }).tier].name.toLowerCase()} round. That is how real bees go, and you learned from it!` : score === total ? 'A perfect mock bee!' : 'You made it through every round!';
       } else line = 'Nice practice!';
       B.xp += bonus; st.xp += bonus;
       if (!B.days.includes(today())) B.days.push(today());
       kit().markDay();
       fresh = Bee.award(B, list(), today(), Adapt.streak(B.days, today()));
       save();
-      const r = Bee.rank(B.xp), c = Bee.counts(B, list());
+      const r = Bee.rank(B.xp), c = Bee.counts(B, pl());
       const summary = []; outs.forEach(o => { const f = summary.find(y => y.x.w === o.x.w); if (!f) summary.push({ x: o.x, outcome: o.outcome }); else if (o.outcome === 'miss' || f.outcome === 'miss') f.outcome = 'miss'; else if (o.outcome === 'second') f.outcome = 'second'; });
       const sp = h('div', { class: 'sparkles', 'aria-hidden': 'true' }, ['✨', '⭐', '🐝', '✨', '🎉', '🐝', '✨', '⭐'].map((e, k) => h('span', { style: `left:${8 + k * 12}%;animation-delay:${(k % 4) * 0.25}s` }, e)));
       show(h('div', {}, h('section', { class: 'card hero bee-done' }, h('h1', {}, eliminated ? '🐝 Good try!' : tamed ? '🏆 Victory!' : '🐝 Nice work!'), h('p', {}, line),
@@ -291,7 +306,50 @@
     const sel = (opts, cur) => h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, opts.map(([v, t]) => h('option', Object.assign({ value: v }, String(cur) === String(v) ? { selected: 'selected' } : {}), t)));
     const size = sel([[8, '8 words'], [10, '10 words'], [12, '12 words'], [15, '15 words']], B.size), newMax = sel([[3, '3 new words'], [4, '4 new words'], [6, '6 new words'], [8, '8 new words'], [10, '10 new words']], B.newMax);
     const area = h('textarea', { rows: 6, style: 'width:100%', placeholder: 'One word per line. Optional: word | meaning | sentence\nexample: friend | someone you like | My friend came to play.' });
-    const msg = h('p', { class: 'muted' });
+    const msg = h('p', { class: 'muted' }), preview = h('div'), lists = h('div'), name = h('input', { type: 'text', placeholder: 'List name, e.g. 2026 school list', maxlength: 40, style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);width:100%;margin-bottom:8px' });
+    const file = h('input', { type: 'file', accept: '.txt,.csv,.tsv,.pdf,text/plain,text/csv,application/pdf', style: 'display:none' });
+    const lvl = t => Bee.TIERS[t].emoji + ' ' + Bee.TIERS[t].name;
+    const drawLists = () => {
+      lists.replaceChildren(...B.lists.map(l => { const n = [0, 0, 0, 0]; l.words.forEach(x => { n[Bee.tierOf(x[3]) || Bee.autoTier(x[0])]++; });
+        return h('p', {}, h('b', {}, l.name), ` : ${l.words.length} words (${n[1]} simple, ${n[2]} advanced, ${n[3]} expert) `, h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Remove the list "${l.name}"?`)) { B.lists = B.lists.filter(z => z.id !== l.id); B.active = B.active.filter(id => id !== l.id); if (!B.active.length) B.active = ['grade1']; B.setAt = Date.now(); save(); drawLists(); } } }, 'Remove')); }));
+      if (!B.lists.length) lists.append(h('p', { class: 'muted' }, 'No lists of your own yet.'));
+    };
+    const finish = (words, skipped) => {
+      if (!words.length) { msg.textContent = 'No valid words found. Use letters only.'; return; }
+      const l = Bee.addList(B, name.value || 'My list', words); B.setAt = Date.now(); save(); name.value = ''; preview.replaceChildren(); drawLists();
+      msg.textContent = `Saved "${l.name}" with ${l.words.length} words. It is off until you tick it on the Bee page.${skipped && skipped.length ? ' Skipped: ' + skipped.slice(0, 8).join(', ') : ''}`;
+    };
+    const addPasted = () => { const r = Bee.parseWords(area.value); area.value = ''; finish(r.added, r.skipped); };
+    const showPreview = rows => {
+      let mode = 'row', minLen = 3, edit;
+      const draw = () => {
+        const ws = Bee.extractFromRows(rows, mode, minLen);
+        edit.value = ws.join('\n'); cnt.textContent = `${ws.length} words found. Check and edit the list, one word per line.`;
+      };
+      const cnt = h('p', {}); edit = h('textarea', { rows: 8, style: 'width:100%' });
+      const m = h('select', { style: 'font:inherit;padding:8px', onchange: () => { mode = m.value; draw(); } }, [['row', 'First word of each line'], ['cell', 'First word of each column'], ['all', 'Every word']].map(([v, t]) => h('option', { value: v }, t)));
+      const n = h('select', { style: 'font:inherit;padding:8px', onchange: () => { minLen = +n.value; draw(); } }, [2, 3, 4].map(v => h('option', Object.assign({ value: v }, v === 3 ? { selected: 'selected' } : {}), `at least ${v} letters`)));
+      preview.replaceChildren(h('h4', {}, 'Preview'), h('div', { class: 'ans' }, m, n), cnt, edit, h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => { const r = Bee.parseWords(edit.value); finish(r.added, r.skipped); } }, 'Save as a list'), h('button', { class: 'btn alt', onclick: () => preview.replaceChildren() }, 'Cancel')));
+      draw();
+    };
+    const pdfRows = async f => {
+      if (!window.pdfjsLib) await new Promise((ok, no) => { const sc = h('script', { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js' }); sc.onload = ok; sc.onerror = () => no(new Error('The PDF reader could not load. Check the internet connection.')); document.head.append(sc); });
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const doc = await pdfjsLib.getDocument({ data: await f.arrayBuffer() }).promise, rows = [];
+      for (let p = 1; p <= doc.numPages; p++) {
+        const items = (await (await doc.getPage(p)).getTextContent()).items.filter(t => t.str.trim()), lines = [];
+        items.forEach(t => { const y = Math.round(t.transform[5] / 3); let ln = lines.find(z => z.y === y); if (!ln) lines.push(ln = { y, c: [] }); ln.c.push({ x: t.transform[4], s: t.str.trim() }); });
+        lines.sort((a, b) => b.y - a.y).forEach(ln => rows.push(ln.c.sort((a, b) => a.x - b.x).map(c => c.s)));
+      }
+      return rows;
+    };
+    file.addEventListener('change', async () => {
+      const f = file.files[0]; if (!f) return; msg.textContent = 'Reading ' + f.name + ' ...'; if (!name.value) name.value = f.name.replace(/\.[^.]+$/, '').slice(0, 40);
+      try { const rows = /\.pdf$/i.test(f.name) || f.type === 'application/pdf' ? await pdfRows(f) : Bee.rowsFromText(await f.text()); msg.textContent = ''; showPreview(rows); }
+      catch (e) { msg.textContent = 'Could not read that file: ' + (e.message || e); }
+      file.value = '';
+    });
+    drawLists();
     const weak = Bee.hardWords(B, L).slice(0, 12);
     box.append(h('h2', {}, '🐝 Spelling Bee'),
       h('p', { class: 'muted' }, `${c.mastered} of ${c.total} words mastered, ${c.seen} met. ${B.drills} drills done, ${B.xp} points.`),
@@ -299,10 +357,10 @@
       h('div', { class: 'ans', style: 'margin-top:14px' }, h('label', {}, 'Words per drill: '), size, h('label', {}, ' New words per day (at most): '), newMax, h('button', { class: 'btn', onclick: () => { B.size = +size.value; B.newMax = +newMax.value; B.setAt = Date.now(); save(); alert('Saved'); } }, 'Save')),
       h('p', { class: 'muted small' }, 'Each drill mixes new words with words that are due for review. In the last 7 days before the bee there are no new words, only review of the words already met.'),
       weak.length ? h('p', {}, h('b', {}, 'Words that need more practice: '), weak.map(x => x.w).join(', ')) : '',
-      h('h3', { style: 'margin-top:20px' }, 'Add the official word list or your own words'), h('p', { class: 'muted small' }, `The built-in list is our own grade 1 practice list (${BEE_GROUPS.reduce((n, g) => n + g.words.length, 0)} words), not the official Scripps list, which is copyrighted. Paste the organisers' list here. Words you add are taught first. Without a meaning and sentence, the app only says the word.`),
-      area, h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => { const r = Bee.parseCustom(area.value); if (!r.added.length) { msg.textContent = 'No valid words found. Use letters only, one word per line.'; return; } const have = new Set(B.custom.map(x => x[0])); const add = r.added.filter(x => !have.has(x[0])); B.custom = B.custom.concat(add); B.setAt = Date.now(); save(); area.value = ''; msg.textContent = `Added ${add.length} word${add.length === 1 ? '' : 's'}.${r.skipped.length ? ' Skipped: ' + r.skipped.join(', ') : ''} You now have ${B.custom.length} of your own words.`; } }, 'Add words'),
-        B.custom.length ? h('button', { class: 'btn alt', onclick: () => { if (confirm(`Remove your ${B.custom.length} own words?`)) { B.custom = []; B.setAt = Date.now(); save(); msg.textContent = 'Removed.'; } } }, 'Remove my words') : ''), msg,
-      h('p', {}, h('button', { class: 'btn alt small', onclick: () => { if (confirm('Erase all spelling bee progress, points and trophies? This cannot be undone.')) { const keep = { date: B.date, custom: B.custom }; Object.assign(kit().S, { bee: Object.assign(Bee.blank(), keep, { setAt: Date.now() }) }); save(); alert('Spelling bee progress was reset.'); kit().go('#/parent'); } } }, 'Reset spelling bee progress')));
+      h('h3', { style: 'margin-top:20px' }, 'Word lists'), h('p', { class: 'muted small' }, `Built in: our own grade 1 practice list (${BEE_GROUPS.reduce((n, g) => n + g.words.length, 0)} words). The official Scripps and school lists are copyrighted, so they are not bundled. Add them here from a file or by pasting: they stay in this account only. Every word gets a level (Simple, Advanced or Expert) from its length and spelling traps. Add | 1, 2 or 3 at the end of a line to set a level yourself. Switch lists on and off on the Bee page.`),
+      lists, h('h4', {}, 'Add words'), name, area,
+      h('div', { class: 'ans' }, h('label', { class: 'btn alt' }, 'Choose a file (.txt, .csv, .pdf)', file), h('button', { class: 'btn', onclick: addPasted }, 'Add pasted words')), msg, preview,
+      h('p', {}, h('button', { class: 'btn alt small', onclick: () => { if (confirm('Erase all spelling bee progress, points and trophies? This cannot be undone.')) { const keep = { date: B.date, lists: B.lists }; Object.assign(kit().S, { bee: Object.assign(Bee.blank(), keep, { setAt: Date.now() }) }); save(); alert('Spelling bee progress was reset.'); kit().go('#/parent'); } } }, 'Reset spelling bee progress')));
     return box;
   }
 
