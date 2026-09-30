@@ -37,7 +37,7 @@ Visual tokens in `learn`: `[[bond:10|3,7]]`, `[[bar:6,?|10]]`, `[[cmp:8,3|Amy,Be
 ## Deploy
 
 GitHub Pages via `.github/workflows/pages.yml` (repo Settings > Pages > Source: GitHub Actions).
-Live at https://pravityo.github.io/grade1math/ . On iPad/iPhone Safari use Share > Add to Home Screen so progress is not evicted.
+Live at https://pravityo.github.io/grade1training/ . On iPad/iPhone Safari use Share > Add to Home Screen so progress is not evicted.
 
 ## Randomised questions
 
