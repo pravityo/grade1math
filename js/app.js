@@ -39,7 +39,7 @@
     try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
     if (!S || typeof S !== 'object') S = {};
     S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate';
-    S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; S.removed = S.removed || {};
+    S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; S.removed = S.removed || {}; S.bee = Bee.norm(S.bee);
     if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; // saved before subjects existed
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ } if (window.Cloud) Cloud.pushSoon(); }
@@ -48,7 +48,8 @@
   if (window.Cloud) Cloud.attach({ get: () => S, apply: m => {
     // update in place, so a lesson that is open keeps writing into the same objects
     const right = S.right; Object.keys(m.right || {}).forEach(id => { right[id] = Object.assign(right[id] || {}, m.right[id]); });
-    Object.keys(m).forEach(k => { if (k !== 'right' && k !== 'pos') S[k] = m[k]; });
+    if (m.bee) S.bee = S.bee ? Object.assign(S.bee, m.bee) : m.bee;   // a spelling drill in progress keeps writing into the same object
+    Object.keys(m).forEach(k => { if (k !== 'right' && k !== 'pos' && k !== 'bee') S[k] = m[k]; });
     load2(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage blocked */ }
     if (['', 'map', 'review', 'parent'].includes((location.hash || '#/').slice(2).split('/')[0])) route(); // never redraw in the middle of a lesson
   } });
@@ -293,6 +294,7 @@
     const drawWard = () => wardEl.replaceChildren(wardrobe(() => { refreshKnight(); drawWard(); }));
     drawWard();
     frag.append(gc.card, h('button', { class: 'linkbtn', style: 'margin:6px 0 0', onclick: () => { wardEl.style.display = wardEl.style.display === 'none' ? 'block' : 'none'; } }, '🛡️ Open the armoury'), wardEl);
+    if (window.BeeUI) frag.append(BeeUI.homeCard());
     frag.append(h('h2', { class: 'sect' }, plan.weekend ? 'Pick a quest' : 'Today\'s quests'));
     plan.main.forEach(k => frag.append(subjCard(SUBJ[k], true)));
     if (plan.optional.length) {
@@ -578,6 +580,7 @@
       h('ol', {}, h('li', {}, '5 min: Look Back questions from earlier lessons'), h('li', {}, '8 min: Learn the new idea with the pictures and do the hands-on activity'),
         h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong answers are fine, thinking is the point.'))));
     frag.append(familyCard());
+    if (window.BeeUI) frag.append(BeeUI.parentCard());
     const skipSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
     const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Levels 1 to ${n}`)));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Already learned some of this, or marked by mistake?'),
@@ -603,7 +606,7 @@
       h('p', {}, h('button', { class: 'btn', style: 'background:var(--bad)', onclick: () => { if (confirm('Erase all progress?')) { S = {}; load2(); save(); go('#/'); } } }, 'Reset all progress'))));
     app(frag);
   }
-  function load2() { S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate'; S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; S.removed = S.removed || {}; if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; }
+  function load2() { S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate'; S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; S.removed = S.removed || {}; S.bee = Bee.norm(S.bee); if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; }
 
   function viewKey(id) {
     setNav('parent');
@@ -625,10 +628,11 @@
       return GATE.require(route, () => go('#/'));
     }
     if (gated && window.GATE) GATE.touch();
-    const rl = p[0] === 'lesson' ? (BYID[p[1]] || {}).subj : p[0] === 'map' ? (SUBJ[p[1]] ? p[1] : 'math') : p[0] === 'placement' ? p[1] : '';
+    const rl = p[0] === 'lesson' ? (BYID[p[1]] || {}).subj : p[0] === 'map' ? (SUBJ[p[1]] ? p[1] : 'math') : p[0] === 'placement' ? p[1] : p[0] === 'bee' ? 'bee' : '';
     document.body.dataset.realm = rl || 'home';
-    ({ '': viewHome, placement: () => viewPlacement(p[1]), map: () => viewMap(p[1]), lesson: () => viewLesson(p[1]), done: () => viewDone(p[1]), review: () => viewReview(p[1]), parent: viewParent, key: () => viewKey(p[1]) }[p[0]] || viewHome)();
+    ({ '': viewHome, bee: () => BeeUI.view(p[1], p[2]), placement: () => viewPlacement(p[1]), map: () => viewMap(p[1]), lesson: () => viewLesson(p[1]), done: () => viewDone(p[1]), review: () => viewReview(p[1]), parent: viewParent, key: () => viewKey(p[1]) }[p[0]] || viewHome)();
   }
+  window.AppKit = { h, get S() { return S; }, save, go, app, setNav, todayStr, markDay, knightHtml };
   window.addEventListener('hashchange', route);
   route();
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});

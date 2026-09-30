@@ -110,3 +110,13 @@ area for 10 minutes (`js/gate.js`) and keeps progress in a shared family record 
 - Publish the rules in `firestore.rules` in the Firebase console (Firestore Database, Rules). `pravityo.github.io` must be under
   Authentication, Settings, Authorized domains.
 - Tests: `node tests/merge.test.js`, `node tests/family.test.js`. The Firestore rules themselves are not covered by the offline tests.
+
+## Spelling Bee training (`js/bee.js`, `js/beeview.js`, `js/data/beewords.js`)
+A "Bee" tab prepares for a grade 1 spelling bee. The built-in list is our own 360 practice words in 30 pattern groups (tiers 1
+to 3), not the official Scripps list, which is copyrighted; a parent can paste the organisers' list in the Grown-ups area
+(one word per line, optionally `word | meaning | sentence`), and those words are taught first.
+- **Daily drill:** about 10 words, some new (at most 6 a day, set by the parent) and the rest due for review in Leitner boxes (1, 2, 4, 7, 14, 30 days). The last 7 days before the bee date have no new words, only review.
+- **Ways to answer:** letter tiles, typing, or saying it out loud with a self-check. Words are spoken with the browser's speech (a pronouncer: word, meaning, sentence, repeat); without sound a grown-up reads it.
+- **Game:** each drill is a fight with a word monster (5 hearts); points (10 first try, 5 second, 1 for trying, plus a combo bonus), ranks (Word Page to Word Wizard), 14 trophies, tamed monsters, streaks, and a Mock Bee (12 words in 3 harder rounds, 3 lives).
+- **Countdown:** the parent sets the bee date; the app shows days left and whether the child is on track.
+- Progress syncs with the rest of the saved progress (`js/merge.js`). Tests: `node tests/bee.test.js`.

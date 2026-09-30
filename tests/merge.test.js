@@ -31,4 +31,13 @@ eq('old records without a time lose to a tombstone', Object.keys(M.merge(old, un
 // settings tie and empty cases
 eq('empty remote name falls back', M.merge({ name: '', setAt: 5 }, { name: 'Zed', setAt: 1 }).name, 'Zed');
 eq('does not mutate inputs', JSON.stringify(A).length > 0 && A.name, 'Mia');
+// spelling bee state
+const b1 = { date: '2026-11-13', start: '2026-10-01', words: { cat: { box: 2, last: '2026-10-03', ok: 3, miss: 0 }, dog: { box: 1, last: '2026-10-02', ok: 1, miss: 1 } }, xp: 120, drills: 3, days: ['2026-10-01', '2026-10-03'], friends: [3], trophies: { first: '2026-10-01' }, custom: [['zip', 'a fastener', 'Zip it.']], setAt: 5, mockBest: 4, maxCombo: 6, perfect: 0 };
+const b2 = { date: '2026-11-20', start: '2026-09-30', words: { cat: { box: 3, last: '2026-10-05', ok: 4, miss: 0 }, hat: { box: 1, last: '2026-10-04', ok: 1, miss: 0 } }, xp: 90, drills: 5, days: ['2026-10-02'], friends: [3, 8], trophies: { first: '2026-09-30', flawless: '2026-10-04' }, custom: [['zip'], ['yak', 'x', 'y']], setAt: 9, mockBest: 9, maxCombo: 3, perfect: 1 };
+const mb = M.merge({ bee: b1 }, { bee: b2 }).bee;
+eq('bee: words from both, newer practice wins', [Object.keys(mb.words).sort(), mb.words.cat.box], [['cat', 'dog', 'hat'], 3]);
+eq('bee: best numbers kept', [mb.xp, mb.drills, mb.mockBest, mb.maxCombo, mb.perfect], [120, 5, 9, 6, 1]);
+eq('bee: days, friends and trophies combined', [mb.days, mb.friends, mb.trophies], [['2026-10-01', '2026-10-02', '2026-10-03'], [3, 8], { first: '2026-09-30', flawless: '2026-10-04' }]);
+eq('bee: custom words combined once', mb.custom.map(c => c[0]), ['zip', 'yak']); eq('bee: newer settings win, earliest start', [mb.date, mb.start], ['2026-11-20', '2026-09-30']);
+eq('bee: only one side has it', M.merge({}, { bee: b2 }).bee.xp, 90); eq('bee: merging twice changes nothing', M.same(M.merge({ bee: mb }, { bee: b1 }).bee, M.merge(M.merge({ bee: mb }, { bee: b1 }), { bee: b2 }).bee), true);
 console.log(bad ? bad + ' failures' : 'merge tests OK'); process.exit(bad ? 1 : 0);

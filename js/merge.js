@@ -46,10 +46,31 @@
     const useLocal = num(local.setAt) >= num(remote.setAt);
     const s = useLocal ? local : remote, t = useLocal ? remote : local;
     out.name = s.name || t.name || ''; out.plan = s.plan || t.plan || 'rotate'; out.goal = s.goal || t.goal || 3; out.setAt = Math.max(num(local.setAt), num(remote.setAt));
+    if (local.bee || remote.bee) out.bee = mergeBee(local.bee, remote.bee);
     out.pos = clone(local.pos == null ? remote.pos : local.pos);          // where you were belongs to this device
     return out;
   }
+  /* Spelling bee training (S.bee): words the child has met, points and trophies are all kept from both copies. */
+  function mergeBee(a, b) {
+    if (!a) return clone(b); if (!b) return clone(a);
+    const o = {}, useA = num(a.setAt) >= num(b.setAt), p = useA ? a : b, q = useA ? b : a;
+    ['date', 'mode', 'size', 'newMax', 'sound'].forEach(k => { o[k] = p[k] != null ? p[k] : q[k]; });
+    o.setAt = Math.max(num(a.setAt), num(b.setAt));
+    o.start = [a.start, b.start].filter(Boolean).sort()[0] || null;
+    ['xp', 'drills', 'perfect', 'mockBest', 'maxCombo'].forEach(k => { o[k] = Math.max(num(a[k]), num(b[k])); });
+    o.words = {};
+    new Set([...Object.keys(a.words || {}), ...Object.keys(b.words || {})]).forEach(w => {
+      const x = (a.words || {})[w], y = (b.words || {})[w];
+      o.words[w] = clone(!x ? y : !y ? x : ((x.last || '') !== (y.last || '') ? later(x, y) : (num(x.ok) + num(x.miss) >= num(y.ok) + num(y.miss) ? x : y)));
+    });
+    o.days = [...new Set([...(a.days || []), ...(b.days || [])])].sort();
+    o.friends = [...new Set([...(a.friends || []), ...(b.friends || [])])];
+    o.trophies = {}; [a.trophies, b.trophies].forEach(m => Object.entries(m || {}).forEach(([id, d]) => { if (!o.trophies[id] || d < o.trophies[id]) o.trophies[id] = d; }));
+    const seen = new Set(); o.custom = [];
+    [...(a.custom || []), ...(b.custom || [])].forEach(c => { if (c && !seen.has(c[0])) { seen.add(c[0]); o.custom.push(c); } });
+    return o;
+  }
   /* Two copies are "the same" if merging changes nothing (used to skip needless writes and reloads). */
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-  root.Merge = { merge, betterDone, same };
+  root.Merge = { merge, mergeBee, betterDone, same };
 })(typeof window !== 'undefined' ? window : globalThis);
