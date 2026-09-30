@@ -1,0 +1,27 @@
+/* Optional One Bee resource: source boundaries, duplicate handling and practice selection. */
+const assert = require('assert'), fs = require('fs'), path = require('path');
+globalThis.window = globalThis;
+for (const file of ['data/beewords', 'data/onebeewords', 'bee']) eval(fs.readFileSync(path.join(__dirname, '..', 'js', file + '.js'), 'utf8'));
+const extra = BEE_EXTRA_LISTS[0], words = extra.words.map(x => x[0]);
+assert.strictEqual(words.length, 947);
+assert.strictEqual(new Set(words).size, words.length);
+assert(words.every(w => /^[a-zñ]+(?:[ -][a-z]+)*$/.test(w)), 'no PDF headings or footers');
+for (const w of ['acrobat', 'zooming', 'punting', 'parsley', 'pattern', 'thistle', 'señor', 'grown-ups', 'fuddy-duddy', 'gung ho', 'dim sum', 'favourite', 'formalise', 'imposter', 'squawl', 'marvellous']) assert(words.includes(w), w);
+for (const w of ['abdicate', 'gallop', 'hexagonal', 'lacrosse', 'difficulty', 'hosted', 'or']) assert(!words.includes(w), 'outside One Bee: ' + w);
+const all = Bee.flatten(BEE_GROUPS, BEE_EXTRA_LISTS), normal = Bee.flatten(BEE_GROUPS, []);
+assert.strictEqual(new Set(all.map(x => x.w)).size, all.length);
+const state = Bee.blank();
+assert.deepStrictEqual(Bee.pool(state, all).map(x => x.w), normal.map(x => x.w), 'default practice remains the existing list');
+state.active = [extra.id];
+const pool = Bee.pool(state, all);
+assert.strictEqual(pool.length, 947);
+assert(pool.every(x => [1, 2, 3].includes(x.tier)));
+const shared = normal.find(x => words.includes(x.w));
+assert(shared && shared.def);
+assert.strictEqual(pool.find(x => x.w === shared.w).def, shared.def);
+state.tiers = [1];
+assert(Bee.pool(state, all).every(x => x.tier === 1));
+state.tiers = [1, 2, 3];
+const session = Bee.buildSession(state, pool, '2026-09-30');
+assert(session.order.length > 0 && session.order.every(x => words.includes(x.w)));
+console.log('One Bee resource tests OK');

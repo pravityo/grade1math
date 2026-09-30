@@ -113,7 +113,7 @@ area for 10 minutes (`js/gate.js`) and keeps progress in a shared family record 
 
 ## Spelling Bee training (`js/bee.js`, `js/beeview.js`, `js/data/beewords.js`)
 A "Bee" tab prepares for a grade 1 spelling bee. The built-in list is our own 360 practice words in 30 pattern groups (tiers 1
-to 3), not the official Scripps list, which is copyrighted; a parent can paste the organisers' list in the Grown-ups area
+to 3), with an optional One Bee extra practice list from the two user-supplied PDFs; a parent can paste the organisers' list in the Grown-ups area
 (one word per line, optionally `word | meaning | sentence`), and those words are taught first.
 - **Daily drill:** about 10 words, some new (at most 6 a day, set by the parent) and the rest due for review in Leitner boxes (1, 2, 4, 7, 14, 30 days). The last 7 days before the bee date have no new words, only review.
 - **Ways to answer:** letter tiles, typing, or saying it out loud with a self-check. Words are spoken with the browser's speech (a pronouncer: word, meaning, sentence, repeat); without sound a grown-up reads it.
@@ -123,4 +123,4 @@ to 3), not the official Scripps list, which is copyrighted; a parent can paste t
 
 ### Word lists and levels
 Words are graded **Simple, Advanced or Expert** (built-in groups by hand, imported words by `Bee.autoTier`: length, syllables, spelling traps such as silent letters, ph, gh, double letters, plus a set of common irregular words). Add `| 1`, `| 2` or `| 3` after a line to set a level yourself. The Bee page has tick boxes to choose which lists and levels to practise; the mock bee runs Simple, Advanced, then Expert rounds.
-Grown-ups can add extra lists (school list, Scripps "Words of the Champions") from **Grown-ups > Spelling Bee**: paste words, or choose a .txt/.csv/.pdf file (PDFs are read in the browser with pdf.js from cdnjs). A preview lets you choose "first word of each line / column / every word" and edit the result before saving. Official lists are copyrighted, so they are not bundled in the repo; imported lists are saved only in the family's progress.
+Grown-ups can add extra lists (school list, Scripps "Words of the Champions") from **Grown-ups > Spelling Bee**: paste words, or choose a .txt/.csv/.pdf file (PDFs are read in the browser with pdf.js from cdnjs). A preview lets you choose "first word of each line / column / every word" and edit the result before saving. The optional `js/data/onebeewords.js` bundles 947 unique entries from the One Bee sections of the supplied 2026 school PDF (page 2, 150 words) and the supplied 2020 Words of the Champions PDF (pages 4–8, 806 entries including alternate spellings). It starts unticked and uses the existing Simple/Advanced/Expert grading. Accents, spaces and hyphens are preserved. These sources supply spellings only; existing practice words retain their definitions and sentences. Other imported lists are saved only in the family's progress.
