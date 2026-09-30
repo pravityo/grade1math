@@ -40,4 +40,14 @@ eq('bee: best numbers kept', [mb.xp, mb.drills, mb.mockBest, mb.maxCombo, mb.per
 eq('bee: days, friends and trophies combined', [mb.days, mb.friends, mb.trophies], [['2026-10-01', '2026-10-02', '2026-10-03'], [3, 8], { first: '2026-09-30', flawless: '2026-10-04' }]);
 eq('bee: own words combined once (legacy custom migrated)', mb.lists[0].words.map(c => c[0]), ['zip', 'yak']); eq('bee: newer list choice wins', [mb.active, mb.tiers], [['grade1'], [1, 2, 3]]); eq('bee: newer settings win, earliest start', [mb.date, mb.start], ['2026-11-20', '2026-09-30']);
 eq('bee: only one side has it', M.merge({}, { bee: b2 }).bee.xp, 90); eq('bee: merging twice changes nothing', M.same(M.merge({ bee: mb }, { bee: b1 }).bee, M.merge(M.merge({ bee: mb }, { bee: b1 }), { bee: b2 }).bee), true);
+const oldState = { done: { '0': { at: 10, correct: 2 } }, right: { '0': { '1': true } }, days: ['2026-09-30'], name: 'Old', bee: { xp: 500, words: { cat: { ok: 2 } }, lists: [{ id: 'school', words: [['cat']] }] } };
+const cleared = M.reset(oldState, 100);
+eq('reset wins over stale remote', M.merge(cleared, oldState), cleared);
+eq('reset wins over stale local', M.merge(oldState, cleared), cleared);
+const afterReset = Object.assign({}, cleared, { done: { '1': { at: 110, correct: 3 } } });
+eq('new progress survives stale device', M.merge(afterReset, oldState), afterReset);
+const newerReset = M.reset(afterReset, 90);
+eq('repeated reset timestamp increases', newerReset.resetAt, 101);
+eq('newer reset wins', M.merge(afterReset, newerReset), newerReset);
+eq('reset marker survives equal-generation merge', M.merge(cleared, afterReset).resetAt, 100);
 console.log(bad ? bad + ' failures' : 'merge tests OK'); process.exit(bad ? 1 : 0);

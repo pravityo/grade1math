@@ -16,7 +16,7 @@
   function norm(B) {
     const b = Object.assign(blank(), B || {}); ['words', 'trophies'].forEach(k => { b[k] = b[k] || {}; }); ['days', 'friends', 'lists'].forEach(k => { b[k] = Array.isArray(b[k]) ? b[k] : []; });
     if (Array.isArray(b.custom) && b.custom.length) { b.lists.push({ id: 'own', name: 'Your own words', words: b.custom }); } delete b.custom;   // older saves had one flat list of own words
-    if (!Array.isArray(b.active) || !b.active.length) b.active = ['grade1']; if (!Array.isArray(b.tiers) || !b.tiers.length) b.tiers = [1, 2, 3];
+    if (!Array.isArray(b.active) || !b.active.length) b.active = ['grade1']; b.active = [...new Set(b.active.map(id => id === 'onebee-extra' ? 'grade1' : id))]; if (!Array.isArray(b.tiers) || !b.tiers.length) b.tiers = [1, 2, 3];
     return b;
   }
   /* A judgement of how hard a word is for a young speller: length, number of beats, and spelling traps such as silent letters,
@@ -38,6 +38,11 @@
     const out = [], at = new Map();
     const add = (it, listId) => { const k = at.get(it.w); if (k) { if (!k.lists.includes(listId)) k.lists.push(listId); } else { it.lists = [listId]; at.set(it.w, it); out.push(it); } };
     groups.forEach((g, gi) => g.words.forEach(x => add({ w: x[0], def: x[1], sent: x[2], tier: g.tier, gid: g.id, gname: g.name, tip: g.tip, emoji: g.emoji, gi }, 'grade1')));
+    // Supplied One Bee words belong to the same built-in pool as the original practice words.
+    (root.BEE_EXTRA_LISTS || []).forEach(l => l.words.forEach(x => {
+      const t = autoTier(x[0]);
+      add({ w: x[0], def: x[1] || '', sent: x[2] || '', tier: t, gid: 'onebee-t' + t, gname: TIERS[t].name + ' words', tip: TIER_TIP[t], emoji: TIERS[t].emoji }, 'grade1');
+    }));
     (lists || []).forEach(l => (l.words || []).map(x => ({ x, t: tierOf(x[3]) || autoTier(x[0]) })).sort((a, b) => a.t - b.t).forEach(({ x, t }) => add({ w: x[0], def: x[1] || '', sent: x[2] || '', tier: t, gid: `${l.id}-t${t}`, gname: `${l.name}: ${TIERS[t].name}`, tip: TIER_TIP[t], emoji: TIERS[t].emoji, custom: true, listName: l.name }, l.id)));
     return out;
   }

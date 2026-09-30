@@ -7,7 +7,7 @@
   const bee = () => { const S = kit().S; if (!S.bee || !S.bee.words) S.bee = Bee.norm(S.bee); return S.bee; };
   const save = () => { bee().setAt = bee().setAt || 0; kit().save(); };
   let cache = null;
-  const list = () => { const key = bee().lists.map(l => l.id + ':' + l.words.length).join(','); if (!cache || cache.key !== key) cache = { key, items: Bee.flatten(BEE_GROUPS, (window.BEE_EXTRA_LISTS || []).concat(bee().lists)) }; return cache.items; };
+  const list = () => { const key = bee().lists.map(l => l.id + ':' + l.words.length).join(','); if (!cache || cache.key !== key) cache = { key, items: Bee.flatten(BEE_GROUPS, bee().lists) }; return cache.items; };
   const pl = () => Bee.pool(bee(), list());          // the words for the lists and levels that are switched on
   const tierTag = x => h('span', { class: 'tier t' + x.tier }, `${Bee.TIERS[x.tier].emoji} ${Bee.TIERS[x.tier].name}`);
   const byWord = w => list().find(x => x.w === w);
@@ -129,12 +129,11 @@
       h('label', { class: 'soundtoggle' }, h('input', Object.assign({ type: 'checkbox', onchange: e => { bee().sound = e.target.checked; save(); if (!e.target.checked) Speech.stop(); } }, B.sound !== false ? { checked: 'checked' } : {})), ' 🔊 Say the words out loud'),
       Speech.ok ? '' : h('p', { class: 'muted small' }, 'This device cannot speak, so a grown-up will need to read the words.')));
     // word lists and levels
-    const all = list(), listDefs = [{ id: 'grade1', name: 'Grade 1 practice words' }].concat((window.BEE_EXTRA_LISTS || []).map(l => ({ id: l.id, name: l.name })), B.lists.map(l => ({ id: l.id, name: l.name })));
+    const all = list(), listDefs = [{ id: 'grade1', name: 'Bee practice words' }].concat(B.lists.map(l => ({ id: l.id, name: l.name })));
     const toggle = (arr, v) => { const i = arr.indexOf(v); if (i >= 0) { if (arr.length > 1) arr.splice(i, 1); } else arr.push(v); B.setAt = Date.now(); save(); view(); };
     wrap.append(h('section', { class: 'card' }, h('h2', {}, '📚 Which words?'), h('p', { class: 'muted small' }, 'Tick the word lists to practise. A grown-up can add more lists in the Grown-ups area, for example the school bee list.'),
       h('div', { class: 'checks' }, listDefs.map(d => { const n = all.filter(x => x.lists.includes(d.id)).length; return h('label', { class: 'check' }, h('input', Object.assign({ type: 'checkbox', onchange: () => toggle(B.active, d.id) }, B.active.includes(d.id) ? { checked: 'checked' } : {})), ` ${d.name} `, h('small', {}, `(${n} words)`)); })),
       h('div', { class: 'checks' }, [1, 2, 3].map(t => { const n = all.filter(x => x.tier === t && x.lists.some(id => B.active.includes(id))).length; return h('label', { class: 'check t' + t }, h('input', Object.assign({ type: 'checkbox', onchange: () => toggle(B.tiers, t) }, B.tiers.includes(t) ? { checked: 'checked' } : {})), ` ${Bee.TIERS[t].emoji} ${Bee.TIERS[t].name} `, h('small', {}, `(${n})`)); })),
-      h('p', { class: 'muted small' }, 'One Bee extra practice has words from the 2026 school list and the 2020 Champions list. Tick it for more words.'),
       h('p', { class: 'muted small' }, `${L.length} words in your practice now. Simple words are short and follow the sound rules, advanced ones are longer or have a tricky part, and expert ones are long or very tricky.`),
       L.length ? '' : h('p', { class: 'feedback-warn' }, '⚠️ Nothing to practise with this choice. Tick a list and a level.')));
     // trophies
@@ -157,7 +156,7 @@
     const gids = []; all.forEach(x => { if (!gids.includes(x.gid)) gids.push(x.gid); });
     let lastList = null;
     gids.forEach(gid => {
-      const items = all.filter(x => x.gid === gid), f = items[0], list0 = f.custom ? f.listName : 'Grade 1 practice words';
+      const items = all.filter(x => x.gid === gid), f = items[0], list0 = f.custom ? f.listName : 'Bee practice words';
       if (list0 !== lastList) { wrap.append(h('h2', { class: 'sect' }, list0)); lastList = list0; }
       const mast = items.filter(x => Bee.isMastered(B.words[x.w])).length, met = items.filter(x => B.words[x.w]).length;
       wrap.append(h('a', { class: 'group', href: '#/bee/group/' + gid }, h('span', { class: 'g-emoji' }, f.emoji), h('span', { class: 'g-body' }, h('b', {}, f.custom ? Bee.TIERS[f.tier].name : f.gname), ' ', tierTag(f), h('br'), meter(mast / items.length * 100, 'gold'), h('small', {}, `${mast} mastered · ${met} met · ${items.length} words`))));
@@ -358,7 +357,7 @@
       h('div', { class: 'ans', style: 'margin-top:14px' }, h('label', {}, 'Words per drill: '), size, h('label', {}, ' New words per day (at most): '), newMax, h('button', { class: 'btn', onclick: () => { B.size = +size.value; B.newMax = +newMax.value; B.setAt = Date.now(); save(); alert('Saved'); } }, 'Save')),
       h('p', { class: 'muted small' }, 'Each drill mixes new words with words that are due for review. In the last 7 days before the bee there are no new words, only review of the words already met.'),
       weak.length ? h('p', {}, h('b', {}, 'Words that need more practice: '), weak.map(x => x.w).join(', ')) : '',
-      h('h3', { style: 'margin-top:20px' }, 'Word lists'), h('p', { class: 'muted small' }, `Built in: our own grade 1 practice list (${BEE_GROUPS.reduce((n, g) => n + g.words.length, 0)} words). One Bee extra practice combines the One Bee sections from the supplied 2026 school list and the 2020 Words of the Champions PDF. It is optional on the Bee page. Extra words use speech without definitions or example sentences unless already in our practice list. Add other lists here from a file or by pasting: imported lists stay in this family account. Every word gets a level (Simple, Advanced or Expert) from its length and spelling traps. Add | 1, 2 or 3 at the end of a line to set a level yourself. Switch lists on and off on the Bee page.`),
+      h('h3', { style: 'margin-top:20px' }, 'Word lists'), h('p', { class: 'muted small' }, `Built in: our own grade 1 practice list (${BEE_GROUPS.reduce((n, g) => n + g.words.length, 0)} words). The practice pool also includes the One Bee sections from the supplied 2026 school list and the 2020 Words of the Champions PDF. Extra words use speech without definitions or example sentences unless already in our practice list. Add other lists here from a file or by pasting: imported lists stay in this family account. Every word gets a level (Simple, Advanced or Expert) from its length and spelling traps. Add | 1, 2 or 3 at the end of a line to set a level yourself. Switch lists on and off on the Bee page.`),
       h('p', { class: 'muted small' }, 'One Bee sources: ', (window.BEE_EXTRA_LISTS || []).flatMap(l => l.sources.map((source, i) => h('span', {}, i ? ' · ' : '', h('a', { href: source.url, target: '_blank', rel: 'noopener noreferrer' }, source.name))))),
       lists, h('h4', {}, 'Add words'), name, area,
       h('div', { class: 'ans' }, h('label', { class: 'btn alt' }, 'Choose a file (.txt, .csv, .pdf)', file), h('button', { class: 'btn', onclick: addPasted }, 'Add pasted words')), msg, preview,

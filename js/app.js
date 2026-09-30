@@ -47,6 +47,7 @@
   // Optional Google sign-in (js/cloud.js): the cloud copy is merged in and the app redraws when it changes.
   if (window.Cloud) Cloud.attach({ get: () => S, apply: m => {
     // update in place, so a lesson that is open keeps writing into the same objects
+    if ((m.resetAt || 0) > (S.resetAt || 0)) { S.right = {}; S.bee = Bee.blank(); }
     const right = S.right; Object.keys(m.right || {}).forEach(id => { right[id] = Object.assign(right[id] || {}, m.right[id]); });
     if (m.bee) S.bee = S.bee ? Object.assign(S.bee, m.bee) : m.bee;   // a spelling drill in progress keeps writing into the same object
     Object.keys(m).forEach(k => { if (k !== 'right' && k !== 'pos' && k !== 'bee') S[k] = m[k]; });
@@ -603,7 +604,7 @@
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Backup / new device'),
       h('button', { class: 'btn alt', onclick: () => { io.value = JSON.stringify(S); io.select(); } }, 'Show progress code'), ' ',
       h('button', { class: 'btn alt', onclick: () => { try { const o = JSON.parse(io.value); if (!o.done) throw 0; S = o; load2(); save(); alert('Restored'); go('#/'); } catch (e) { alert('That code was not valid.'); } } }, 'Restore from code'), io,
-      h('p', {}, h('button', { class: 'btn', style: 'background:var(--bad)', onclick: () => { if (confirm('Erase all progress?')) { S = {}; load2(); save(); go('#/'); } } }, 'Reset all progress'))));
+      h('p', {}, h('button', { class: 'btn', style: 'background:var(--bad)', onclick: () => { if (confirm('Reset everything? This erases all lesson progress, stars, armour, placement results, spelling bee progress, imported word lists and settings for this family. It syncs to your other devices. Parent accounts stay connected. This cannot be undone.')) { S = Merge.reset(S, Date.now()); load2(); save(); go('#/'); } } }, 'Reset everything'))));
     app(frag);
   }
   function load2() { S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate'; S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; S.removed = S.removed || {}; S.bee = Bee.norm(S.bee); if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; }

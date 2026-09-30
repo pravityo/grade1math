@@ -16,7 +16,10 @@
 
   function merge(local, remote) {
     local = local || {}; if (!remote) return clone(local);
+    // A full reset starts a new progress generation. Older devices cannot restore erased progress.
+    if (num(local.resetAt) !== num(remote.resetAt)) return clone(num(local.resetAt) > num(remote.resetAt) ? local : remote);
     const out = {};
+    if (num(local.resetAt)) out.resetAt = num(local.resetAt);
     // tombstones: newest time per lesson
     out.removed = {};
     [local.removed, remote.removed].forEach(m => Object.entries(m || {}).forEach(([id, t]) => { out.removed[id] = Math.max(num(out.removed[id]), num(t)); }));
@@ -78,5 +81,6 @@
   }
   /* Two copies are "the same" if merging changes nothing (used to skip needless writes and reloads). */
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-  root.Merge = { merge, mergeBee, betterDone, same };
+  const reset = (state, now) => ({ resetAt: Math.max(num(now), num(state && state.resetAt) + 1), setAt: Math.max(num(now), num(state && state.resetAt) + 1) });
+  root.Merge = { merge, mergeBee, betterDone, same, reset };
 })(typeof window !== 'undefined' ? window : globalThis);
