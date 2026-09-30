@@ -45,9 +45,9 @@
   const monsterIdx = n => (n * 7 + 3) % Monsters.LIST.length;
 
   /* Buttons that say the word, its meaning and a sentence, like a bee pronouncer. */
-  function pronouncer(item, big) {
+  function pronouncer(item, big, beforeListen) {
     const row = h('div', { class: 'pron' });
-    const b = (label, fn, cls) => row.append(h('button', { class: 'btn alt ' + (cls || ''), onclick: fn }, label));
+    const b = (label, fn, cls) => row.append(h('button', { class: 'btn alt ' + (cls || ''), onclick: () => { if (beforeListen) beforeListen(); fn(); } }, label));
     b('🔊 Word', () => Speech.say(item.w, 0.8), big ? 'big' : '');
     if (item.def) b('📖 Meaning', () => Speech.say('Meaning: ' + item.def + '.', 0.9));
     if (item.sent) b('💬 Sentence', () => Speech.say(item.sent, 0.9));
@@ -224,15 +224,24 @@
     /* meet the new words */
     function study(k) {
       if (k >= cfg.fresh.length) return battle();
-      const x = cfg.fresh[k], shell = h('div', {});
-      const cover = h('div', {}), fully = h('div', { class: 'card studycard' });
-      fully.append(h('div', { class: 'muted small' }, `New word ${k + 1} of ${cfg.fresh.length} `, tierTag(x)), h('div', { class: 'sw' }, letters(x.w, 'huge')), pronouncer(x, true),
-        h('div', { class: 'ans center' }, h('button', { class: 'btn alt', onclick: () => Speech.spell(x.w) }, '🔤 Say the letters')),
-        x.def ? h('p', {}, h('b', {}, 'Meaning: '), x.def) : '', x.sent ? h('p', { class: 'sentence' }, h('b', {}, 'Sentence: '), x.sent) : '', h('p', { class: 'key' }, `${x.emoji} ${x.tip}`), silentHelp(x),
-        h('p', { class: 'muted' }, 'Look at it, say it, then cover it and try to spell it from memory.'),
-        h('button', { class: 'btn', onclick: () => { fully.replaceChildren(h('h3', {}, 'Cover and spell'), h('p', { class: 'muted' }, 'The word is hidden. Spell it from memory.'), pronouncer(x), memory(x, k)); } }, '🙈 Cover it and spell'));
-      shell.append(fully); show(shell);
-      Speech.say(x.w, 0.8);
+      const x = cfg.fresh[k], fully = h('div', { class: 'card studycard' });
+      const spelling = h('div', { class: 'bee-study-spelling' });
+      let visible = false;
+      const hide = () => { visible = false; spelling.replaceChildren(); reveal.textContent = '👀 Show the spelling'; reveal.setAttribute('aria-expanded', 'false'); };
+      const reveal = h('button', { class: 'btn alt', 'aria-expanded': 'false', onclick: () => {
+        if (visible) return hide();
+        visible = true; reveal.textContent = '🙈 Hide the spelling'; reveal.setAttribute('aria-expanded', 'true');
+        spelling.replaceChildren(h('div', { class: 'sw' }, letters(x.w, 'huge')),
+          h('button', { class: 'btn alt', onclick: () => Speech.spell(x.w) }, '🔤 Say the letters'),
+          h('p', { class: 'key' }, `${x.emoji} ${x.tip}`));
+      } }, '👀 Show the spelling');
+      fully.append(h('div', { class: 'muted small' }, `New word ${k + 1} of ${cfg.fresh.length} `, tierTag(x)),
+        h('h2', {}, 'Listen first'), h('p', {}, 'Hear the word. Try to spell it before you look.'), pronouncer(x, true, hide), silentHelp(x),
+        x.def ? h('p', {}, h('b', {}, 'Meaning: '), blanked(x.def, x.w)) : '',
+        x.sent ? h('p', { class: 'sentence' }, h('b', {}, 'Sentence: '), blanked(x.sent, x.w)) : '', reveal, spelling,
+        h('p', { class: 'muted' }, 'Ready? Keep the spelling hidden and give it a try.'),
+        h('button', { class: 'btn', onclick: () => { fully.replaceChildren(h('h3', {}, 'Spell from listening'), h('p', { class: 'muted' }, 'The spelling is hidden. Spell the word you heard.'), pronouncer(x), silentHelp(x), memory(x, k)); } }, 'Try spelling it'));
+      show(fully); Speech.say(x.w, 0.8);
     }
     function memory(x, k) {
       const done = ok => h('div', { class: 'bee-feedback ' + (ok ? 'ok' : 'no') }, ok ? '✅ Perfect memory!' : ['Look again: ', letters(x.w)], h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => study(k + 1) }, k + 1 < cfg.fresh.length ? 'Next new word ➜' : 'Start the battle ⚔️')));
