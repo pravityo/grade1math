@@ -126,3 +126,15 @@ Words are graded **Simple, Advanced or Expert** (built-in groups by hand, import
 Grown-ups can add extra lists (school list, Scripps "Words of the Champions") from **Grown-ups > Spelling Bee**: paste words, or choose a .txt/.csv/.pdf file (PDFs are read in the browser with pdf.js from cdnjs). A preview lets you choose "first word of each line / column / every word" and edit the result before saving. `js/data/onebeewords.js` bundles 947 unique source entries from the One Bee sections of the supplied 2026 school PDF (page 2, 150 words) and the supplied 2020 Words of the Champions PDF (pages 4–8, 806 entries including alternate spellings). These words join the default practice pool and use the existing Simple/Advanced/Expert grading. Accents, spaces and hyphens are preserved. These sources supply spellings only; existing practice words retain their definitions and sentences. Other imported lists are saved only in the family's progress.
 
 Grown-ups has a **Reset everything** button with confirmation. It clears progress, rewards, imported lists and settings, while keeping parent accounts connected. A reset timestamp prevents older devices from restoring erased progress during cloud sync.
+
+## Learning-first interface
+Home puts daily quests first. Lessons use compact monster progress after the introduction.
+Completion overrides are shown only while Grown-ups is unlocked and recheck the gate when used.
+The map expands the next unfinished level. Grown-ups is organized into Setup, Progress,
+Spelling, Family and Data, with collapsible subject reports and mobile progress rows.
+Bee leads with the daily drill and the next milestone; Word Trail supports search, difficulty
+and progress filters, and 40-word pages, including large groups.
+
+Optional browser regression checks: `node tests/ux.browser.check.js` (requires Playwright).
+They exercise phone/iPad widths, light/dark mode, parent controls, pagination and overflow
+in isolated browser contexts. `BROWSER_EXECUTABLE` can select an installed Chrome binary.

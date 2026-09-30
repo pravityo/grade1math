@@ -486,3 +486,56 @@ ul.plain{list-style:none;padding:0;margin:8px 0}
 .check{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:12px;border:2px solid var(--line);cursor:pointer;font-weight:700}
 .check input{width:20px;height:20px}
 .feedback-warn{color:#8a5a00}
+
+/* Learning-first layouts and accessible controls. */
+:root{--link:#5b3cc4}
+.home-welcome{margin:0 0 18px}.home-welcome h1{font-size:1.65rem}.home-welcome p{margin-bottom:8px}
+.home-welcome+.sect{margin-top:12px}
+.fold{background:var(--card);border:2px solid var(--line);border-radius:18px;margin:18px 0;padding:12px 16px}
+.fold>summary{cursor:pointer;font-weight:800;min-height:48px;padding:10px 4px;line-height:1.4}
+.fold>summary:focus-visible{border-radius:8px}
+.fold .card{margin:16px 0;padding:20px 16px}.fold .hello{margin-top:16px}
+.map-level>summary{display:list-item;margin:0;font-size:1.1rem}.map-level>summary .wk{display:block;font-size:.9rem;margin-top:6px}
+.map-level .grid{margin-top:16px}.parent-section .card{border:0;border-top:1px solid var(--line);border-radius:0}
+.arena-compact{padding:12px 16px;margin:12px 0}.arena-compact .ar-scene{display:none}.arena-compact .ar-realm{font-size:.8rem}.arena-compact .ar-msg{font-size:.95rem}.arena-compact .ar-calm{margin-top:8px}
+.top nav a,.steps button,.linkbtn{min-height:48px;display:inline-flex;align-items:center;justify-content:center}
+.top nav{gap:4px;flex-wrap:wrap}.steps button{padding:10px 12px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--link);outline-offset:3px}
+.top a:focus-visible{outline-color:#ffd84d}
+main h1:focus,main h2:focus{outline:none}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);max-width:100%}
+.bee-daily{padding:16px 4px}.bee-daily h2{font-size:1.2rem}.bee-daily p{margin:0}
+.bee-filters{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}.bee-filters label{display:flex;flex-direction:column;flex:1 1 150px;font-size:.9rem;font-weight:700}
+.bee-filters input,.bee-filters select{width:100%;min-height:48px;padding:8px;border:2px solid var(--line);border-radius:10px}
+.bee-browser .wordgrid{margin:16px 0}.bee-browser .bee-wchip{display:flex;flex-direction:column;gap:6px;min-width:0;overflow-wrap:anywhere}.bee-browser .bee-wchip a{min-height:44px;display:flex;align-items:center;justify-content:center;color:var(--link)}
+.soundtoggle,.check{min-height:48px}.soundtoggle{display:flex;align-items:center;gap:10px}.soundtoggle input{width:24px;height:24px}
+.bee-mode{min-height:48px}.bee-browser .ans{justify-content:space-between}
+@media(max-width:560px){
+ .top{padding:8px 12px}.top nav{width:100%;justify-content:space-between}.top nav a{font-size:.85rem !important;padding:6px 8px !important}
+ main{padding-top:18px}.sc{padding:16px}.sc-wrap{margin-bottom:18px}.home-welcome h1{font-size:1.5rem}
+ .parent-section table,.parent-section tbody,.parent-section tr,.parent-section td{display:block;width:100%}
+ .parent-section tr:first-child{display:none}.parent-section tr{padding:12px 0;border-bottom:2px solid var(--line)}
+ .parent-section td{border:0;padding:4px 0;overflow-wrap:anywhere}.parent-section td::before{content:attr(data-label) ': ';font-weight:700}
+ .parent-section td a{display:inline-flex;align-items:center;min-height:48px;padding:6px 12px}
+ .parent-section .ans>*{max-width:100%;min-width:0}.parent-section .ans select{width:100%}
+}
+@media(prefers-color-scheme:dark){
+ :root{--pri:#7050c4;--link:#cbbaff;--ok:#73dfa4;--bad:#ff9898}
+ .bee-hero{background:linear-gradient(160deg,#362952,var(--card) 60%)}
+ .btn.alt,.linkbtn,.muted a,.pill.dark{color:var(--link)}
+ .btn:not(.alt):not(.light){color:#fff}.bee-mode.on{color:#fff}
+ .known-card,.news{background:#392f20;color:var(--ink)}
+ .gd.on{background:#443719;color:#fff}.tier{color:#2a2350}
+ .bee-input,.ans input{color:var(--ink)}
+ .group,.tile{color:var(--ink)}
+ .bee-done .muted{color:#fff}
+}
+@media(prefers-reduced-motion:reduce){.tile.next .tile-mon{animation:none}}
+:root{--ok:#167d43;--bad:#ba3030;--b:#197c46;--c:#245bb5;--s:#a24d10;--o:#7d32b4}
+.bee-browser [role=status]{scroll-margin-top:140px}
+@media(prefers-color-scheme:dark){
+ :root{--ok:#73dfa4;--bad:#c43e4e}
+ .fb.no,.bee-feedback.no{color:#ffb3b3}
+ .parent-section a:not(.btn){color:var(--link)}
+ .tile.done .stamp,.badge-done{color:var(--ok)}
+}

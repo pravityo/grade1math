@@ -19,9 +19,18 @@
       <div class="gate-row"><button class="btn" data-ok disabled>Getting ready...</button><button class="btn alt" data-cancel>Back to the quest</button></div>
     </div>`;
     const ok = back.querySelector('[data-ok]'), msg = back.querySelector('.gate-msg');
-    const close = () => { back.remove(); document.removeEventListener('keydown', onKey); };
+    const previousFocus = document.activeElement;
+    const close = () => { back.remove(); document.removeEventListener('keydown', onKey); if (previousFocus && previousFocus.isConnected) previousFocus.focus(); };
     const cancel = () => { close(); onCancel(); };
-    const onKey = e => { if (e.key === 'Escape') cancel(); };
+    const onKey = e => {
+      if (e.key === 'Escape') return cancel();
+      if (e.key === 'Tab') {
+        const controls = Array.from(back.querySelectorAll('button:not(:disabled)'));
+        if (!controls.length) return;
+        const index = controls.indexOf(document.activeElement);
+        if ((e.shiftKey && index <= 0) || (!e.shiftKey && (index < 0 || index === controls.length - 1))) { e.preventDefault(); controls[e.shiftKey ? controls.length - 1 : 0].focus(); }
+      }
+    };
     // the Google window must open straight from the tap, so the sign-in code is loaded first
     (window.Cloud ? Cloud.preload() : Promise.resolve()).then(() => { ok.disabled = false; ok.textContent = 'Sign in with Google'; const s = window.Cloud && Cloud.status(); if (s && s.state === 'error') msg.textContent = s.message; });
     ok.addEventListener('click', () => {
@@ -35,6 +44,7 @@
     back.querySelector('[data-cancel]').addEventListener('click', cancel);
     document.addEventListener('keydown', onKey);
     document.body.appendChild(back);
+    back.querySelector('[data-cancel]').focus();
   }
   window.GATE = { require, isUnlocked, touch, lock };
 })();

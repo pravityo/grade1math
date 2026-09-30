@@ -71,9 +71,15 @@
   /* ---------- helpers ---------- */
   const h = (tag, attrs, ...kids) => {
     const e = document.createElement(tag);
+    if (tag === 'button') e.type = 'button';
+    if (/(^| )(fb|bee-feedback)( |$)/.test((attrs || {}).class || '')) { e.setAttribute('role', 'status'); e.setAttribute('aria-live', 'polite'); }
     Object.entries(attrs || {}).forEach(([k, v]) => {
       if (k === 'class') e.className = v; else if (k === 'html') e.innerHTML = v;
-      else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v);
+      else if (k.startsWith('on')) e.addEventListener(k.slice(2), evt => {
+        const adultControl = k === 'onclick' && /already know|mark as known|not done|Start this lesson over|Choose lessons to change/i.test(e.textContent);
+        if (adultControl && window.GATE && !GATE.isUnlocked()) return GATE.require(() => v(evt), () => go('#/'));
+        v(evt);
+      }); else e.setAttribute(k, v);
     });
     kids.flat().forEach(c => e.append(c && c.nodeType ? c : document.createTextNode(c == null ? '' : c)));
     return e;
@@ -197,7 +203,7 @@
   }
 
   /* ---------- views ---------- */
-  function setNav(name) { document.querySelectorAll('[data-nav]').forEach(a => a.classList.toggle('on', a.dataset.nav === name)); }
+  function setNav(name) { document.querySelectorAll('[data-nav]').forEach(a => { const active = a.dataset.nav === name; a.classList.toggle('on', active); if (active) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); }
   const pillOf = L => `${SUBJ[L.subj].icon} ${SUBJ[L.subj].name} · Level ${L.week} · ${DAYS[L.day - 1]} · ${L.theme}`;
   let pick = null; // Set of lesson ids while choosing lessons to mark as known on the map
   function tile(L) {
@@ -247,7 +253,7 @@
       h('a', { class: 'go', href: '#/lesson/' + L.id }, cont ? 'Keep going' : 'Start!'));
     const skip = h('button', { class: 'linkbtn', onclick: () => { if (confirm(`Mark "${L.t}" as already known? It will count as done without any questions. You can undo this.`)) { markKnown(L); const nx = sb.lessons.find(l => !S.done[l.id]); S.pos = nx ? { id: nx.id, step: 0 } : null; save(); route(); } } }, 'I already know this one');
     const check = doneCount(sb) === 0 && !S.placed[sb.key] ? h('a', { class: 'linkbtn', href: '#/placement/' + sb.key }, 'Not sure where to start? Take a quick check') : '';
-    return h('div', { class: 'sc-wrap' }, card, skip, check);
+    return h('div', { class: 'sc-wrap' }, card, window.GATE && GATE.isUnlocked() ? skip : '', check);
   }
 
   /* A newly earned piece of armour (one per 3 study days) is worn straight away and announced once. */
@@ -314,34 +320,48 @@
         h('div', { class: 'stickers' }, sb.lessons.map(L => { const r = S.done[L.id], m = monsterFor(L); return h('a', { class: `stk ${sb.key} ${r ? (r.skipped ? 'known' : 'got') : ''} ${L.n === nx ? 'next' : ''}${m.boss ? ' bossk' : ''}`, href: '#/lesson/' + L.id, title: r && !r.skipped ? `${m.name}: ${L.t}` : (r ? L.t : `A monster is waiting: ${L.t}`), 'aria-label': L.t + (r ? ' (done)' : ''), html: monPic(L, '', !r) + (r && r.skipped ? '<b class="chk">✓</b>' : '') }); }))));
     });
     frag.append(book);
+    const intro = frag.querySelector('.hello');
+    const greetingTitle = intro.querySelector('h1');
+    const welcome = h('section', { class: 'home-welcome' }, greetingTitle, h('p', { class: 'muted' }, 'Choose a quest and let us begin!'));
+    const firstHeading = Array.from(frag.children).find(el => el.tagName === 'H2');
+    const questNodes = []; let collecting = false;
+    Array.from(frag.children).forEach(el => { if (el === firstHeading) collecting = true; if (collecting && (el.tagName === 'H2' || el.classList.contains('sc-wrap') || el.classList.contains('sc'))) questNodes.push(el); else if (collecting) collecting = false; });
+    intro.remove();
+    const trivia = h('details', { class: 'fold' }, h('summary', {}, 'Meet your knight and learn a fun fact'), intro);
+    frag.prepend(welcome, ...questNodes);
+    frag.append(trivia);
     app(frag);
   }
 
   function viewMap(key) {
     setNav('map');
     const sb = SUBJ[key] || SUBJECTS[0];
-    if (pick && pick.subj !== sb.key) pick = null;
+    const adult = window.GATE && GATE.isUnlocked();
+    if (!adult || (pick && pick.subj !== sb.key)) pick = null;
     const frag = h('div', {}, h('h1', {}, 'Quest Map'), subjTabs('map', sb.key), h('p', { class: 'muted' }, `${sb.blurb} 8 levels, 5 quests each. The last quest of every level is a Big Boss. Tap a quest to open it.`));
     if (!pick && doneCount(sb) === 0) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Not sure where to start? A short check (2 questions at a time) finds the right lesson.'), h('a', { class: 'btn', href: '#/placement/' + sb.key }, 'Take the quick check')));
-    if (!pick) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Learned some already, or pressed done by mistake?'), h('button', { class: 'btn', onclick: () => { pick = new Set(); pick.subj = sb.key; route(); } }, 'Choose lessons to change')));
-    else {
+    if (adult && !pick) frag.append(h('div', { class: 'known-card' }, h('span', {}, 'Learned some already, or pressed done by mistake?'), h('button', { class: 'btn', onclick: () => { pick = new Set(); pick.subj = sb.key; route(); } }, 'Choose lessons to change')));
+    else if (adult && pick) {
       const ids = [...pick], toKnow = ids.filter(id => !S.done[id]), toReset = ids.filter(id => S.done[id]);
       frag.append(h('div', { class: 'pickbar' }, h('b', {}, ids.length ? `${ids.length} chosen` : 'Tap the lessons to change'),
         h('button', Object.assign({ class: 'btn', onclick: () => { if (confirm(`Mark ${toKnow.length} lesson${toKnow.length > 1 ? 's' : ''} as already known? They will count as done without any questions. You can undo this.`)) { toKnow.forEach(id => markKnown(BYID[id])); pick = null; save(); route(); } } }, toKnow.length ? {} : { disabled: 'disabled' }), `Mark as known${toKnow.length ? ' (' + toKnow.length + ')' : ''}`),
         h('button', Object.assign({ class: 'btn alt', onclick: () => { if (confirm(`Mark ${toReset.length} lesson${toReset.length > 1 ? 's' : ''} as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { toReset.forEach(id => unmarkDone(BYID[id])); pick = null; save(); route(); } } }, toReset.length ? {} : { disabled: 'disabled' }), `↩ Mark as not done${toReset.length ? ' (' + toReset.length + ')' : ''}`),
         h('button', { class: 'btn alt', onclick: () => { pick = null; route(); } }, 'Cancel')));
     }
+    const currentWeek = (sb.lessons.find(l => !S.done[l.id]) || sb.lessons[sb.lessons.length - 1]).week;
     sb.weeks.forEach(w => {
+      const level = h('details', Object.assign({ class: 'map-level fold' }, w.week === currentWeek || pick ? { open: '' } : {}));
       const wl = sb.lessons.filter(l => l.week === w.week), wd = wl.filter(l => S.done[l.id]);
       const last = wd.map(l => S.done[l.id].when).sort().pop();
       const todo = wl.filter(l => !S.done[l.id]), known = wl.filter(l => S.done[l.id] && S.done[l.id].skipped);
-      frag.append(h('div', { class: 'weekh' }, h('h2', {}, `🏰 Level ${w.week}: ${w.theme}`),
+      level.append(h('summary', { class: 'weekh' }, h('span', {}, `🏰 Level ${w.week}: ${w.theme}`),
         h('span', { class: 'wk' + (wd.length === wl.length ? ' ok' : '') }, wd.length === wl.length ? `✅ Level cleared ${fmtDate(last)}` : `${wd.length}/${wl.length} tamed`)), h('p', { class: 'muted' }, w.blurb), (() => { const bl = wl[wl.length - 1], bm = monsterFor(bl); return h('p', { class: 'bossline' }, h('span', { class: 'boss-pic', html: monPic(bl, '', !S.done[bl.id]) }), `👑 Big Boss of this level: ${bm.name}` + (S.done[bl.id] ? ' (tamed!)' : '')); })(),
-        h('div', { class: 'known-row' },
+        adult ? h('div', { class: 'known-row' },
           todo.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark the ${todo.length} unfinished lesson${todo.length > 1 ? 's' : ''} in Level ${w.week} as already known? They will count as done without questions. You can undo this.`)) { todo.forEach(markKnown); save(); route(); } } }, `✔ Already know all of Level ${w.week}`) : '',
           known.length ? h('button', { class: 'btn alt small', onclick: () => { known.forEach(unmarkKnown); save(); route(); } }, `↩ Undo ${known.length} marked as known`) : '',
-          wd.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark all ${wd.length} finished lesson${wd.length > 1 ? 's' : ''} in Level ${w.week} as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { wd.forEach(unmarkDone); save(); route(); } } }, `↩ Mark Level ${w.week} as not done`) : ''));
-      frag.append(h('div', { class: 'grid' }, wl.map(tile)));
+          wd.length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm(`Mark all ${wd.length} finished lesson${wd.length > 1 ? 's' : ''} in Level ${w.week} as not done? Scores and dates for them are removed. Stars for solved questions are kept.`)) { wd.forEach(unmarkDone); save(); route(); } } }, `↩ Mark Level ${w.week} as not done`) : '') : '');
+      level.append(h('div', { class: 'grid' }, wl.map(tile)));
+      frag.append(level);
     });
     app(frag);
   }
@@ -401,17 +421,18 @@
     function draw() {
       wrap.replaceChildren();
       ar = arena(L);
+      if (cur > 0) ar.el.classList.add('arena-compact');
       const steps = stepsBase.map(st => st[1] === 'chal' && chalLocked() ? ['🔒 Challenge', 'chal'] : st);
       wrap.append(h('span', { class: 'pill dark ' + L.subj }, pillOf(L)), h('h1', {}, L.t), ar.el);
       if (S.done[id]) {
         wrap.append(h('div', { class: 'badge-done' }, `✅ ${doneLine(S.done[id])}${S.done[id].skipped ? '' : ' · ' + scoreText(S.done[id])}`));
-        wrap.append(h('div', { class: 'known-row' },
+        if (window.GATE && GATE.isUnlocked()) wrap.append(h('div', { class: 'known-row' },
           h('button', { class: 'btn alt small', onclick: () => { if (confirm('Mark this lesson as not done? The score and date are removed. Stars for solved questions are kept.')) { unmarkDone(L); save(); draw(); } } }, '↩ Mark as not done'),
           Object.keys(S.right[id] || {}).length ? h('button', { class: 'btn alt small', onclick: () => { if (confirm('Start this lesson over? The score, date and all stars for this lesson are removed.')) { startOver(L); Object.keys(right).forEach(k => delete right[k]); save(); draw(); } } }, '🔄 Start this lesson over') : ''));
-      } else {
+      } else if (window.GATE && GATE.isUnlocked()) {
         wrap.append(h('div', { class: 'known-card' }, h('span', {}, 'Learned this before, somewhere else?'), h('button', { class: 'btn', onclick: () => { if (confirm('Mark this lesson as already known? It will count as done without any questions. You can undo this.')) { markKnown(L); S.pos = { id: (sb.lessons[L.n + 1] || L).id, step: 0 }; save(); go('#/map/' + L.subj); } } }, '✔ I already know this')));
       }
-      wrap.append(h('div', { class: 'steps' }, steps.map((st, i) => h('button', { class: (i === cur ? 'on ' : '') + (seen.has(i) && i !== cur ? 'done' : ''), onclick: () => { cur = i; draw(); window.scrollTo(0, 0); } }, st[0]))));
+      wrap.append(h('div', { class: 'steps' }, steps.map((st, i) => h('button', { 'aria-current': i === cur ? 'step' : 'false', class: (i === cur ? 'on ' : '') + (seen.has(i) && i !== cur ? 'done' : ''), onclick: () => { cur = i; draw(); window.scrollTo(0, 0); } }, st[0]))));
       seen.add(cur); S.pos = { id, step: cur }; save();
       const body = h('section', { class: 'card' });
       const kind = steps[cur][1];
@@ -561,10 +582,10 @@
   function viewParent() {
     setNav('parent');
     const frag = h('div', {}, h('h1', {}, '🏰 The Keep (for grown-ups)'), h('p', {}, h('button', { class: 'btn alt small', onclick: () => { GATE.lock(); go('#/'); } }, '🔒 Lock grown-ups area now'), h('span', { class: 'muted small' }, '  It also locks itself after 10 minutes.')));
-    const nm = h('input', { type: 'text', value: S.name, placeholder: 'Child\'s name', style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' });
-    const pl = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' },
+    const nm = h('input', { type: 'text', value: S.name, 'aria-label': 'Child name', placeholder: 'Child\'s name', style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' });
+    const pl = h('select', { 'aria-label': 'Daily plan', style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' },
       [['rotate', 'Maths every day + English (Mon, Wed, Fri) or Science (Tue, Thu)'], ['all', 'All three subjects every day'], ['math', 'Maths every day, others optional']].map(([v, t]) => h('option', Object.assign({ value: v }, S.plan === v ? { selected: 'selected' } : {}), t)));
-    const gl = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5].map(n => h('option', Object.assign({ value: n }, S.goal === n ? { selected: 'selected' } : {}), `${n} evening${n > 1 ? 's' : ''} a week`)));
+    const gl = h('select', { 'aria-label': 'Weekly goal', style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5].map(n => h('option', Object.assign({ value: n }, S.goal === n ? { selected: 'selected' } : {}), `${n} evening${n > 1 ? 's' : ''} a week`)));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Setup'), h('div', { class: 'ans' }, nm, h('button', { class: 'btn', onclick: () => { S.name = nm.value.trim(); S.setAt = Date.now(); save(); alert('Saved'); } }, 'Save name')),
       h('h3', { style: 'margin-top:24px' }, 'Daily plan'), h('div', { class: 'ans' }, pl, h('button', { class: 'btn', onclick: () => { S.plan = pl.value; S.setAt = Date.now(); save(); alert('Saved'); } }, 'Save plan')),
       h('h3', { style: 'margin-top:24px' }, 'Weekly goal'), h('div', { class: 'ans' }, gl, h('button', { class: 'btn', onclick: () => { S.goal = +gl.value; S.setAt = Date.now(); save(); alert('Saved'); } }, 'Save goal')),
@@ -582,8 +603,8 @@
         h('li', {}, '8 min: Practice (warm-up and core questions)'), h('li', {}, '4 min: Challenge (stretch and olympiad puzzles). Wrong answers are fine, thinking is the point.'))));
     frag.append(familyCard());
     if (window.BeeUI) frag.append(BeeUI.parentCard());
-    const skipSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
-    const weekSel = h('select', { style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Levels 1 to ${n}`)));
+    const skipSel = h('select', { 'aria-label': 'Subject to update', style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line);max-width:100%' }, SUBJECTS.map(sb => h('option', { value: sb.key }, `${sb.icon} ${sb.name}`)));
+    const weekSel = h('select', { 'aria-label': 'Levels to update', style: 'font:inherit;padding:8px 12px;border-radius:10px;border:2px solid var(--line)' }, [1, 2, 3, 4, 5, 6, 7, 8].map(n => h('option', { value: n }, `Levels 1 to ${n}`)));
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Already learned some of this, or marked by mistake?'),
       h('p', { class: 'muted' }, 'Mark lessons as done without questions when your child has already learned them elsewhere. Lessons already completed here keep their real scores. Marked lessons still appear in Look Back so old ideas are refreshed, and you can undo any time from the map.'),
       h('div', { class: 'ans' }, skipSel, weekSel, h('button', { class: 'btn', onclick: () => {
@@ -600,11 +621,28 @@
       sb.lessons.forEach(L => t.append(h('tr', {}, h('td', {}, `W${L.week}·${DAYS[L.day - 1]} ${L.t}`), h('td', {}, S.done[L.id] ? scoreShort(S.done[L.id]) : '-'), h('td', {}, S.done[L.id] ? fmtDate(S.done[L.id].when) : '-'), h('td', {}, h('a', { href: '#/key/' + L.id }, 'Key')))));
       frag.append(h('section', { class: 'card' }, h('h2', {}, `${sb.icon} ${sb.name}: progress and answer keys`), t));
     });
-    const io = h('textarea', { rows: 3, style: 'width:100%', placeholder: 'Paste saved progress here to restore' });
+    const io = h('textarea', { 'aria-label': 'Progress backup code', rows: 3, style: 'width:100%', placeholder: 'Paste saved progress here to restore' });
     frag.append(h('section', { class: 'card' }, h('h2', {}, 'Backup / new device'),
       h('button', { class: 'btn alt', onclick: () => { io.value = JSON.stringify(S); io.select(); } }, 'Show progress code'), ' ',
       h('button', { class: 'btn alt', onclick: () => { try { const o = JSON.parse(io.value); if (!o.done) throw 0; S = o; load2(); save(); alert('Restored'); go('#/'); } catch (e) { alert('That code was not valid.'); } } }, 'Restore from code'), io,
       h('p', {}, h('button', { class: 'btn', style: 'background:var(--bad)', onclick: () => { if (confirm('Reset everything? This erases all lesson progress, stars, armour, placement results, spelling bee progress, imported word lists and settings for this family. It syncs to your other devices. Parent accounts stay connected. This cannot be undone.')) { S = Merge.reset(S, Date.now()); load2(); save(); go('#/'); } } }, 'Reset everything'))));
+    const sections = Array.from(frag.querySelectorAll(':scope > section'));
+    const categories = ['Setup', 'Progress', 'Spelling', 'Family', 'Data'];
+    const groups = categories.map((name, i) => h('details', Object.assign({ class: 'parent-section fold', id: 'parent-' + name.toLowerCase() }, i === 0 ? { open: '' } : {}), h('summary', {}, name)));
+    sections.forEach(section => {
+      const title = (section.querySelector('h2') || {}).textContent || '';
+      const category = /Parents and cloud/.test(title) ? 3 : /Spelling Bee/.test(title) ? 2 : /Backup/.test(title) ? 4 : /progress and answer|Already learned/.test(title) ? 1 : 0;
+      const supportingGuide = category === 0 && title !== 'Setup';
+      const subjectReport = /progress and answer/.test(title);
+      if (supportingGuide || subjectReport) {
+        const heading = section.querySelector('h2'); heading.remove();
+        groups[category].append(h('details', { class: 'fold' }, h('summary', {}, title), section));
+      } else groups[category].append(section);
+      section.querySelectorAll('table td').forEach(td => { td.dataset.label = ['Lesson', 'Score', 'Completed', 'Answers'][td.cellIndex]; });
+    });
+    const manageMaps = h('div', { class: 'ans' }, SUBJECTS.map(sb => h('a', { class: 'btn alt', href: '#/map/' + sb.key }, 'Manage ' + sb.name + ' lessons')));
+    groups[1].append(manageMaps);
+    groups.forEach(group => frag.append(group));
     app(frag);
   }
   function load2() { S.done = S.done || {}; S.right = S.right || {}; S.days = S.days || []; S.name = S.name || ''; S.plan = S.plan || 'rotate'; S.skills = S.skills || {}; S.goal = S.goal | 0 || 3; S.hero = S.hero || {}; S.placed = S.placed || {}; S.removed = S.removed || {}; S.bee = Bee.norm(S.bee); if (S.pos && S.pos.id == null && S.pos.n != null) S.pos = { id: String(S.pos.n), step: S.pos.step | 0 }; }
@@ -619,7 +657,7 @@
   }
 
   /* ---------- router ---------- */
-  function app(node) { $app.replaceChildren(node); window.scrollTo(0, 0); }
+  function app(node) { $app.replaceChildren(node); window.scrollTo(0, 0); const title = $app.querySelector('h1, h2'); if (title) { title.tabIndex = -1; title.focus({ preventScroll: true }); } }
   function go(hash) { if (location.hash === hash) route(); else location.hash = hash; }
   function route() {
     const p = (location.hash || '#/').slice(2).split('/');
