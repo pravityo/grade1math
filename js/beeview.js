@@ -150,7 +150,7 @@
   }
   function modeChips(after) {
     const B = bee();
-    return h('div', { class: 'bee-modes' }, [['tiles', '🔤 Letter tiles', 'Tap the letters'], ['type', '⌨️ Type it', 'Use the keyboard'], ['say', '🗣️ Say it', 'Spell out loud']].map(([k, a, b]) => h('button', { class: 'bee-mode' + (B.mode === k ? ' on' : ''), 'aria-pressed': String(B.mode === k), onclick: () => { B.mode = k; save(); if (after) after(); } }, h('b', {}, a), h('small', {}, b))));
+    return h('div', { class: 'bee-modes' }, [['tiles', '🔤 Letter tiles', 'Tap the letters'], ['type', '⌨️ Type it', 'Use the keyboard'], ['say', '🗣️ Spell aloud', 'Say each letter, then check']].map(([k, a, b]) => h('button', { class: 'bee-mode' + (B.mode === k ? ' on' : ''), 'aria-pressed': String(B.mode === k), onclick: () => { B.mode = k; save(); if (after) after(); } }, h('b', {}, a), h('small', {}, b))));
   }
 
   function wordBrowser(items) {
@@ -241,11 +241,23 @@
         h('button', { class: 'btn', onclick: () => { fully.replaceChildren(h('h3', {}, 'Listen, then spell.'), h('p', { class: 'muted' }, 'The spelling is hidden. Spell the word you heard.'), pronouncer(x), silentHelp(x), memory(x, k)); } }, 'Try spelling it'));
       show(fully); Speech.say(x.w, 0.8);
     }
+    // Oral practice is self-checked; no microphone or speech recognition is used.
+    function oralInput(x, onCheck) {
+      const reveal = h('div', {});
+      return h('div', {}, h('p', { class: 'muted' }, 'Say each letter out loud. Then look and check.'),
+        h('p', { class: 'muted small' }, 'The app does not listen. You or a grown-up checks your spelling.'),
+        h('button', { class: 'btn', onclick: () => {
+          reveal.replaceChildren(h('div', { class: 'reveal' }, letters(x.w)), h('div', { class: 'ans' },
+            h('button', { class: 'btn', onclick: () => onCheck(true) }, '✅ I spelled it right'),
+            h('button', { class: 'btn alt', onclick: () => onCheck(false) }, '❌ Not yet')));
+          Speech.spell(x.w);
+        } }, '👀 Show me the letters'), reveal);
+    }
     function memory(x, k) {
       const done = ok => h('div', { class: 'bee-feedback ' + (ok ? 'ok' : 'no') }, ok ? '✅ You remembered it!' : ['Look again: ', letters(x.w)], h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => study(k + 1) }, k + 1 < cfg.fresh.length ? 'Next new word ➜' : 'Start spelling ✏️')));
       const holder = h('div', {});
       const submit = v => { holder.replaceChildren(done(v === x.w)); };
-      holder.append(B.mode === 'type' ? typeInput(x, submit) : tilesInput(x, submit));
+      holder.append(B.mode === 'say' ? oralInput(x, ok => holder.replaceChildren(done(ok))) : B.mode === 'type' ? typeInput(x, submit) : tilesInput(x, submit));
       return holder;
     }
 
@@ -281,7 +293,7 @@
         if (!hit) Speech.spell(x.w); else Speech.say(['Nice!', 'Great job!', 'Correct!', 'Awesome!'][st.i % 4], 1);
       };
       const next = over => h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => { st.i++; if (over) return finish(); battle(); } }, st.i + 1 >= st.queue.length ? 'Finish ➜' : 'Next word ➜'));
-      const retype = () => { const holder = h('div', {}); const sub = v => { if (v === x.w) { holder.replaceChildren(h('p', { class: 'good' }, '✅ That is it!'), next(false)); } else { holder.replaceChildren(h('p', { class: 'muted' }, 'Almost. Look at the word above and try again.'), input2()); } }; const input2 = () => (mode === 'type' ? typeInput(x, sub, { label: '✔ Check' }) : tilesInput(x, sub)); holder.append(input2()); return holder; };
+      const retype = () => { const holder = h('div', {}); const sub = v => { if (v === x.w) { holder.replaceChildren(h('p', { class: 'good' }, '✅ That is it!'), next(false)); } else { holder.replaceChildren(h('p', { class: 'muted' }, 'Almost. Look at the word above and try again.'), input2()); } }; const input2 = () => (mode === 'say' ? oralInput(x, ok => { if (ok) { holder.replaceChildren(h('p', { class: 'good' }, '✅ Nice practice!'), next(false)); } else { holder.replaceChildren(input2()); } }) : mode === 'type' ? typeInput(x, sub, { label: '✔ Check' }) : tilesInput(x, sub)); holder.append(input2()); return holder; };
       const submit = v => {
         tries++;
         if (v === x.w) return finishWord(tries === 1 ? 'first' : 'second');
@@ -291,15 +303,12 @@
         finishWord('miss');
       };
       const input = () => mode === 'type' ? typeInput(x, submit) : tilesInput(x, submit);
-      const sayMode = () => {
-        const reveal = h('div', {});
-        return h('div', {}, h('p', { class: 'muted' }, 'Spell the word out loud, letter by letter. Then check.'), h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => { reveal.replaceChildren(h('div', { class: 'reveal' }, letters(x.w)), h('div', { class: 'ans' }, h('button', { class: 'btn', onclick: () => finishWord('first') }, '✅ I spelled it right'), h('button', { class: 'btn alt', onclick: () => finishWord('miss') }, '❌ Not yet'))); Speech.spell(x.w); } }, '👀 Show me the letters')), reveal);
-      };
+      const sayMode = () => oralInput(x, ok => finishWord(ok ? 'first' : 'miss'));
       inputBox.append(mode === 'say' ? sayMode() : input());
       sect.append(arena(), h('div', { class: 'card wordcard' }, h('div', { class: 'muted small' }, `Word ${Math.min(st.i + 1, st.queue.length)} of ${st.queue.length}${cfg.kind === 'mock' ? ' · ' + Bee.TIERS[x.tier].emoji + ' ' + Bee.TIERS[x.tier].name + ' round' : ''}`), h('h2', {}, cfg.kind === 'mock' ? '🐝 Spell the word' : 'Spell the word'), tierTag(x), pronouncer(x, true), silentHelp(x), modeSwitch(), inputBox, fb));
       show(sect); Speech.say(x.w, 0.8);
     }
-    const modeSwitch = () => h('div', { class: 'bee-modes small' }, [['tiles', '🔤'], ['type', '⌨️'], ['say', '🗣️']].map(([k, e]) => h('button', { class: 'bee-mode' + (B.mode === k ? ' on' : ''), 'aria-pressed': String(B.mode === k), 'aria-label': k, onclick: () => { B.mode = k; save(); word(); } }, e)));
+    const modeSwitch = () => h('div', { class: 'bee-modes small' }, [['tiles', '🔤'], ['type', '⌨️'], ['say', '🗣️']].map(([k, e]) => h('button', { class: 'bee-mode' + (B.mode === k ? ' on' : ''), 'aria-pressed': String(B.mode === k), 'aria-label': k === 'say' ? 'Spell aloud' : k === 'type' ? 'Type it' : 'Letter tiles', onclick: () => { B.mode = k; save(); word(); } }, e)));
 
     /* the end */
     function finish() {
